@@ -5158,8 +5158,13 @@ static void K_drawRingCounter(boolean gametypeinfoshown)
 					.small_sticker();
 			}
 
+			// radio
+			UINT32 livesflags = V_SLIDEIN|splitflags|greyout;
+			if (DRAW_RINGS_ON_PLAYER)
+				livesflags = V_HUDTRANS|V_SLIDEIN|splitflags;
+			
 			UINT8 *colormap = R_GetTranslationColormap(stplyr->skin, static_cast<skincolornum_t>(stplyr->skincolor), GTC_CACHE);
-			V_DrawMappedPatch(LAPS_X+facerank_x, lives_y-5, V_HUDTRANS|V_SLIDEIN|splitflags|greyout, faceprefix[stplyr->skin][FACE_RANK], colormap);
+			V_DrawMappedPatch(LAPS_X+facerank_x, lives_y-5, livesflags, faceprefix[stplyr->skin][FACE_RANK], colormap);
 			SINT8 livescount = 0;
 			if (stplyr->lives > 0)
 			{
@@ -5168,7 +5173,7 @@ static void K_drawRingCounter(boolean gametypeinfoshown)
 					livescount = 10;
 			}
 			using srb2::Draw;
-			Draw row = Draw(LAPS_X+lifecount_x, lives_y-4).flags(V_HUDTRANS|V_SLIDEIN|splitflags|greyout).font(Draw::Font::kThinTimer);
+			Draw row = Draw(LAPS_X+lifecount_x, lives_y-4).flags(livesflags).font(Draw::Font::kThinTimer);
 			row.text("{}", livescount);
 		}
 
@@ -7556,7 +7561,7 @@ static void K_drawKartStartCountdown(void)
 
 	if (leveltime >= introtime && leveltime < starttime-(3*TICRATE))
 	{
-		if (cv_hud_hideposition.value)
+		if (!cv_hud_hideposition.value)
 			return;
 		
 		if (numbulbs > 1)
@@ -7565,7 +7570,7 @@ static void K_drawKartStartCountdown(void)
 	else
 	{
 
-		if (cv_hud_hidecountdown.value)
+		if (!cv_hud_hidecountdown.value)
 			return;
 
 		if (leveltime >= starttime-(2*TICRATE)) // 2
