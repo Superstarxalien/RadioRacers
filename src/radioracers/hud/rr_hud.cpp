@@ -284,7 +284,7 @@ void RR_DoChatStuff(chat_box_parameters_t parameters) {
     INT32 boxw = cv_chatwidth.value;
     INT16 chatx = parameters.x, y = parameters.y;
     INT16 typelines = parameters.typelines;
-    CONST INT32 charheight = parameters.charheight;
+    const INT32 charheight = parameters.charheight;
 
     // Is the player trying to quick-select an emote?
     if (is_emote_preview_on) {
