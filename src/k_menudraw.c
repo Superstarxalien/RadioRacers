@@ -519,7 +519,7 @@ void M_DrawMenuForeground(void)
 	{
 		// Radio: What if...
 		// Egg TV workaround
-		if (cv_highreshudscale_temp.value != 0)
+		if (cv_highreshudscale_temp.value != 0 || cv_highreshudscale.value == FRACUNIT)
 			V_DrawFixedPatch(0, 0, FRACUNIT, 0, W_CachePatchName("WEIRDRES", PU_CACHE), NULL);
 	}
 }

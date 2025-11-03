@@ -22,6 +22,9 @@
 // SRB2Kart
 #include "hu_stuff.h" // fonts
 
+// Radio
+#include "radioracers/rr_cvar.h"
+
 #ifdef __cplusplus
 
 #include "hwr2/twodee.hpp"
@@ -443,7 +446,7 @@ void V_DrawAdaptiveScaledFullScreenPatch(patch_t *patch, uint8_t* c, INT32 flags
 void V_DrawHorizontallyScaledFullScreenPatch(patch_t *patch);
 
 // For widescreen
-#define IS_WEIRD_RES() ((vid.width % BASEVIDWIDTH != 0) || (vid.height % BASEVIDHEIGHT != 0))
+#define IS_WEIRD_RES() (cv_highreshudscale.value != FRACUNIT && ((vid.width % BASEVIDWIDTH != 0) || (vid.height % BASEVIDHEIGHT != 0)))
 void V_DrawAdaptiveScaledPatchWithCoords(fixed_t x, fixed_t y, patch_t *patch, INT32 flags);
 /**
  * Display the software framebuffer to the screen. Added in RHI conversion; software is not implicitly displayed by the

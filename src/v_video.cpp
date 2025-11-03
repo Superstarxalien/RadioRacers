@@ -3764,7 +3764,7 @@ void V_Recalc(void)
 	vid.fdupy = FixedDiv(vid.height*FRACUNIT, BASEVIDHEIGHT*FRACUNIT);
 
 	// Credit to Alufolie for this (from Indev450/SRB2Kart-Saturn)
-	if ((vid.width > 720) && (vid.height > 1280)) // ehhhh well this thing has so many issues, so ill lock it to higher resolutions instead
+	if (cv_highreshudscale.value != FRACUNIT && (vid.width > 720) && (vid.height > 1280)) // ehhhh well this thing has so many issues, so ill lock it to higher resolutions instead
 	{
 		vid.dupx = FixedDiv(vid.dupx, cv_highreshudscale.value);
 		vid.dupy = FixedDiv(vid.dupy, cv_highreshudscale.value);
