@@ -607,6 +607,7 @@ INT32 CL_CheckFiles(void)
 			// CONS_Printf("checking %d of %d / %d of %d?\n", i, fileneedednum, j, numwadfiles);
 			// CONS_Printf("i: %s / j: %s \n", fileneeded[i].filename, wadfiles[j]->filename);
 			
+			CONS_Printf("CHECKING FILE: %s\n", wadfiles[j]->filename);
 			if (j < numwadfiles && !wadfiles[j]->important)
 			{
 				// Unimportant on our side.
@@ -618,6 +619,9 @@ INT32 CL_CheckFiles(void)
 			// and the other still has a file that's important
 			if (i >= fileneedednum || j >= numwadfiles)
 			{
+				// Radio
+				// this shouldn't hit for the radio assets
+				CONS_Printf("RADIO WAD DEBUG LOAD: %d - %s\n", j, wadfiles[j]->filename);
 				return 2;
 			}
 
@@ -625,6 +629,9 @@ INT32 CL_CheckFiles(void)
 			// For the sake of speed, only bother with a md5 check
 			if (memcmp(wadfiles[j]->md5sum, fileneeded[i].md5sum, 16))
 			{
+				// Radio
+				// this shouldn't hit for the radio assets
+				CONS_Printf("RADIO WAD DEBUG LOAD: %d - %s\n", j, wadfiles[j]->filename);
 				return 2;
 			}
 
