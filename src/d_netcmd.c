@@ -4710,7 +4710,7 @@ static void Command_ListWADS_f(void)
 {
 	INT32 i = numwadfiles;
 	char *tempname;
-	CONS_Printf(M_GetText("There are %d wads loaded (%d \x82main\x80 wads):\n"),numwadfiles, mainwads);
+	CONS_Printf(M_GetText("There are %d wads loaded:\n"),numwadfiles);
 	for (i--; i >= 0; i--)
 	{
 		nameonly(tempname = va("%s", wadfiles[i]->filename));
