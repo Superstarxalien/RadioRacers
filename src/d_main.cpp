@@ -146,7 +146,9 @@ INT32 window_y;
 // DEMO LOOP
 //
 static size_t num_startupiwads = 0;
+static size_t num_optionalwads = 0;
 static initmultiplefilesentry_t startupiwads[MAX_WADFILES];
+static initmultiplefilesentry_t optionalwads[MAX_WADFILES];
 static size_t num_startuppwads = 0;
 static initmultiplefilesentry_t startuppwads[MAX_WADFILES];
 
@@ -1489,11 +1491,11 @@ static void IdentifyVersion(void)
 
 	// RadioRacers
 	if (FIL_ReadFileOK(va(pandf,srb2path,"radioracers.pk3"))) {
-		D_AddFile(startupiwads, num_startupiwads++, va(pandf,srb2path,"radioracers.pk3"), NULL);
+		D_AddFile(optionalwads, num_optionalwads++, va(pandf,srb2path,"radioracers.pk3"), NULL);
 		found_radioracers = true;
 	}
 	if (FIL_ReadFileOK(va(pandf,srb2path,"radioracers_plus.pk3"))) {
-		D_AddFile(startupiwads, num_startupiwads++, va(pandf,srb2path,"radioracers_plus.pk3"), NULL);
+		D_AddFile(optionalwads, num_optionalwads++, va(pandf,srb2path,"radioracers_plus.pk3"), NULL);
 		found_radioracers_plus = true;
 	}
 }
@@ -1791,17 +1793,22 @@ void D_SRB2Main(void)
 	mainwads = num_startupiwads - musicwads;
 	D_CleanFile(startupiwads, num_startupiwads);
 	num_startupiwads = 0;
+	
+	// Optional wads
+	W_InitMultipleFiles(optionalwads, num_optionalwads, false);
+	D_CleanFile(optionalwads, num_optionalwads);
 
+	UINT16 optionalwads_count = numwadfiles - num_optionalwads;
 	if(found_radioracers)
 	{
-		mainwads++;
-		wadfiles[mainwads]->important = false;
+		wadfiles[optionalwads_count++]->important = false;
 	}
 	if(found_radioracers_plus)
 	{
-		mainwads++;
-		wadfiles[mainwads]->important = false;
+		wadfiles[optionalwads_count++]->important = false;
 	}
+
+	num_optionalwads = 0;
 
 	// Load credits_def lump
 	F_LoadCreditsDefinitions();
