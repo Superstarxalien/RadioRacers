@@ -2606,61 +2606,109 @@ void M_DrawCharacterSelect(void)
 
 		INT16 y = (BASEVIDHEIGHT/4) - 5;
 		INT16 px = (BASEVIDWIDTH/2) - 24;
-		INT16 py = y+48 - listskin*12 +
+		INT16 py = y+48 - listskin*18 +
 			Easing_OutSine(
 				M_DueFrac(setup_skinlist_slide.start, 5),
-				setup_skinlist_slide.dist*12,
+				setup_skinlist_slide.dist*18,
 				0
 			);
 
-		V_SetClipRect(0, (10+12)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (13*12)*FRACUNIT, 0);
+		V_SetClipRect(0, (1+18)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (9*18)*FRACUNIT, 0);
 
 		for (l = 0; l < setup_numskinlist; l++)
 		{
 			INT16 dist = abs(listskin - l);
 
-			if (dist > 7)
+			if (dist > 5)
 			{
-				py += 12;
+				py += 18;
 				continue;
 			}
 
-			if (dist > 5)
+			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
+
+			V_DrawMappedPatch(82, py, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+
+			if (dist > 4)
 			{
-				V_DrawCenteredMenuString(px+26, (py+2), 0, skins[setup_skinlist[l]]->realname);
-				K_DrawSticker(px, py+1, 100, V_TRANSLUCENT, false);
+				const char *txt = skins[setup_skinlist[l]]->realname;
+
+				fixed_t w = V_StringScaledWidth(
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					KART_FONT,
+					txt
+				);
+
+				V_DrawStringScaled(
+					((px+26) * FRACUNIT) - (w/2),
+					(py+2) * FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					NULL,
+					KART_FONT,
+					txt
+				);
+				
+				K_DrawSticker(82 + 16 + 2 + 12, py+4, 100, V_TRANSLUCENT, false);
 			}
 			else
 			{
-				K_DrawSticker(px, py+1, 100, 0, false);
+				K_DrawSticker(82 + 16 + 2 + 12, py+4, 100, 0, false);
 
-				if (l != listskin || ((setup_animcounter/10) & 1))
-				{
-					const char *txt = skins[setup_skinlist[l]]->realname;
+				char stat[8] = "";
+				sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
+				stat[7] = '\0';
 
-					fixed_t w = V_StringScaledWidth(
-						FRACUNIT,
-						FRACUNIT,
-						FRACUNIT,
-						0,
-						MENU_FONT,
-						txt
-					);
+				fixed_t w = V_StringScaledWidth(
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					TINY_FONT,
+					stat
+				);
 
-					V_DrawStringScaled(
-						((px+26) * FRACUNIT) - (w/2),
-						(py+2) * FRACUNIT,
-						FRACUNIT,
-						FRACUNIT,
-						FRACUNIT,
-						0,
-						l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-						MENU_FONT,
-						txt
-					);
-				}
+				V_DrawStringScaled(
+					((px+98) * FRACUNIT) - (w/2),
+					(py+5) * FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					NULL,
+					TINY_FONT,
+					stat
+				);
+
+				const char *txt = skins[setup_skinlist[l]]->realname;
+
+				w = V_StringScaledWidth(
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					KART_FONT,
+					txt
+				);
+
+				V_DrawStringScaled(
+					((px+26) * FRACUNIT) - (w/2),
+					(py+2) * FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+					KART_FONT,
+					txt
+				);
 			}
-			py += 12;
+			py += 18;
 		}
 
 		V_ClearClipRect();
