@@ -75,6 +75,10 @@ tic_t setup_animcounter = 0;
 UINT8 setup_page = 0;
 UINT8 setup_maxpage = 0;	// For charsel page to identify alts easier...
 
+UINT16 setup_skinlist[MAXSKINS];
+UINT16 setup_numskinlist = 0;
+menu_anim_t setup_skinlist_slide;
+
 static void M_PushMenuColor(setup_player_colors_t *colors, UINT16 newColor)
 {
 	if (colors->listLen >= colors->listCap)
@@ -286,6 +290,14 @@ static void M_SetupMidGameGridPos(setup_player_t *p, UINT8 num)
 }
 
 
+static int M_CompareSkinNames(const void *n1, const void *n2)
+{
+	const skin_t *skin1 = skins[*(const UINT16*)n1];
+	const skin_t *skin2 = skins[*(const UINT16*)n2];
+
+	return strcmp(skin1->realname, skin2->realname);
+}
+
 void M_CharacterSelectInit(void)
 {
 	UINT16 i, j;
@@ -304,6 +316,11 @@ void M_CharacterSelectInit(void)
 	memset(setup_explosions, 0, sizeof(setup_explosions));
 	setup_animcounter = 0;
 
+	memset(setup_skinlist, 0, sizeof(setup_skinlist));
+	setup_numskinlist = 0;
+	setup_skinlist_slide.start = 0;
+	setup_skinlist_slide.dist = 0;
+
 	for (i = 0; i < numskins; i++)
 	{
 		UINT8 x = skins[i]->kartspeed-1;
@@ -311,6 +328,9 @@ void M_CharacterSelectInit(void)
 
 		if (!R_SkinUsable(g_localplayers[0], i, false))
 			continue;
+
+		setup_skinlist[i] = i;
+		setup_numskinlist++;
 
 		if (setup_chargrid[x][y].numskins >= MAXCLONES)
 			CONS_Alert(CONS_ERROR, "Max character alts reached for %d,%d\n", x+1, y+1);
@@ -322,6 +342,8 @@ void M_CharacterSelectInit(void)
 			setup_maxpage = max(setup_maxpage, setup_chargrid[x][y].numskins-1);
 		}
 	}
+
+	qsort(setup_skinlist, setup_numskinlist, sizeof(UINT16), M_CompareSkinNames);
 
 	setup_numfollowercategories = 0;
 	for (i = 0; i < numfollowercategories; i++)
@@ -552,6 +574,7 @@ static boolean M_HandlePressStart(setup_player_t *p, UINT8 num)
 	return false;
 }
 
+// handle up and down inputs for scrollbar thing --Super
 static boolean M_HandleCSelectProfile(setup_player_t *p, UINT8 num)
 {
 	const UINT8 maxp = PR_GetNumProfiles() -1;
@@ -742,7 +765,8 @@ static void M_HandleBackToChars(setup_player_t *p)
 	boolean forceskin = M_CharacterSelectForceInAction();
 
 	if (forceskin
-	|| setup_chargrid[p->gridx][p->gridy].numskins == 1)
+	|| setup_chargrid[p->gridx][p->gridy].numskins == 1
+	|| p->mdepth == CSSTEP_SCROLLBAR) // shouldn't happen? but whatever
 	{
 		p->mdepth = CSSTEP_CHARS; // Skip clones menu
 	}
@@ -851,6 +875,11 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 		p->gridy = (3*p->gridy) + 1;
 		S_StartSound(NULL, sfx_s3k7b); //sfx_s3kc3s
 		M_SetMenuDelay(num);
+	}
+	else if (M_MenuButtonPressed(num, MBT_Y))
+	{
+		p->mdepth = CSSTEP_SCROLLBAR;
+		S_StartSound(NULL, sfx_s3k65);
 	}
 
 	// try to set the clone num to the page # if possible.
@@ -981,6 +1010,84 @@ static void M_HandleCharRotate(setup_player_t *p, UINT8 num)
 		S_StartSound(NULL, sfx_s3k7b); //sfx_s3kc3s
 		M_SetMenuDelay(num);
 	}
+}
+
+static boolean M_HandleCharacterScrollbar(setup_player_t *p)
+{
+	if (menucmd[0].dpad_ud > 0)
+	{
+		UINT16 n = 0;
+
+		for (UINT16 i = 0; i < setup_numskinlist; i++)
+		{
+			if (setup_skinlist[i] == p->skin)
+			{
+				n = i;
+				break;
+			}
+		}
+
+		UINT16 oldn = n;
+		n++;
+		if (n >= setup_numskinlist)
+			n = 0;
+		p->skin = setup_skinlist[n];
+		setup_skinlist_slide.dist = n - oldn;
+		setup_skinlist_slide.start = I_GetTime();
+
+		S_StartSound(NULL, sfx_s3k5b);
+		M_SetMenuDelay(0);
+	}
+	else if (menucmd[0].dpad_ud < 0)
+	{
+		UINT16 n = 0;
+
+		for (UINT16 i = 0; i < setup_numskinlist; i++)
+		{
+			if (setup_skinlist[i] == p->skin)
+			{
+				n = i;
+				break;
+			}
+		}
+
+		UINT16 oldn = n;
+		if (n == 0)
+			n = setup_numskinlist-1;
+		else
+			n--;
+		p->skin = setup_skinlist[n];
+		setup_skinlist_slide.dist = n - oldn;
+		setup_skinlist_slide.start = I_GetTime();
+
+		S_StartSound(NULL, sfx_s3k5b);
+		M_SetMenuDelay(0);
+	}
+	else if (M_MenuButtonPressed(0, MBT_Y))
+	{
+		p->mdepth = CSSTEP_CHARS;
+		S_StartSound(NULL, sfx_s3k65);
+	}
+	else if (M_MenuBackPressed(0))
+	{
+		// for profiles / gameplay, exit out of the menu instantly,
+		// we don't want to go to the input detection menu.
+		if (optionsmenu.profile || gamestate != GS_MENU)
+		{
+			memset(setup_player, 0, sizeof(setup_player));	// Reset setup_player otherwise it does some VERY funky things.
+			M_SetMenuDelay(0);
+			M_GoBack(0);
+			return true;
+		}
+		else	// in main menu
+		{
+			p->mdepth = CSSTEP_PROFILE;
+			S_StartSound(NULL, sfx_s3k5b);
+		}
+		M_SetMenuDelay(0);
+	}
+
+	return false;
 }
 
 static void M_HandleColorRotate(setup_player_t *p, UINT8 num)
@@ -1325,6 +1432,10 @@ boolean M_CharacterSelectHandler(INT32 choice)
 				case CSSTEP_ALTS: // Select clone
 					M_HandleCharRotate(p, i);
 					break;
+				case CSSTEP_SCROLLBAR: // Character Select scrollbar
+					// add something to prevent multiplayer maybe? --Super
+					M_HandleCharacterScrollbar(p);
+					break;
 				case CSSTEP_COLORS: // Select color
 					M_HandleColorRotate(p, i);
 					break;
@@ -1360,7 +1471,7 @@ boolean M_CharacterSelectHandler(INT32 choice)
 			else
 				p->skin = cv_forceskin.value;
 		}
-		else
+		else if (p->mdepth != CSSTEP_SCROLLBAR)
 		{
 			p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
 		}

@@ -1973,6 +1973,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 		M_DrawCharSelectCircle(p, x+32, y+64);
 	}
 
+	// similar logic for rendering scrollbar graphics that I want --Super
 	if (p->showextra == false)
 	{
 		INT32 backx = x + ((num & 1) ? -1 : 11);
@@ -2005,6 +2006,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 		}
 	}
 
+	// this is the logic for the profile scroll menu --Super
 	// Profile selection
 	if (p->mdepth == CSSTEP_PROFILE)
 	{
@@ -2479,6 +2481,7 @@ void M_DrawCharacterSelect(void)
 	const UINT8 pid = 0;
 
 	UINT8 i, j, k;
+	UINT16 l;
 	UINT8 priority = 0;
 	INT16 quadx, quady;
 	INT16 skin;
@@ -2503,87 +2506,165 @@ void M_DrawCharacterSelect(void)
 		}
 	}
 
-	// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
-	if (forceskin == false)
+	// regular character select screen that gets sidestepped if you're on scrollbar menu instead
+	if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
 	{
+		// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
+		if (forceskin == false)
+		{
+			for (i = 0; i < 9; i++)
+			{
+				for (j = 0; j < 9; j++)
+				{
+					skin = setup_chargrid[i][j].skinlist[setup_page];
+					quadx = 4 * (i / 3);
+					quady = 4 * (j / 3);
+
+					// Here's a quick little cheat to save on drawing time!
+					// Don't draw a shadow if it'll get covered by another icon
+					if ((i % 3 < 2) && (j % 3 < 2))
+					{
+						if ((setup_chargrid[i+1][j].skinlist[setup_page] != -1)
+						&& (setup_chargrid[i][j+1].skinlist[setup_page] != -1)
+						&& (setup_chargrid[i+1][j+1].skinlist[setup_page] != -1))
+							continue;
+					}
+
+					if (skin != -1)
+						V_DrawScaledPatch(basex+ 82 + (i*16) + quadx + 1, 22 + (j*16) + quady + 1, 0, W_CachePatchName("ICONBACK", PU_CACHE));
+				}
+			}
+		}
+
+		// Draw this inbetween. These drop shadows should be covered by the stat graph, but the icons shouldn't.
+		V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
+
+		// Draw the icons now
 		for (i = 0; i < 9; i++)
 		{
+			if ((forceskin == true) && (i != skins[cv_forceskin.value]->kartspeed-1))
+				continue;
+
 			for (j = 0; j < 9; j++)
 			{
-				skin = setup_chargrid[i][j].skinlist[setup_page];
+				if (forceskin == true)
+				{
+					if (j != skins[cv_forceskin.value]->kartweight-1)
+						continue;
+					skin = cv_forceskin.value;
+				}
+				else
+				{
+					skin = setup_chargrid[i][j].skinlist[setup_page];
+				}
+
+				for (k = 0; k < setup_numplayers; k++)
+				{
+					if (setup_player[k].mdepth < CSSTEP_ASKCHANGES)
+						continue;
+					if (setup_player[k].gridx != i || setup_player[k].gridy != j)
+						continue;
+					break; // k == setup_numplayers means no one has it selected
+				}
+
 				quadx = 4 * (i / 3);
 				quady = 4 * (j / 3);
 
-				// Here's a quick little cheat to save on drawing time!
-				// Don't draw a shadow if it'll get covered by another icon
-				if ((i % 3 < 2) && (j % 3 < 2))
-				{
-					if ((setup_chargrid[i+1][j].skinlist[setup_page] != -1)
-					&& (setup_chargrid[i][j+1].skinlist[setup_page] != -1)
-					&& (setup_chargrid[i+1][j+1].skinlist[setup_page] != -1))
-						continue;
-				}
-
 				if (skin != -1)
-					V_DrawScaledPatch(basex+ 82 + (i*16) + quadx + 1, 22 + (j*16) + quady + 1, 0, W_CachePatchName("ICONBACK", PU_CACHE));
+				{
+					UINT8 *colormap;
+
+					if (k == setup_numplayers)
+						colormap = R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_GREY, GTC_MENUCACHE);
+					else
+						colormap = R_GetTranslationColormap(skin, skins[skin]->prefcolor, GTC_MENUCACHE);
+
+					V_DrawMappedPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady, 0, faceprefix[skin][FACE_RANK], colormap);
+
+					// draw dot if there are more alts behind there!
+					if (forceskin == false && setup_page+1 < setup_chargrid[i][j].numskins)
+						V_DrawScaledPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady + 11, 0, W_CachePatchName("ALTSDOT", PU_CACHE));
+				}
 			}
 		}
+
+		// Explosions when you've made your final selection
+		M_DrawCharSelectExplosions(true, basex + 82, 22);
 	}
-
-	// Draw this inbetween. These drop shadows should be covered by the stat graph, but the icons shouldn't.
-	V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
-
-	// Draw the icons now
-	for (i = 0; i < 9; i++)
+	else
 	{
-		if ((forceskin == true) && (i != skins[cv_forceskin.value]->kartspeed-1))
-			continue;
+		UINT16 listskin = 0;
 
-		for (j = 0; j < 9; j++)
+		for (l = 0; l < setup_numskinlist; l++)
 		{
-			if (forceskin == true)
+			if (setup_skinlist[l] == setup_player[0].skin)
 			{
-				if (j != skins[cv_forceskin.value]->kartweight-1)
-					continue;
-				skin = cv_forceskin.value;
+				listskin = l;
+				break;
+			}
+		}
+
+		INT16 y = (BASEVIDHEIGHT/4) - 5;
+		INT16 px = (BASEVIDWIDTH/2) - 24;
+		INT16 py = y+48 - listskin*12 +
+			Easing_OutSine(
+				M_DueFrac(setup_skinlist_slide.start, 5),
+				setup_skinlist_slide.dist*12,
+				0
+			);
+
+		V_SetClipRect(0, (10+12)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (13*12)*FRACUNIT, 0);
+
+		for (l = 0; l < setup_numskinlist; l++)
+		{
+			INT16 dist = abs(listskin - l);
+
+			if (dist > 7)
+			{
+				py += 12;
+				continue;
+			}
+
+			if (dist > 5)
+			{
+				V_DrawCenteredFileString(px+26, py, 0, skins[setup_skinlist[l]]->realname);
+				V_DrawScaledPatch(px, py, V_TRANSLUCENT, W_CachePatchName("FILEBACK", PU_CACHE));
 			}
 			else
 			{
-				skin = setup_chargrid[i][j].skinlist[setup_page];
+				V_DrawScaledPatch(px, py, 0, W_CachePatchName("FILEBACK", PU_CACHE));
+
+				if (l != listskin || ((setup_animcounter/10) & 1))
+				{
+					const char *txt = skins[setup_skinlist[l]]->realname;
+
+					fixed_t w = V_StringScaledWidth(
+						FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						0,
+						FILE_FONT,
+						txt
+					);
+
+					V_DrawStringScaled(
+						((px+26) * FRACUNIT) - (w/2),
+						py * FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						0,
+						l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						FILE_FONT,
+						txt
+					);
+				}
 			}
-
-			for (k = 0; k < setup_numplayers; k++)
-			{
-				if (setup_player[k].mdepth < CSSTEP_ASKCHANGES)
-					continue;
-				if (setup_player[k].gridx != i || setup_player[k].gridy != j)
-					continue;
-				break; // k == setup_numplayers means no one has it selected
-			}
-
-			quadx = 4 * (i / 3);
-			quady = 4 * (j / 3);
-
-			if (skin != -1)
-			{
-				UINT8 *colormap;
-
-				if (k == setup_numplayers)
-					colormap = R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_GREY, GTC_MENUCACHE);
-				else
-					colormap = R_GetTranslationColormap(skin, skins[skin]->prefcolor, GTC_MENUCACHE);
-
-				V_DrawMappedPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady, 0, faceprefix[skin][FACE_RANK], colormap);
-
-				// draw dot if there are more alts behind there!
-				if (forceskin == false && setup_page+1 < setup_chargrid[i][j].numskins)
-					V_DrawScaledPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady + 11, 0, W_CachePatchName("ALTSDOT", PU_CACHE));
-			}
+			py += 12;
 		}
-	}
 
-	// Explosions when you've made your final selection
-	M_DrawCharSelectExplosions(true, basex + 82, 22);
+		V_ClearClipRect();
+	}
 
 	for (i = 0; i < MAXSPLITSCREENPLAYERS; i++)
 	{
@@ -2601,11 +2682,11 @@ void M_DrawCharacterSelect(void)
 			continue;
 
 		// Draw the cursors
-		if (i != priority)
+		if (i != priority && setup_player[0].mdepth != CSSTEP_SCROLLBAR)
 			M_DrawCharSelectCursor(i);
 	}
 
-	if (setup_numplayers > 0)
+	if (setup_numplayers > 0 && setup_player[0].mdepth != CSSTEP_SCROLLBAR)
 	{
 		// Draw the priority player over the other ones
 		M_DrawCharSelectCursor(priority);
