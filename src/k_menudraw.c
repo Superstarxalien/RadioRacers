@@ -2632,7 +2632,7 @@ void M_DrawCharacterSelect(void)
 		}
 
 		INT16 y = (BASEVIDHEIGHT/4) - 5;
-		INT16 px = (BASEVIDWIDTH/2) - 24;
+		INT16 px = basex + (BASEVIDWIDTH/2);
 		INT16 py = y+48 - listskin*18 +
 			Easing_OutSine(
 				M_DueFrac(setup_skinlist_slide.start, 5),
@@ -2654,7 +2654,7 @@ void M_DrawCharacterSelect(void)
 
 			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
 
-			V_DrawMappedPatch(82, py, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+			V_DrawMappedPatch(basex + 82, py, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
 
 			if (dist > 4)
 			{
@@ -2670,7 +2670,7 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					((px+26) * FRACUNIT) - (w/2),
+					(px * FRACUNIT) - (w/2),
 					(py+2) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
@@ -2681,11 +2681,11 @@ void M_DrawCharacterSelect(void)
 					txt
 				);
 				
-				K_DrawSticker(82 + 16 + 2 + 12, py+4, 100, V_TRANSLUCENT, false);
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, py+4, 98, V_TRANSLUCENT, false);
 			}
 			else
 			{
-				K_DrawSticker(82 + 16 + 2 + 12, py+4, 100, 0, false);
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, py+4, 98, 0, false);
 
 				char stat[8] = "";
 				sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
@@ -2701,7 +2701,7 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					((px+98) * FRACUNIT) - (w/2),
+					((px+72) * FRACUNIT) - (w/2),
 					(py+5) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
@@ -2724,7 +2724,7 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					((px+26) * FRACUNIT) - (w/2),
+					(px * FRACUNIT) - (w/2),
 					(py+2) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
