@@ -2627,12 +2627,12 @@ void M_DrawCharacterSelect(void)
 
 			if (dist > 5)
 			{
-				V_DrawCenteredFileString(px+26, py, 0, skins[setup_skinlist[l]]->realname);
-				V_DrawScaledPatch(px, py, V_TRANSLUCENT, W_CachePatchName("FILEBACK", PU_CACHE));
+				V_DrawCenteredMenuString(px+26, (py+2), 0, skins[setup_skinlist[l]]->realname);
+				K_DrawSticker(px, py+1, 100, V_TRANSLUCENT, false);
 			}
 			else
 			{
-				V_DrawScaledPatch(px, py, 0, W_CachePatchName("FILEBACK", PU_CACHE));
+				K_DrawSticker(px, py+1, 100, 0, false);
 
 				if (l != listskin || ((setup_animcounter/10) & 1))
 				{
@@ -2643,19 +2643,19 @@ void M_DrawCharacterSelect(void)
 						FRACUNIT,
 						FRACUNIT,
 						0,
-						FILE_FONT,
+						MENU_FONT,
 						txt
 					);
 
 					V_DrawStringScaled(
 						((px+26) * FRACUNIT) - (w/2),
-						py * FRACUNIT,
+						(py+2) * FRACUNIT,
 						FRACUNIT,
 						FRACUNIT,
 						FRACUNIT,
 						0,
 						l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-						FILE_FONT,
+						MENU_FONT,
 						txt
 					);
 				}
