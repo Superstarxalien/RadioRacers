@@ -2151,6 +2151,19 @@ static void M_DrawCharSelectPreview(UINT8 num)
 						? '?' : ('1'+p->gridy))
 					));
 				break;
+			case CSSTEP_SCROLLBAR:
+				randomskin = (skins[p->skin]->flags & SF_IRONMAN);
+				doping = (skins[p->skin]->flags & SF_HIVOLT);
+				V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
+					(doping
+						? 'R' : ('A' + R_GetEngineClass(skins[p->skin]->kartspeed, skins[p->skin]->kartweight, randomskin))),
+					(randomskin
+						? '?' : ('0'+skins[p->skin]->kartspeed)),
+					(randomskin
+						? '?' : ('0'+skins[p->skin]->kartweight))
+					));
+				V_DrawThinString(x-3, y+12, 0, skins[p->skin]->name);
+				break;
 			case CSSTEP_COLORS: // Select color
 				if (p->color < numskincolors)
 				{
@@ -2498,11 +2511,25 @@ void M_DrawCharacterSelect(void)
 
 		if (!optionsmenu.profile) // Does nothing on this screen
 		{
-			K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
+			if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+			{
+				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
+			}
+			else
+			{
+				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <y_animated> Grid", 1, TINY_FONT, 0);
+			}
 		}
 		else
 		{
-			K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default", 1, TINY_FONT, 0);
+			if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+			{
+				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
+			}
+			else
+			{
+				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <y_animated> Grid", 1, TINY_FONT, 0);
+			}
 		}
 	}
 
