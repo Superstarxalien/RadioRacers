@@ -1973,7 +1973,6 @@ static void M_DrawCharSelectPreview(UINT8 num)
 		M_DrawCharSelectCircle(p, x+32, y+64);
 	}
 
-	// similar logic for rendering scrollbar graphics that I want --Super
 	if (p->showextra == false)
 	{
 		INT32 backx = x + ((num & 1) ? -1 : 11);
@@ -2006,7 +2005,6 @@ static void M_DrawCharSelectPreview(UINT8 num)
 		}
 	}
 
-	// this is the logic for the profile scroll menu --Super
 	// Profile selection
 	if (p->mdepth == CSSTEP_PROFILE)
 	{
