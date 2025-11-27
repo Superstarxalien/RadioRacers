@@ -2377,10 +2377,14 @@ void M_DrawProfileCard(INT32 x, INT32 y, boolean greyedout, profile_t *p)
 		strcpy(pname, p->profilename);
 	}
 
+	// might have to change this? --Super
 	if (sp->mdepth >= CSSTEP_CHARS)
 	{
 		truecol = sp->color;
-		skinnum = setup_chargrid[sp->gridx][sp->gridy].skinlist[sp->clonenum];
+		if (sp->mdepth != CSSTEP_CHARSLIST)
+			skinnum = setup_chargrid[sp->gridx][sp->gridy].skinlist[sp->clonenum];
+		else
+			skinnum = setup_skinlist[setup_listselect];
 	}
 
 	if (truecol == SKINCOLOR_NONE)
@@ -2424,7 +2428,8 @@ void M_DrawProfileCard(INT32 x, INT32 y, boolean greyedout, profile_t *p)
 				V_DrawMappedPatch(x+14, y+66, 0, faceprefix[skinnum][FACE_RANK], ccolormap);
 		}
 
-		M_DrawCharSelectCircle(sp, x-22, y+104);
+		if (sp->mdepth != CSSTEP_CHARSLIST)
+			M_DrawCharSelectCircle(sp, x-22, y+104);
 
 		if (sp->mdepth >= CSSTEP_FOLLOWER)
 		{
