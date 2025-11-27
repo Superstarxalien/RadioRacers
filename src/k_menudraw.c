@@ -2756,18 +2756,39 @@ void M_DrawCharacterSelect(void)
 				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
 
 				// render name
-				V_DrawStringScaled(
-					(csscenterx * FRACUNIT) - (namewidth/2),
-					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					0,
-					// if the entry is selected then apply skincolor_sapphire
-					l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-					font,
-					name
-				);
+				if (!(sp->mdepth == CSSTEP_READY && l == listskin))
+				{
+					V_DrawStringScaled(
+						(csscenterx * FRACUNIT) - (namewidth/2),
+						(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						0,
+						// if the entry is selected then apply skincolor_sapphire
+						l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						font,
+						name
+					);
+				}
+				else
+				{
+					if ((setup_animcounter/10) & 1)
+					{
+						V_DrawStringScaled(
+							(csscenterx * FRACUNIT) - (namewidth/2),
+							(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
+							FRACUNIT,
+							FRACUNIT,
+							FRACUNIT,
+							0,
+							// apply selected player color
+							R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE),
+							font,
+							name
+						);
+					}
+				}
 			}
 
 			char stat[8] = "";
