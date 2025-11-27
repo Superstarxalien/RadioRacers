@@ -2622,6 +2622,7 @@ void M_DrawCharacterSelect(void)
 	{
 		UINT16 listskin = 0;
 
+		// match selected player skin with alphabetical skin order used for the list
 		for (l = 0; l < setup_numskinlist; l++)
 		{
 			if (setup_skinlist[l] == setup_player[0].skin)
@@ -2631,31 +2632,55 @@ void M_DrawCharacterSelect(void)
 			}
 		}
 
-		INT16 y = (BASEVIDHEIGHT/4) - 5;
-		INT16 px = basex + (BASEVIDWIDTH/2);
-		INT16 py = y+48 - listskin*18 +
-			Easing_OutSine(
+		// the offset for the button tooltips at the top of the CSS
+		INT16 tooltipy = (BASEVIDHEIGHT/4) - 5;
+		// the screen's horizontal center, plus the offset for the profile settings menu
+		INT16 csscenterx = basex + (BASEVIDWIDTH/2);
+		
+		// the vertical position of each skin list entry
+		INT16 listy =
+		// render the 1st list entry at the middle of the screen
+		// i kinda just used arbitrary values here
+		tooltipy+48
+		// offset selected entry to be at the middle of the screen
+		// ---
+		// future list entries after the 0th entry are offset by +(entry order*18)
+		// (i.e. the listy += 18 per each loop cycle)
+		// so, re-offset that in order for the selected entry to be at the middle
+		// this pushes up entries preceding the selected one
+		// and, in practice, this enables the scrolling behavior for the list of characters
+		- listskin*18
+		// interpolate the scrolling
+		+ Easing_OutSine(
 				M_DueFrac(setup_skinlist_slide.start, 5),
 				setup_skinlist_slide.dist*18,
 				0
-			);
+		);
 
+		// set a clip rect to cut off entries going above/below during transition
 		V_SetClipRect(0, (1+18)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (9*18)*FRACUNIT, 0);
 
-		for (l = 0; l < setup_numskinlist; l++)
+		for (l = 0; l < setup_numskinlist; l++, listy += 18)
 		{
+			// calculate distance between player-selected entry and loop index entry
 			INT16 dist = abs(listskin - l);
 
+			// only 11 entries are rendered at once;
+			// the 9 visible on-screen, and two transparent ones top to
+			// bottom that are only seen in the interpolated transition
+			// for optimization, skip the entry if it's at a distance greater than 5 entries above or below
 			if (dist > 5)
 			{
-				py += 18;
 				continue;
 			}
 
+			// colormap for character icon
 			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
 
-			V_DrawMappedPatch(basex + 82, py, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+			// character icon
+			V_DrawMappedPatch(basex + 82, listy, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
 
+			// render transparent entries only seen during transition
 			if (dist > 4)
 			{
 				const char *txt = skins[setup_skinlist[l]]->realname;
@@ -2670,8 +2695,8 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					(px * FRACUNIT) - (w/2),
-					(py+2) * FRACUNIT,
+					(csscenterx * FRACUNIT) - (w/2),
+					(listy+2) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
@@ -2681,11 +2706,13 @@ void M_DrawCharacterSelect(void)
 					txt
 				);
 				
-				K_DrawSticker(basex + 82 + 16 + 2 + 12, py+4, 98, V_TRANSLUCENT, false);
+				// transparent sticker goes on top of text to make it greyed-out
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, V_TRANSLUCENT, false);
 			}
+			// render normal entries
 			else
 			{
-				K_DrawSticker(basex + 82 + 16 + 2 + 12, py+4, 98, 0, false);
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
 
 				char stat[8] = "";
 				sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
@@ -2701,8 +2728,8 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					((px+72) * FRACUNIT) - (w/2),
-					(py+5) * FRACUNIT,
+					((csscenterx+72) * FRACUNIT) - (w/2),
+					(listy+5) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
@@ -2724,18 +2751,18 @@ void M_DrawCharacterSelect(void)
 				);
 
 				V_DrawStringScaled(
-					(px * FRACUNIT) - (w/2),
-					(py+2) * FRACUNIT,
+					(csscenterx * FRACUNIT) - (w/2),
+					(listy+2) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					0,
+					// if the entry is selected then apply skincolor_sapphire
 					l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
 					KART_FONT,
 					txt
 				);
 			}
-			py += 18;
 		}
 
 		V_ClearClipRect();
@@ -2756,7 +2783,7 @@ void M_DrawCharacterSelect(void)
 		if (i >= setup_numplayers)
 			continue;
 
-		// Draw the cursors
+		// Draw the cursors (unless it's list view)
 		if (i != priority && setup_player[0].mdepth != CSSTEP_SCROLLBAR)
 			M_DrawCharSelectCursor(i);
 	}
