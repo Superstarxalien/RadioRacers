@@ -1070,7 +1070,7 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 		S_StartSound(NULL, sfx_s3k5b);
 		M_SetMenuDelay(0);
 	}
-	else if (M_MenuButtonPressed(0, MBT_Y))
+	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
 	{
 		// set grid cursor to position of list character selected
 		sp->gridx = skins[sp->skin]->kartspeed - 1;
@@ -1084,8 +1084,16 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 				setup_page = i;
 		}
 
-		sp->mdepth = CSSTEP_CHARS;
-		S_StartSound(NULL, sfx_s3k65);
+		if (M_MenuButtonPressed(0, MBT_Y))
+		{
+			sp->mdepth = CSSTEP_CHARS;
+			S_StartSound(NULL, sfx_s3k65);
+		}
+		else if (M_MenuConfirmPressed(0))
+		{
+			M_HandleBeginningColorsOrFollowers(p);
+			M_SetMenuDelay(0);
+		}
 	}
 	else if (M_MenuBackPressed(0))
 	{
