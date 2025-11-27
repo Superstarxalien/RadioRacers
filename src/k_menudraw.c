@@ -2672,36 +2672,47 @@ void M_DrawCharacterSelect(void)
 				continue;
 			}
 
-			// colormap for character icon
-			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
+			const char *name = skins[setup_skinlist[l]]->realname;
 
-			// character icon
-			V_DrawMappedPatch(basex + 82, listy, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+			UINT8 font = KART_FONT;
+			UINT8 yoffsetfornamethatiswaytoolong = 0;
 
-			// render transparent entries only seen during transition
-			if (dist > 4)
+			fixed_t namewidth = V_StringScaledWidth(
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				font,
+				name
+			);
+
+			if (namewidth >= 120*FRACUNIT)
 			{
-				const char *txt = skins[setup_skinlist[l]]->realname;
-
-				fixed_t w = V_StringScaledWidth(
+				font = TINY_FONT;
+				namewidth = V_StringScaledWidth(
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					0,
-					KART_FONT,
-					txt
+					font,
+					name
 				);
+				yoffsetfornamethatiswaytoolong = 3;
+			}
 
+			// render transparent entries only seen during transition
+			if (dist > 4)
+			{
 				V_DrawStringScaled(
-					(csscenterx * FRACUNIT) - (w/2),
-					(listy+2) * FRACUNIT,
+					(csscenterx * FRACUNIT) - (namewidth/2),
+					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					0,
 					NULL,
-					KART_FONT,
-					txt
+					font,
+					name
 				);
 				
 				// transparent sticker goes on top of text to make it greyed-out
@@ -2712,55 +2723,51 @@ void M_DrawCharacterSelect(void)
 			{
 				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
 
-				char stat[8] = "";
-				sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
-				stat[7] = '\0';
-
-				fixed_t w = V_StringScaledWidth(
-					FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					0,
-					TINY_FONT,
-					stat
-				);
-
 				V_DrawStringScaled(
-					((csscenterx+72) * FRACUNIT) - (w/2),
-					(listy+5) * FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					0,
-					NULL,
-					TINY_FONT,
-					stat
-				);
-
-				const char *txt = skins[setup_skinlist[l]]->realname;
-
-				w = V_StringScaledWidth(
-					FRACUNIT,
-					FRACUNIT,
-					FRACUNIT,
-					0,
-					KART_FONT,
-					txt
-				);
-
-				V_DrawStringScaled(
-					(csscenterx * FRACUNIT) - (w/2),
-					(listy+2) * FRACUNIT,
+					(csscenterx * FRACUNIT) - (namewidth/2),
+					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					FRACUNIT,
 					0,
 					// if the entry is selected then apply skincolor_sapphire
 					l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-					KART_FONT,
-					txt
+					font,
+					name
 				);
 			}
+
+			char stat[8] = "";
+			// currently doesn't pick up if character is Ironman, kinda want to keep that way?
+			sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
+			stat[7] = '\0';
+
+			fixed_t statwidth = V_StringScaledWidth(
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				TINY_FONT,
+				stat
+			);
+
+			V_DrawStringScaled(
+				((csscenterx+72) * FRACUNIT) - (statwidth/2),
+				(listy+5) * FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				NULL,
+				TINY_FONT,
+				stat
+			);
+
+			// colormap for character icon
+			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
+
+			// character icon
+			V_DrawMappedPatch(basex + 82, listy, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
 		}
 
 		V_ClearClipRect();
