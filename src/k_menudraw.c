@@ -2149,7 +2149,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 						? '?' : ('1'+p->gridy))
 					));
 				break;
-			case CSSTEP_SCROLLBAR:
+			case CSSTEP_CHARSLIST:
 				randomskin = (skins[p->skin]->flags & SF_IRONMAN);
 				doping = (skins[p->skin]->flags & SF_HIVOLT);
 				V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
@@ -2509,7 +2509,7 @@ void M_DrawCharacterSelect(void)
 
 		if (!optionsmenu.profile) // Does nothing on this screen
 		{
-			if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+			if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
 			}
@@ -2520,7 +2520,7 @@ void M_DrawCharacterSelect(void)
 		}
 		else
 		{
-			if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+			if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
 			}
@@ -2531,8 +2531,8 @@ void M_DrawCharacterSelect(void)
 		}
 	}
 
-	// regular character select screen that gets sidestepped if you're on scrollbar menu instead
-	if (setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+	// render grid character select screen
+	if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
 	{
 		// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
 		if (forceskin == false)
@@ -2616,8 +2616,14 @@ void M_DrawCharacterSelect(void)
 		// Explosions when you've made your final selection
 		M_DrawCharSelectExplosions(true, basex + 82, 22);
 	}
+	// render list character select screen
 	else
 	{
+		// the yellow borders around the profile views for each player are a
+		// single graphic combined with the stat chart/graph
+		// so I'd have to make a brand new one which won't be included right now
+		//V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
+
 		UINT16 listskin = 0;
 
 		// match selected player skin with alphabetical skin order used for the list
@@ -2703,6 +2709,7 @@ void M_DrawCharacterSelect(void)
 			// render transparent entries only seen during transition
 			if (dist > 4)
 			{
+				// render name
 				V_DrawStringScaled(
 					(csscenterx * FRACUNIT) - (namewidth/2),
 					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
@@ -2723,6 +2730,7 @@ void M_DrawCharacterSelect(void)
 			{
 				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
 
+				// render name
 				V_DrawStringScaled(
 					(csscenterx * FRACUNIT) - (namewidth/2),
 					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
@@ -2751,6 +2759,7 @@ void M_DrawCharacterSelect(void)
 				stat
 			);
 
+			// render stat text
 			V_DrawStringScaled(
 				((csscenterx+72) * FRACUNIT) - (statwidth/2),
 				(listy+5) * FRACUNIT,
@@ -2789,11 +2798,11 @@ void M_DrawCharacterSelect(void)
 			continue;
 
 		// Draw the cursors (unless it's list view)
-		if (i != priority && setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+		if (i != priority && setup_player[0].mdepth != CSSTEP_CHARSLIST)
 			M_DrawCharSelectCursor(i);
 	}
 
-	if (setup_numplayers > 0 && setup_player[0].mdepth != CSSTEP_SCROLLBAR)
+	if (setup_numplayers > 0 && setup_player[0].mdepth != CSSTEP_CHARSLIST)
 	{
 		// Draw the priority player over the other ones
 		M_DrawCharSelectCursor(priority);
