@@ -2503,6 +2503,7 @@ void M_DrawCharacterSelect(void)
 	INT16 skin;
 	INT32 basex = optionsmenu.profile ? (64 + M_EaseWithTransition(Easing_InSine, 5 * 48)) : 0;
 	boolean forceskin = M_CharacterSelectForceInAction();
+	setup_player_t *sp = &setup_player[0]; // list view is only enabled for P1
 
 	if (setup_numplayers > 0)
 	{
@@ -2514,7 +2515,7 @@ void M_DrawCharacterSelect(void)
 
 		if (!optionsmenu.profile) // Does nothing on this screen
 		{
-			if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
+			if (sp->mdepth != CSSTEP_CHARSLIST)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
 			}
@@ -2525,7 +2526,7 @@ void M_DrawCharacterSelect(void)
 		}
 		else
 		{
-			if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
+			if (sp->mdepth != CSSTEP_CHARSLIST)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
 			}
@@ -2537,7 +2538,7 @@ void M_DrawCharacterSelect(void)
 	}
 
 	// render grid character select screen
-	if (setup_player[0].mdepth != CSSTEP_CHARSLIST)
+	if (sp->mdepth != CSSTEP_CHARSLIST)
 	{
 		// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
 		if (forceskin == false)
@@ -2634,7 +2635,7 @@ void M_DrawCharacterSelect(void)
 		// match selected player skin with alphabetical skin order used for the list
 		for (l = 0; l < setup_numskinlist; l++)
 		{
-			if (setup_skinlist[l] == setup_player[0].skin)
+			if (setup_skinlist[l] == sp->skin)
 			{
 				listskin = l;
 				break;
@@ -2803,11 +2804,11 @@ void M_DrawCharacterSelect(void)
 			continue;
 
 		// Draw the cursors (unless it's list view)
-		if (i != priority && setup_player[0].mdepth != CSSTEP_CHARSLIST)
+		if (i != priority && sp->mdepth != CSSTEP_CHARSLIST)
 			M_DrawCharSelectCursor(i);
 	}
 
-	if (setup_numplayers > 0 && setup_player[0].mdepth != CSSTEP_CHARSLIST)
+	if (setup_numplayers > 0 && sp->mdepth != CSSTEP_CHARSLIST)
 	{
 		// Draw the priority player over the other ones
 		M_DrawCharSelectCursor(priority);

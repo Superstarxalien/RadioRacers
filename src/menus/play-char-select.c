@@ -1035,6 +1035,8 @@ static void M_HandleCharRotate(setup_player_t *p, UINT8 num)
 
 static boolean M_HandleCharacterList(setup_player_t *p)
 {
+	setup_player_t *sp = &setup_player[0]; // only enabled for P1
+
 	if (menucmd[0].dpad_ud > 0)
 	{
 		UINT16 oldselect = setup_listselect;
@@ -1044,7 +1046,7 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 		if (setup_listselect >= setup_numskinlist)
 			setup_listselect = 0;
 
-		p->skin = setup_skinlist[setup_listselect];
+		sp->skin = setup_skinlist[setup_listselect];
 		setup_skinlist_slide.dist = setup_listselect - oldselect;
 		setup_skinlist_slide.start = I_GetTime();
 
@@ -1061,7 +1063,7 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 		else
 			setup_listselect--;
 
-		p->skin = setup_skinlist[setup_listselect];
+		sp->skin = setup_skinlist[setup_listselect];
 		setup_skinlist_slide.dist = setup_listselect - oldselect;
 		setup_skinlist_slide.start = I_GetTime();
 
@@ -1071,18 +1073,18 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 	else if (M_MenuButtonPressed(0, MBT_Y))
 	{
 		// set grid cursor to position of list character selected
-		p->gridx = skins[p->skin]->kartspeed - 1;
-		p->gridy = skins[p->skin]->kartweight - 1;
+		sp->gridx = skins[sp->skin]->kartspeed - 1;
+		sp->gridy = skins[sp->skin]->kartweight - 1;
 		
 		// set grid page to page that has the list character selected
 		// e.g. goes to page 2 if emerl was selected
 		for (UINT16 i = 0; i < MAXCLONES; i++)
 		{
-			if (setup_chargrid[p->gridx][p->gridy].skinlist[i] == p->skin)
+			if (setup_chargrid[sp->gridx][sp->gridy].skinlist[i] == sp->skin)
 				setup_page = i;
 		}
 
-		p->mdepth = CSSTEP_CHARS;
+		sp->mdepth = CSSTEP_CHARS;
 		S_StartSound(NULL, sfx_s3k65);
 	}
 	else if (M_MenuBackPressed(0))
@@ -1098,7 +1100,7 @@ static boolean M_HandleCharacterList(setup_player_t *p)
 		}
 		else	// in main menu
 		{
-			p->mdepth = CSSTEP_PROFILE;
+			sp->mdepth = CSSTEP_PROFILE;
 			S_StartSound(NULL, sfx_s3k5b);
 		}
 		M_SetMenuDelay(0);
