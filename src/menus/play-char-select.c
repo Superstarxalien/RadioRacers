@@ -79,6 +79,7 @@ UINT16 setup_skinlist[MAXSKINS];
 UINT16 setup_numskinlist = 0;
 UINT16 setup_listselect = 0;
 menu_anim_t setup_skinlist_slide;
+boolean setup_listview = false;
 
 static void M_PushMenuColor(setup_player_colors_t *colors, UINT16 newColor)
 {
@@ -322,6 +323,7 @@ void M_CharacterSelectInit(void)
 	setup_numskinlist = 0;
 	setup_skinlist_slide.start = 0;
 	setup_skinlist_slide.dist = 0;
+	setup_listview = false;
 
 	for (i = 0; i < numskins; i++)
 	{
@@ -771,7 +773,7 @@ static void M_HandleBackToChars(setup_player_t *p)
 
 	if (forceskin
 	|| setup_chargrid[p->gridx][p->gridy].numskins == 1
-	|| p->mdepth == CSSTEP_CHARSLIST) // shouldn't happen? but whatever
+	|| !!setup_listview) // shouldn't happen? but whatever
 	{
 		p->mdepth = CSSTEP_CHARS; // Skip clones menu
 	}
@@ -887,7 +889,7 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 		for (UINT16 i = 0; i < setup_numskinlist; i++)
 		{
 			// this can happen if the player selects an empty grid slot
-			if (p->skin < 1)
+			if (p->skin < 0)
 			{
 				setup_listselect = 0;
 				break;
@@ -899,7 +901,7 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 			}
 		}
 
-		p->mdepth = CSSTEP_CHARSLIST;
+		setup_listview = true;
 		S_StartSound(NULL, sfx_s3k65);
 	}
 
@@ -986,6 +988,93 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 	return false;
 }
 
+static boolean M_HandleCharacterList(void)
+{
+	setup_player_t *sp = &setup_player[0]; // only enabled for P1
+
+	if (menucmd[0].dpad_ud > 0)
+	{
+		UINT16 oldselect = setup_listselect;
+		setup_listselect++;
+
+		// if scrolling past the bottom of the list
+		if (setup_listselect >= setup_numskinlist)
+			setup_listselect = 0;
+
+		sp->skin = setup_skinlist[setup_listselect];
+		setup_skinlist_slide.dist = setup_listselect - oldselect;
+		setup_skinlist_slide.start = I_GetTime();
+
+		S_StartSound(NULL, sfx_s3k5b);
+		M_SetMenuDelay(0);
+	}
+	else if (menucmd[0].dpad_ud < 0)
+	{
+		UINT16 oldselect = setup_listselect;
+		
+		// if scrolling past the top of the list
+		if (setup_listselect == 0)
+			setup_listselect = setup_numskinlist-1;
+		else
+			setup_listselect--;
+
+		sp->skin = setup_skinlist[setup_listselect];
+		setup_skinlist_slide.dist = setup_listselect - oldselect;
+		setup_skinlist_slide.start = I_GetTime();
+
+		S_StartSound(NULL, sfx_s3k5b);
+		M_SetMenuDelay(0);
+	}
+	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
+	{
+		if (sp->skin >= 0)
+		{
+			// set grid cursor to position of list character selected
+			sp->gridx = skins[sp->skin]->kartspeed - 1;
+			sp->gridy = skins[sp->skin]->kartweight - 1;
+			
+			// set grid page to page that has the list character selected
+			// e.g. goes to page 2 if emerl was selected
+			for (UINT16 i = 0; i < MAXCLONES; i++)
+			{
+				if (setup_chargrid[sp->gridx][sp->gridy].skinlist[i] == sp->skin)
+					setup_page = i;
+			}
+		}
+
+		if (M_MenuButtonPressed(0, MBT_Y))
+		{
+			setup_listview = false;
+			S_StartSound(NULL, sfx_s3k65);
+		}
+		else if (M_MenuConfirmPressed(0))
+		{
+			M_HandleBeginningColorsOrFollowers(sp);
+			M_SetMenuDelay(0);
+		}
+	}
+	else if (M_MenuBackPressed(0))
+	{
+		// for profiles / gameplay, exit out of the menu instantly,
+		// we don't want to go to the input detection menu.
+		if (optionsmenu.profile || gamestate != GS_MENU)
+		{
+			memset(setup_player, 0, sizeof(setup_player));	// Reset setup_player otherwise it does some VERY funky things.
+			M_SetMenuDelay(0);
+			M_GoBack(0);
+			return true;
+		}
+		else	// in main menu
+		{
+			sp->mdepth = CSSTEP_PROFILE;
+			S_StartSound(NULL, sfx_s3k5b);
+		}
+		M_SetMenuDelay(0);
+	}
+
+	return false;
+}
+
 static void M_HandleCharRotate(setup_player_t *p, UINT8 num)
 {
 	UINT8 numclones = setup_chargrid[p->gridx][p->gridy].numskins;
@@ -1031,90 +1120,6 @@ static void M_HandleCharRotate(setup_player_t *p, UINT8 num)
 		S_StartSound(NULL, sfx_s3k7b); //sfx_s3kc3s
 		M_SetMenuDelay(num);
 	}
-}
-
-static boolean M_HandleCharacterList(setup_player_t *p)
-{
-	setup_player_t *sp = &setup_player[0]; // only enabled for P1
-
-	if (menucmd[0].dpad_ud > 0)
-	{
-		UINT16 oldselect = setup_listselect;
-		setup_listselect++;
-
-		// if scrolling past the bottom of the list
-		if (setup_listselect >= setup_numskinlist)
-			setup_listselect = 0;
-
-		sp->skin = setup_skinlist[setup_listselect];
-		setup_skinlist_slide.dist = setup_listselect - oldselect;
-		setup_skinlist_slide.start = I_GetTime();
-
-		S_StartSound(NULL, sfx_s3k5b);
-		M_SetMenuDelay(0);
-	}
-	else if (menucmd[0].dpad_ud < 0)
-	{
-		UINT16 oldselect = setup_listselect;
-		
-		// if scrolling past the top of the list
-		if (setup_listselect == 0)
-			setup_listselect = setup_numskinlist-1;
-		else
-			setup_listselect--;
-
-		sp->skin = setup_skinlist[setup_listselect];
-		setup_skinlist_slide.dist = setup_listselect - oldselect;
-		setup_skinlist_slide.start = I_GetTime();
-
-		S_StartSound(NULL, sfx_s3k5b);
-		M_SetMenuDelay(0);
-	}
-	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
-	{
-		// set grid cursor to position of list character selected
-		sp->gridx = skins[sp->skin]->kartspeed - 1;
-		sp->gridy = skins[sp->skin]->kartweight - 1;
-		
-		// set grid page to page that has the list character selected
-		// e.g. goes to page 2 if emerl was selected
-		for (UINT16 i = 0; i < MAXCLONES; i++)
-		{
-			if (setup_chargrid[sp->gridx][sp->gridy].skinlist[i] == sp->skin)
-				setup_page = i;
-		}
-
-		if (M_MenuButtonPressed(0, MBT_Y))
-		{
-			sp->mdepth = CSSTEP_CHARS;
-			S_StartSound(NULL, sfx_s3k65);
-		}
-		else if (M_MenuConfirmPressed(0))
-		{
-			M_HandleBeginningColorsOrFollowers(p);
-			M_SetMenuDelay(0);
-		}
-	}
-	else if (M_MenuBackPressed(0))
-	{
-		// for profiles / gameplay, exit out of the menu instantly,
-		// we don't want to go to the input detection menu.
-		if (optionsmenu.profile || gamestate != GS_MENU)
-		{
-			memset(setup_player, 0, sizeof(setup_player));	// Reset setup_player otherwise it does some VERY funky things.
-			M_SetMenuDelay(0);
-			M_GoBack(0);
-			return true;
-		}
-		else	// in main menu
-		{
-			sp->mdepth = CSSTEP_PROFILE;
-			S_StartSound(NULL, sfx_s3k5b);
-		}
-		M_SetMenuDelay(0);
-	}
-
-	return false;
 }
 
 static void M_HandleColorRotate(setup_player_t *p, UINT8 num)
@@ -1453,15 +1458,14 @@ boolean M_CharacterSelectHandler(INT32 choice)
 				case CSSTEP_ASKCHANGES:
 					M_HandleCharAskChange(p, i);
 					break;
-				case CSSTEP_CHARS: // Character Select grid
-					M_HandleCharacterGrid(p, i);
+				case CSSTEP_CHARS: // Character Select grid/list
+					if (!setup_listview)
+						M_HandleCharacterGrid(p, i);
+					else
+						M_HandleCharacterList();
 					break;
 				case CSSTEP_ALTS: // Select clone
 					M_HandleCharRotate(p, i);
-					break;
-				case CSSTEP_CHARSLIST: // Character Select list
-					// add something to prevent multiplayer maybe? --Super
-					M_HandleCharacterList(p);
 					break;
 				case CSSTEP_COLORS: // Select color
 					M_HandleColorRotate(p, i);
@@ -1499,7 +1503,7 @@ boolean M_CharacterSelectHandler(INT32 choice)
 				p->skin = cv_forceskin.value;
 		}
 		// list view shouldn't use this
-		else if (p->mdepth != CSSTEP_CHARSLIST)
+		else if (!setup_listview)
 		{
 			p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
 		}

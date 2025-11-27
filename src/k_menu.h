@@ -811,7 +811,6 @@ typedef enum
 	CSSTEP_ASKCHANGES,
 	CSSTEP_CHARS,
 	CSSTEP_ALTS,
-	CSSTEP_CHARSLIST, // alternate step --Super
 	CSSTEP_COLORS,
 	CSSTEP_FOLLOWERCATEGORY,
 	CSSTEP_FOLLOWER,
@@ -871,6 +870,7 @@ extern UINT16 setup_skinlist[MAXSKINS];
 extern UINT16 setup_numskinlist;
 extern UINT16 setup_listselect;
 extern menu_anim_t setup_skinlist_slide;
+extern boolean setup_listview;
 
 #define CSROTATETICS 6
 

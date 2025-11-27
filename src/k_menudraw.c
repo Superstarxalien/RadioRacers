@@ -2139,28 +2139,34 @@ static void M_DrawCharSelectPreview(UINT8 num)
 					V_DrawThinString(x-3, y+12, 0, va("BAD CLONENUM %u", p->clonenum));
 				}
 				/* FALLTHRU */
-			case CSSTEP_CHARS: // Character Select grid
-				V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
-					(doping
-						? 'R' : ('A' + R_GetEngineClass(p->gridx+1, p->gridy+1, randomskin))),
-					(randomskin
-						? '?' : ('1'+p->gridx)),
-					(randomskin
-						? '?' : ('1'+p->gridy))
-					));
-				break;
-			case CSSTEP_CHARSLIST:
-				randomskin = (skins[p->skin]->flags & SF_IRONMAN);
-				doping = (skins[p->skin]->flags & SF_HIVOLT);
-				V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
-					(doping
-						? 'R' : ('A' + R_GetEngineClass(skins[p->skin]->kartspeed, skins[p->skin]->kartweight, randomskin))),
-					(randomskin
-						? '?' : ('0'+skins[p->skin]->kartspeed)),
-					(randomskin
-						? '?' : ('0'+skins[p->skin]->kartweight))
-					));
-				V_DrawThinString(x-3, y+12, 0, skins[p->skin]->name);
+			case CSSTEP_CHARS: // Character Select grid/list
+				// grid
+				if (!setup_listview)
+				{
+					V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
+						(doping
+							? 'R' : ('A' + R_GetEngineClass(p->gridx+1, p->gridy+1, randomskin))),
+						(randomskin
+							? '?' : ('1'+p->gridx)),
+						(randomskin
+							? '?' : ('1'+p->gridy))
+						));
+				}
+				// list
+				else
+				{
+					randomskin = (skins[p->skin]->flags & SF_IRONMAN);
+					doping = (skins[p->skin]->flags & SF_HIVOLT);
+					V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
+						(doping
+							? 'R' : ('A' + R_GetEngineClass(skins[p->skin]->kartspeed, skins[p->skin]->kartweight, randomskin))),
+						(randomskin
+							? '?' : ('0'+skins[p->skin]->kartspeed)),
+						(randomskin
+							? '?' : ('0'+skins[p->skin]->kartweight))
+						));
+					V_DrawThinString(x-3, y+12, 0, skins[p->skin]->name);
+				}
 				break;
 			case CSSTEP_COLORS: // Select color
 				if (p->color < numskincolors)
@@ -2377,11 +2383,10 @@ void M_DrawProfileCard(INT32 x, INT32 y, boolean greyedout, profile_t *p)
 		strcpy(pname, p->profilename);
 	}
 
-	// might have to change this? --Super
 	if (sp->mdepth >= CSSTEP_CHARS)
 	{
 		truecol = sp->color;
-		if (sp->mdepth != CSSTEP_CHARSLIST)
+		if (!setup_listview)
 			skinnum = setup_chargrid[sp->gridx][sp->gridy].skinlist[sp->clonenum];
 		else
 			skinnum = setup_skinlist[setup_listselect];
@@ -2428,8 +2433,7 @@ void M_DrawProfileCard(INT32 x, INT32 y, boolean greyedout, profile_t *p)
 				V_DrawMappedPatch(x+14, y+66, 0, faceprefix[skinnum][FACE_RANK], ccolormap);
 		}
 
-		if (sp->mdepth != CSSTEP_CHARSLIST)
-			M_DrawCharSelectCircle(sp, x-22, y+104);
+		M_DrawCharSelectCircle(sp, x-22, y+104);
 
 		if (sp->mdepth >= CSSTEP_FOLLOWER)
 		{
@@ -2515,30 +2519,44 @@ void M_DrawCharacterSelect(void)
 
 		if (!optionsmenu.profile) // Does nothing on this screen
 		{
-			if (sp->mdepth != CSSTEP_CHARSLIST)
+			if (sp->mdepth > CSSTEP_CHARS)
 			{
-				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
+				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
 			}
 			else
 			{
-				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <y_animated> Grid", 1, TINY_FONT, 0);
+				if (!setup_listview)
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
+				}
+				else
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <y_animated> Grid", 1, TINY_FONT, 0);
+				}
 			}
 		}
 		else
 		{
-			if (sp->mdepth != CSSTEP_CHARSLIST)
+			if (sp->mdepth > CSSTEP_CHARS /*|| is multiplayer or something*/)
 			{
-				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
+				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default", 1, TINY_FONT, 0);
 			}
 			else
 			{
-				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <y_animated> Grid", 1, TINY_FONT, 0);
+				if (!setup_listview)
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
+				}
+				else
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <y_animated> Grid", 1, TINY_FONT, 0);
+				}
 			}
 		}
 	}
 
 	// render grid character select screen
-	if (sp->mdepth != CSSTEP_CHARSLIST)
+	if (!setup_listview)
 	{
 		// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
 		if (forceskin == false)
@@ -2804,11 +2822,11 @@ void M_DrawCharacterSelect(void)
 			continue;
 
 		// Draw the cursors (unless it's list view)
-		if (i != priority && sp->mdepth != CSSTEP_CHARSLIST)
+		if (i != priority && !setup_listview)
 			M_DrawCharSelectCursor(i);
 	}
 
-	if (setup_numplayers > 0 && sp->mdepth != CSSTEP_CHARSLIST)
+	if (setup_numplayers > 0 && !setup_listview)
 	{
 		// Draw the priority player over the other ones
 		M_DrawCharSelectCursor(priority);
