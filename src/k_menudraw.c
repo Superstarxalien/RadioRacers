@@ -2697,7 +2697,8 @@ void M_DrawCharacterSelect(void)
 			// the 9 visible on-screen, and two transparent ones top to
 			// bottom that are only seen in the interpolated transition
 			// for optimization, skip the entry if it's at a distance greater than 5 entries above or below
-			if (dist > 5)
+			// also avoid rendering list entries other than the forceskin
+			if (dist > 5 || (setup_skinlist[l] != cv_forceskin.value && forceskin))
 			{
 				continue;
 			}

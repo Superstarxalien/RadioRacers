@@ -885,6 +885,9 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 	}
 	else if (M_MenuButtonPressed(num, MBT_Y))
 	{
+		// set selected list entry to forceskin
+		if (forceskin) p->skin = cv_forceskin.value;
+
 		// convert selected grid skin to alphabetical list equivalent
 		for (UINT16 i = 0; i < setup_numskinlist; i++)
 		{
@@ -991,39 +994,51 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 static boolean M_HandleCharacterList(void)
 {
 	setup_player_t *sp = &setup_player[0]; // only enabled for P1
+	boolean forceskin = M_CharacterSelectForceInAction();
 
-	if (menucmd[0].dpad_ud > 0)
+	if (menucmd[0].dpad_ud > 0 || menucmd[0].dpad_ud < 0)
 	{
-		UINT16 oldselect = setup_listselect;
-		setup_listselect++;
+		// do nothing other than play a sound if forceskin
+		if (forceskin)
+		{
+			S_StartSound(NULL, sfx_s3k7b);
+			M_SetMenuDelay(0);
+		}
+		// if press down
+		else if (menucmd[0].dpad_ud > 0)
+		{
+			UINT16 oldselect = setup_listselect;
+			setup_listselect++;
 
-		// if scrolling past the bottom of the list
-		if (setup_listselect >= setup_numskinlist)
-			setup_listselect = 0;
+			// if scrolling past the bottom of the list
+			if (setup_listselect >= setup_numskinlist)
+				setup_listselect = 0;
 
-		sp->skin = setup_skinlist[setup_listselect];
-		setup_skinlist_slide.dist = setup_listselect - oldselect;
-		setup_skinlist_slide.start = I_GetTime();
+			sp->skin = setup_skinlist[setup_listselect];
+			setup_skinlist_slide.dist = setup_listselect - oldselect;
+			setup_skinlist_slide.start = I_GetTime();
 
-		S_StartSound(NULL, sfx_s3k5b);
-		M_SetMenuDelay(0);
-	}
-	else if (menucmd[0].dpad_ud < 0)
-	{
-		UINT16 oldselect = setup_listselect;
-		
-		// if scrolling past the top of the list
-		if (setup_listselect == 0)
-			setup_listselect = setup_numskinlist-1;
-		else
-			setup_listselect--;
+			S_StartSound(NULL, sfx_s3k5b);
+			M_SetMenuDelay(0);
+		}
+		// if press up
+		else if (menucmd[0].dpad_ud < 0)
+		{
+			UINT16 oldselect = setup_listselect;
+			
+			// if scrolling past the top of the list
+			if (setup_listselect == 0)
+				setup_listselect = setup_numskinlist-1;
+			else
+				setup_listselect--;
 
-		sp->skin = setup_skinlist[setup_listselect];
-		setup_skinlist_slide.dist = setup_listselect - oldselect;
-		setup_skinlist_slide.start = I_GetTime();
+			sp->skin = setup_skinlist[setup_listselect];
+			setup_skinlist_slide.dist = setup_listselect - oldselect;
+			setup_skinlist_slide.start = I_GetTime();
 
-		S_StartSound(NULL, sfx_s3k5b);
-		M_SetMenuDelay(0);
+			S_StartSound(NULL, sfx_s3k5b);
+			M_SetMenuDelay(0);
+		}
 	}
 	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
 	{
@@ -1494,18 +1509,21 @@ boolean M_CharacterSelectHandler(INT32 choice)
 		}
 
 		// Just makes it easier to access later
-		if (forceskin)
+		// (but list view probably prefers a different way of setting this up) --Super
+		if (!setup_listview)
 		{
-			if (p->gridx != skins[cv_forceskin.value]->kartspeed-1
-				|| p->gridy != skins[cv_forceskin.value]->kartweight-1)
-				p->skin = -1;
+			if (forceskin)
+			{
+				if (p->gridx != skins[cv_forceskin.value]->kartspeed-1
+					|| p->gridy != skins[cv_forceskin.value]->kartweight-1)
+					p->skin = -1;
+				else
+					p->skin = cv_forceskin.value;
+			}
 			else
-				p->skin = cv_forceskin.value;
-		}
-		// list view shouldn't use this
-		else if (!setup_listview)
-		{
-			p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
+			{
+				p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
+			}
 		}
 
 		if (playersChanged == true)
