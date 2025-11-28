@@ -2756,6 +2756,7 @@ void M_DrawCharacterSelect(void)
 						FRACUNIT,
 						0,
 						// if the entry is selected then apply skincolor_sapphire
+						// doesn't work if the font is TINY_FONT though, dunno what to do there --Super
 						l == setup_listselect ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
 						font,
 						name
@@ -2773,6 +2774,7 @@ void M_DrawCharacterSelect(void)
 							FRACUNIT,
 							0,
 							// apply selected player color
+							// doesn't work if the font is TINY_FONT though, dunno what to do there --Super
 							R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE),
 							font,
 							name
