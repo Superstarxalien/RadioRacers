@@ -866,6 +866,12 @@ extern tic_t setup_animcounter;
 extern UINT8 setup_page;
 extern UINT8 setup_maxpage;
 
+extern UINT16 setup_skinlist[MAXSKINS];
+extern UINT16 setup_numskinlist;
+extern UINT16 setup_listselect;
+extern menu_anim_t setup_skinlist_slide;
+extern boolean setup_listview;
+
 #define CSROTATETICS 6
 
 // The selection spawns 3 explosions in 4 directions, and there's 4 players -- 3 * 4 * 4 = 48
