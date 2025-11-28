@@ -1532,6 +1532,8 @@ boolean M_CharacterSelectHandler(INT32 choice)
 		}
 		else if (!!setup_listview && setup_numplayers > 1)
 		{
+			setup_player_t *sp = &setup_player[0];
+
 			if (sp->skin >= 0)
 			{
 				// set grid cursor to position of list character selected
