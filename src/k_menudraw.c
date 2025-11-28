@@ -2517,9 +2517,11 @@ void M_DrawCharacterSelect(void)
 	{
 		const int kTop = 6;
 
-		if (!optionsmenu.profile) // Does nothing on this screen
+		if (!optionsmenu.profile) // Right trigger does nothing on this screen
 		{
-			if (sp->mdepth > CSSTEP_CHARS)
+			// can't toggle CSS views if not selecting character
+			// or if there's more than one local player
+			if (sp->mdepth > CSSTEP_CHARS  /*|| is multiplayer or something*/)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
 			}
@@ -2537,7 +2539,7 @@ void M_DrawCharacterSelect(void)
 		}
 		else
 		{
-			if (sp->mdepth > CSSTEP_CHARS /*|| is multiplayer or something*/)
+			if (sp->mdepth > CSSTEP_CHARS)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default", 1, TINY_FONT, 0);
 			}
@@ -2648,18 +2650,6 @@ void M_DrawCharacterSelect(void)
 		// so I'd have to make a brand new one which won't be included right now
 		//V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
 
-		UINT16 listskin = 0;
-
-		// match selected player skin with alphabetical skin order used for the list
-		for (l = 0; l < setup_numskinlist; l++)
-		{
-			if (setup_skinlist[l] == sp->skin)
-			{
-				listskin = l;
-				break;
-			}
-		}
-
 		// the offset for the button tooltips at the top of the CSS
 		INT16 tooltipy = (BASEVIDHEIGHT/4) - 5;
 		// the screen's horizontal center, plus the offset for the profile settings menu
@@ -2677,7 +2667,7 @@ void M_DrawCharacterSelect(void)
 		// so, re-offset that in order for the selected entry to be at the middle
 		// this pushes up entries preceding the selected one
 		// and, in practice, this enables the scrolling behavior for the list of characters
-		- listskin*18
+		- setup_listselect*18
 		// interpolate the scrolling
 		+ Easing_OutSine(
 				M_DueFrac(setup_skinlist_slide.start, 5),
@@ -2691,7 +2681,7 @@ void M_DrawCharacterSelect(void)
 		for (l = 0; l < setup_numskinlist; l++, listy += 18)
 		{
 			// calculate distance between player-selected entry and loop index entry
-			INT16 dist = abs(listskin - l);
+			INT16 dist = abs(setup_listselect - l);
 
 			// only 11 entries are rendered at once;
 			// the 9 visible on-screen, and two transparent ones top to
@@ -2756,7 +2746,7 @@ void M_DrawCharacterSelect(void)
 				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
 
 				// render name
-				if (!(sp->mdepth == CSSTEP_READY && l == listskin))
+				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect))
 				{
 					V_DrawStringScaled(
 						(csscenterx * FRACUNIT) - (namewidth/2),
@@ -2766,7 +2756,7 @@ void M_DrawCharacterSelect(void)
 						FRACUNIT,
 						0,
 						// if the entry is selected then apply skincolor_sapphire
-						l == listskin ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						l == setup_listselect ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
 						font,
 						name
 					);

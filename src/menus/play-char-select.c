@@ -350,7 +350,7 @@ void M_CharacterSelectInit(void)
 		}
 	}
 
-	// sort list of skins used for alphabetical list...... alphabetically
+	// sort list of skins used for alphabetical list
 	qsort(setup_skinlist, setup_numskinlist, sizeof(UINT16), M_CompareSkinNames);
 
 	setup_numfollowercategories = 0;
@@ -773,7 +773,7 @@ static void M_HandleBackToChars(setup_player_t *p)
 
 	if (forceskin
 	|| setup_chargrid[p->gridx][p->gridy].numskins == 1
-	|| !!setup_listview) // shouldn't happen? but whatever
+	|| !!setup_listview)
 	{
 		p->mdepth = CSSTEP_CHARS; // Skip clones menu
 	}
@@ -1508,8 +1508,11 @@ boolean M_CharacterSelectHandler(INT32 choice)
 			}
 		}
 
-		// Just makes it easier to access later
-		// (but list view probably prefers a different way of setting this up) --Super
+		// set player skin based on selected grid tile
+		// this is ignored altogether upon switching to, or while in, list view
+		// since a loop needs to run in order to match the skin value to the sorted
+		// list which imo is best done upon pressing the view switch button
+		// as opposed to every single frame where this function needs to be ran
 		if (!setup_listview)
 		{
 			if (forceskin)
