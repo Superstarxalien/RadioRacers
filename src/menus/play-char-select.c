@@ -837,6 +837,7 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 	UINT8 numclones;
 	INT32 skin;
 	boolean forceskin = M_CharacterSelectForceInAction();
+	setup_player_t *sp = &setup_player[0];
 
 	if (cv_splitdevice.value)
 		num = 0;
@@ -883,21 +884,22 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 		S_StartSound(NULL, sfx_s3k7b); //sfx_s3kc3s
 		M_SetMenuDelay(num);
 	}
-	else if (M_MenuButtonPressed(num, MBT_Y))
+	// switch to list view
+	else if (M_MenuButtonPressed(0, MBT_Y) && setup_numplayers == 1)
 	{
 		// set selected list entry to forceskin
-		if (forceskin) p->skin = cv_forceskin.value;
+		if (forceskin) sp->skin = cv_forceskin.value;
 
 		// convert selected grid skin to alphabetical list equivalent
 		for (UINT16 i = 0; i < setup_numskinlist; i++)
 		{
 			// this can happen if the player selects an empty grid slot
-			if (p->skin < 0)
+			if (sp->skin < 0)
 			{
 				setup_listselect = 0;
 				break;
 			}
-			if (setup_skinlist[i] == p->skin)
+			if (setup_skinlist[i] == sp->skin)
 			{
 				setup_listselect = i;
 				break;
@@ -1527,6 +1529,21 @@ boolean M_CharacterSelectHandler(INT32 choice)
 			{
 				p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
 			}
+		}
+		else if (!!setup_listview && setup_numplayers > 1)
+		{
+			if (sp->skin >= 0)
+			{
+				// set grid cursor to position of list character selected
+				sp->gridx = skins[sp->skin]->kartspeed - 1;
+				sp->gridy = skins[sp->skin]->kartweight - 1;
+			}
+
+			setup_page = 0;
+
+			// go back to grid view
+			setup_listview = false;
+			S_StartSound(NULL, sfx_s3k7b);
 		}
 
 		if (playersChanged == true)
