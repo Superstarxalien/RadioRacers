@@ -2521,7 +2521,7 @@ void M_DrawCharacterSelect(void)
 		{
 			// can't toggle CSS views if not selecting character
 			// or if there's more than one local player
-			if (sp->mdepth > CSSTEP_CHARS  /*|| is multiplayer or something*/)
+			if (sp->mdepth > CSSTEP_CHARS || setup_numplayers > 1)
 			{
 				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
 			}
