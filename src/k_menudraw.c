@@ -2754,14 +2754,14 @@ void M_DrawCharacterSelect(void)
 						FRACUNIT,
 						FRACUNIT,
 						FRACUNIT,
-						0,
+						(l == setup_listselect && font == TINY_FONT) ? V_SKYMAP : 0,
 						// if the entry is selected then apply skincolor_sapphire
-						// doesn't work if the font is TINY_FONT though, dunno what to do there --Super
-						l == setup_listselect ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						(l == setup_listselect && font != TINY_FONT) ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
 						font,
 						name
 					);
 				}
+				// name has been selected, do graphical flourish
 				else
 				{
 					if ((setup_animcounter/10) & 1)
@@ -2772,10 +2772,9 @@ void M_DrawCharacterSelect(void)
 							FRACUNIT,
 							FRACUNIT,
 							FRACUNIT,
-							0,
+							(l == setup_listselect && font == TINY_FONT) ? skincolors[sp->color].chatcolor : 0,
 							// apply selected player color
-							// doesn't work if the font is TINY_FONT though, dunno what to do there --Super
-							R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE),
+							font != TINY_FONT ? R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE) : NULL,
 							font,
 							name
 						);
@@ -2784,7 +2783,7 @@ void M_DrawCharacterSelect(void)
 			}
 
 			char stat[8] = "";
-			// currently doesn't pick up if character is Ironman, kinda want to keep that way?
+			// currently doesn't pick up if character is Ironman, kinda want to keep that way? --Super
 			sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
 			stat[7] = '\0';
 
