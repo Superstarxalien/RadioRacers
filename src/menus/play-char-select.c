@@ -75,6 +75,12 @@ tic_t setup_animcounter = 0;
 UINT8 setup_page = 0;
 UINT8 setup_maxpage = 0;	// For charsel page to identify alts easier...
 
+UINT16 setup_skinlist[MAXSKINS];
+UINT16 setup_numskinlist = 0;
+UINT16 setup_listselect = 0;
+menu_anim_t setup_skinlist_slide;
+boolean setup_listview = false;
+
 static void M_PushMenuColor(setup_player_colors_t *colors, UINT16 newColor)
 {
 	if (colors->listLen >= colors->listCap)
@@ -285,6 +291,15 @@ static void M_SetupMidGameGridPos(setup_player_t *p, UINT8 num)
 	return;	// we're done here
 }
 
+// used for alphabetical sort (by literally just using strcmp)
+static int M_CompareSkinNames(const void *n1, const void *n2)
+{
+	const skin_t *skin1 = skins[*(const UINT16*)n1];
+	const skin_t *skin2 = skins[*(const UINT16*)n2];
+
+	return strcmp(skin1->realname, skin2->realname);
+}
+
 
 void M_CharacterSelectInit(void)
 {
@@ -304,6 +319,12 @@ void M_CharacterSelectInit(void)
 	memset(setup_explosions, 0, sizeof(setup_explosions));
 	setup_animcounter = 0;
 
+	memset(setup_skinlist, 0, sizeof(setup_skinlist));
+	setup_numskinlist = 0;
+	setup_skinlist_slide.start = 0;
+	setup_skinlist_slide.dist = 0;
+	setup_listview = false;
+
 	for (i = 0; i < numskins; i++)
 	{
 		UINT8 x = skins[i]->kartspeed-1;
@@ -311,6 +332,12 @@ void M_CharacterSelectInit(void)
 
 		if (!R_SkinUsable(g_localplayers[0], i, false))
 			continue;
+
+		// i set this up as its own amount of skins as
+		// a list view of skins wouldn't be bound by "character alts"
+		// might have to change this eventually though --Super
+		setup_skinlist[i] = i;
+		setup_numskinlist++;
 
 		if (setup_chargrid[x][y].numskins >= MAXCLONES)
 			CONS_Alert(CONS_ERROR, "Max character alts reached for %d,%d\n", x+1, y+1);
@@ -322,6 +349,9 @@ void M_CharacterSelectInit(void)
 			setup_maxpage = max(setup_maxpage, setup_chargrid[x][y].numskins-1);
 		}
 	}
+
+	// sort list of skins used for alphabetical list
+	qsort(setup_skinlist, setup_numskinlist, sizeof(UINT16), M_CompareSkinNames);
 
 	setup_numfollowercategories = 0;
 	for (i = 0; i < numfollowercategories; i++)
@@ -742,7 +772,8 @@ static void M_HandleBackToChars(setup_player_t *p)
 	boolean forceskin = M_CharacterSelectForceInAction();
 
 	if (forceskin
-	|| setup_chargrid[p->gridx][p->gridy].numskins == 1)
+	|| setup_chargrid[p->gridx][p->gridy].numskins == 1
+	|| !!setup_listview)
 	{
 		p->mdepth = CSSTEP_CHARS; // Skip clones menu
 	}
@@ -806,6 +837,7 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 	UINT8 numclones;
 	INT32 skin;
 	boolean forceskin = M_CharacterSelectForceInAction();
+	setup_player_t *sp = &setup_player[0];
 
 	if (cv_splitdevice.value)
 		num = 0;
@@ -851,6 +883,31 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 		p->gridy = (3*p->gridy) + 1;
 		S_StartSound(NULL, sfx_s3k7b); //sfx_s3kc3s
 		M_SetMenuDelay(num);
+	}
+	// switch to list view
+	else if (M_MenuButtonPressed(0, MBT_Y) && setup_numplayers == 1)
+	{
+		// set selected list entry to forceskin
+		if (forceskin) sp->skin = cv_forceskin.value;
+
+		// convert selected grid skin to alphabetical list equivalent
+		for (UINT16 i = 0; i < setup_numskinlist; i++)
+		{
+			// this can happen if the player selects an empty grid slot
+			if (sp->skin < 0)
+			{
+				setup_listselect = 0;
+				break;
+			}
+			if (setup_skinlist[i] == sp->skin)
+			{
+				setup_listselect = i;
+				break;
+			}
+		}
+
+		setup_listview = true;
+		S_StartSound(NULL, sfx_s3k65);
 	}
 
 	// try to set the clone num to the page # if possible.
@@ -931,6 +988,105 @@ static boolean M_HandleCharacterGrid(setup_player_t *p, UINT8 num)
 			S_StartSound(NULL, sfx_s3k63);
 			M_SetMenuDelay(num);
 		}
+	}
+
+	return false;
+}
+
+static boolean M_HandleCharacterList(void)
+{
+	setup_player_t *sp = &setup_player[0]; // only enabled for P1
+	boolean forceskin = M_CharacterSelectForceInAction();
+
+	if (menucmd[0].dpad_ud > 0 || menucmd[0].dpad_ud < 0)
+	{
+		// do nothing other than play a sound if forceskin
+		if (forceskin)
+		{
+			S_StartSound(NULL, sfx_s3k7b);
+			M_SetMenuDelay(0);
+		}
+		// if press down
+		else if (menucmd[0].dpad_ud > 0)
+		{
+			UINT16 oldselect = setup_listselect;
+			setup_listselect++;
+
+			// if scrolling past the bottom of the list
+			if (setup_listselect >= setup_numskinlist)
+				setup_listselect = 0;
+
+			sp->skin = setup_skinlist[setup_listselect];
+			setup_skinlist_slide.dist = setup_listselect - oldselect;
+			setup_skinlist_slide.start = I_GetTime();
+
+			S_StartSound(NULL, sfx_s3k5b);
+			M_SetMenuDelay(0);
+		}
+		// if press up
+		else if (menucmd[0].dpad_ud < 0)
+		{
+			UINT16 oldselect = setup_listselect;
+			
+			// if scrolling past the top of the list
+			if (setup_listselect == 0)
+				setup_listselect = setup_numskinlist-1;
+			else
+				setup_listselect--;
+
+			sp->skin = setup_skinlist[setup_listselect];
+			setup_skinlist_slide.dist = setup_listselect - oldselect;
+			setup_skinlist_slide.start = I_GetTime();
+
+			S_StartSound(NULL, sfx_s3k5b);
+			M_SetMenuDelay(0);
+		}
+	}
+	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
+	{
+		if (sp->skin >= 0)
+		{
+			// set grid cursor to position of list character selected
+			sp->gridx = skins[sp->skin]->kartspeed - 1;
+			sp->gridy = skins[sp->skin]->kartweight - 1;
+			
+			// set grid page to page that has the list character selected
+			// e.g. goes to page 2 if emerl was selected
+			for (UINT16 i = 0; i < MAXCLONES; i++)
+			{
+				if (setup_chargrid[sp->gridx][sp->gridy].skinlist[i] == sp->skin)
+					setup_page = i;
+			}
+		}
+
+		if (M_MenuButtonPressed(0, MBT_Y))
+		{
+			setup_listview = false;
+			S_StartSound(NULL, sfx_s3k65);
+		}
+		else if (M_MenuConfirmPressed(0))
+		{
+			M_HandleBeginningColorsOrFollowers(sp);
+			M_SetMenuDelay(0);
+		}
+	}
+	else if (M_MenuBackPressed(0))
+	{
+		// for profiles / gameplay, exit out of the menu instantly,
+		// we don't want to go to the input detection menu.
+		if (optionsmenu.profile || gamestate != GS_MENU)
+		{
+			memset(setup_player, 0, sizeof(setup_player));	// Reset setup_player otherwise it does some VERY funky things.
+			M_SetMenuDelay(0);
+			M_GoBack(0);
+			return true;
+		}
+		else	// in main menu
+		{
+			sp->mdepth = CSSTEP_PROFILE;
+			S_StartSound(NULL, sfx_s3k5b);
+		}
+		M_SetMenuDelay(0);
 	}
 
 	return false;
@@ -1319,8 +1475,11 @@ boolean M_CharacterSelectHandler(INT32 choice)
 				case CSSTEP_ASKCHANGES:
 					M_HandleCharAskChange(p, i);
 					break;
-				case CSSTEP_CHARS: // Character Select grid
-					M_HandleCharacterGrid(p, i);
+				case CSSTEP_CHARS: // Character Select grid/list
+					if (!setup_listview)
+						M_HandleCharacterGrid(p, i);
+					else
+						M_HandleCharacterList();
 					break;
 				case CSSTEP_ALTS: // Select clone
 					M_HandleCharRotate(p, i);
@@ -1351,18 +1510,42 @@ boolean M_CharacterSelectHandler(INT32 choice)
 			}
 		}
 
-		// Just makes it easier to access later
-		if (forceskin)
+		// set player skin based on selected grid tile
+		// this is ignored altogether upon switching to, or while in, list view
+		// since a loop needs to run in order to match the skin value to the sorted
+		// list which imo is best done upon pressing the view switch button
+		// as opposed to every single frame where this function needs to be ran --Super
+		if (!setup_listview)
 		{
-			if (p->gridx != skins[cv_forceskin.value]->kartspeed-1
-				|| p->gridy != skins[cv_forceskin.value]->kartweight-1)
-				p->skin = -1;
+			if (forceskin)
+			{
+				if (p->gridx != skins[cv_forceskin.value]->kartspeed-1
+					|| p->gridy != skins[cv_forceskin.value]->kartweight-1)
+					p->skin = -1;
+				else
+					p->skin = cv_forceskin.value;
+			}
 			else
-				p->skin = cv_forceskin.value;
+			{
+				p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
+			}
 		}
-		else
+		else if (!!setup_listview && setup_numplayers > 1)
 		{
-			p->skin = setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum];
+			setup_player_t *sp = &setup_player[0];
+
+			if (sp->skin >= 0)
+			{
+				// set grid cursor to position of list character selected
+				sp->gridx = skins[sp->skin]->kartspeed - 1;
+				sp->gridy = skins[sp->skin]->kartweight - 1;
+			}
+
+			setup_page = 0;
+
+			// go back to grid view
+			setup_listview = false;
+			S_StartSound(NULL, sfx_s3k7b);
 		}
 
 		if (playersChanged == true)

@@ -2194,15 +2194,34 @@ static void M_DrawCharSelectPreview(UINT8 num)
 					V_DrawThinString(x-3, y+12, 0, va("BAD CLONENUM %u", p->clonenum));
 				}
 				/* FALLTHRU */
-			case CSSTEP_CHARS: // Character Select grid
-				V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
-					(doping
-						? 'R' : ('A' + R_GetEngineClass(p->gridx+1, p->gridy+1, randomskin))),
-					(randomskin
-						? '?' : ('1'+p->gridx)),
-					(randomskin
-						? '?' : ('1'+p->gridy))
-					));
+			case CSSTEP_CHARS: // Character Select grid/list
+				// grid
+				if (!setup_listview)
+				{
+					V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
+						(doping
+							? 'R' : ('A' + R_GetEngineClass(p->gridx+1, p->gridy+1, randomskin))),
+						(randomskin
+							? '?' : ('1'+p->gridx)),
+						(randomskin
+							? '?' : ('1'+p->gridy))
+						));
+				}
+				// list
+				else
+				{
+					randomskin = (skins[p->skin]->flags & SF_IRONMAN);
+					doping = (skins[p->skin]->flags & SF_HIVOLT);
+					V_DrawThinString(x-3, y+2, 0, va("Class %c (s %c - w %c)",
+						(doping
+							? 'R' : ('A' + R_GetEngineClass(skins[p->skin]->kartspeed, skins[p->skin]->kartweight, randomskin))),
+						(randomskin
+							? '?' : ('0'+skins[p->skin]->kartspeed)),
+						(randomskin
+							? '?' : ('0'+skins[p->skin]->kartweight))
+						));
+					V_DrawThinString(x-3, y+12, 0, skins[p->skin]->name);
+				}
 				break;
 			case CSSTEP_COLORS: // Select color
 				if (p->color < numskincolors)
@@ -2472,7 +2491,10 @@ void M_DrawProfileCard(INT32 x, INT32 y, boolean greyedout, profile_t *p)
 	if (sp->mdepth >= CSSTEP_CHARS)
 	{
 		truecol = sp->color;
-		skinnum = setup_chargrid[sp->gridx][sp->gridy].skinlist[sp->clonenum];
+		if (!setup_listview)
+			skinnum = setup_chargrid[sp->gridx][sp->gridy].skinlist[sp->clonenum];
+		else
+			skinnum = setup_skinlist[setup_listselect];
 	}
 
 	if (truecol == SKINCOLOR_NONE)
@@ -2584,11 +2606,13 @@ void M_DrawCharacterSelect(void)
 	const UINT8 pid = 0;
 
 	UINT8 i, j, k;
+	UINT16 l;
 	UINT8 priority = 0;
 	INT16 quadx, quady;
 	INT16 skin;
 	INT32 basex = optionsmenu.profile ? (64 + M_EaseWithTransition(Easing_InSine, 5 * 48)) : 0;
 	boolean forceskin = M_CharacterSelectForceInAction();
+	setup_player_t *sp = &setup_player[0]; // list view is only enabled for P1
 
 	if (setup_numplayers > 0)
 	{
@@ -2598,104 +2622,317 @@ void M_DrawCharacterSelect(void)
 	{
 		const int kTop = 6;
 
-		if (!optionsmenu.profile) // Does nothing on this screen
+		if (!optionsmenu.profile) // Right trigger does nothing on this screen
 		{
-			K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
-			
-			// Radio
-			const INT32 pageButtonX = (BASEVIDWIDTH/2) - 5;
-			const INT32 pageNumberY = kTop + 175;
-			// K_drawButton((pageButtonX) * FRACUNIT, (pageNumberY) * FRACUNIT, 0, kp_button_l, M_MenuButtonPressed(pid, MBT_L));
-
-			K_DrawGameControl(pageButtonX, pageNumberY, pid, va("<l_animated> Page %d of %d", setup_page + 1, setup_maxpage + 1), 1, TINY_FONT, 0);
-		}
-		else
-		{
-			K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default", 1, TINY_FONT, 0);
-		}
-	}
-
-	// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
-	if (forceskin == false)
-	{
-		for (i = 0; i < 9; i++)
-		{
-			for (j = 0; j < 9; j++)
+			// can't toggle CSS views if not selecting character
+			// or if there's more than one local player
+			if (sp->mdepth > CSSTEP_CHARS || setup_numplayers > 1)
 			{
-				skin = setup_chargrid[i][j].skinlist[setup_page];
-				quadx = 4 * (i / 3);
-				quady = 4 * (j / 3);
-
-				// Here's a quick little cheat to save on drawing time!
-				// Don't draw a shadow if it'll get covered by another icon
-				if ((i % 3 < 2) && (j % 3 < 2))
-				{
-					if ((setup_chargrid[i+1][j].skinlist[setup_page] != -1)
-					&& (setup_chargrid[i][j+1].skinlist[setup_page] != -1)
-					&& (setup_chargrid[i+1][j+1].skinlist[setup_page] != -1))
-						continue;
-				}
-
-				if (skin != -1)
-					V_DrawScaledPatch(basex+ 82 + (i*16) + quadx + 1, 22 + (j*16) + quady + 1, 0, W_CachePatchName("ICONBACK", PU_CACHE));
-			}
-		}
-	}
-
-	// Draw this inbetween. These drop shadows should be covered by the stat graph, but the icons shouldn't.
-	V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
-
-	// Draw the icons now
-	for (i = 0; i < 9; i++)
-	{
-		if ((forceskin == true) && (i != skins[cv_forceskin.value]->kartspeed-1))
-			continue;
-
-		for (j = 0; j < 9; j++)
-		{
-			if (forceskin == true)
-			{
-				if (j != skins[cv_forceskin.value]->kartweight-1)
-					continue;
-				skin = cv_forceskin.value;
+				K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default", 1, TINY_FONT, 0);
 			}
 			else
 			{
-				skin = setup_chargrid[i][j].skinlist[setup_page];
-			}
-
-			for (k = 0; k < setup_numplayers; k++)
-			{
-				if (setup_player[k].mdepth < CSSTEP_ASKCHANGES)
-					continue;
-				if (setup_player[k].gridx != i || setup_player[k].gridy != j)
-					continue;
-				break; // k == setup_numplayers means no one has it selected
-			}
-
-			quadx = 4 * (i / 3);
-			quady = 4 * (j / 3);
-
-			if (skin != -1)
-			{
-				UINT8 *colormap;
-
-				if (k == setup_numplayers)
-					colormap = R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_GREY, GTC_MENUCACHE);
+				if (!setup_listview)
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <c_animated> Default   <y_animated> List", 1, TINY_FONT, 0);
+				}
 				else
-					colormap = R_GetTranslationColormap(skin, skins[skin]->prefcolor, GTC_MENUCACHE);
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2, kTop, pid, "<r_animated> Info   <y_animated> Grid", 1, TINY_FONT, 0);
+				}
+			}
 
-				V_DrawMappedPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady, 0, faceprefix[skin][FACE_RANK], colormap);
+			if (!setup_listview)
+			{
+				// Radio
+				const INT32 pageButtonX = (BASEVIDWIDTH/2) - 5;
+				const INT32 pageNumberY = kTop + 175;
+				// K_drawButton((pageButtonX) * FRACUNIT, (pageNumberY) * FRACUNIT, 0, kp_button_l, M_MenuButtonPressed(pid, MBT_L));
 
-				// draw dot if there are more alts behind there!
-				if (forceskin == false && setup_page+1 < setup_chargrid[i][j].numskins)
-					V_DrawScaledPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady + 11, 0, W_CachePatchName("ALTSDOT", PU_CACHE));
+				K_DrawGameControl(pageButtonX, pageNumberY, pid, va("<l_animated> Page %d of %d", setup_page + 1, setup_maxpage + 1), 1, TINY_FONT, 0);
+			}
+		}
+		else
+		{
+			if (sp->mdepth > CSSTEP_CHARS)
+			{
+				K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default", 1, TINY_FONT, 0);
+			}
+			else
+			{
+				if (!setup_listview)
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <c_animated> Default  <y_animated> List", 1, TINY_FONT, 0);
+				}
+				else
+				{
+					K_DrawGameControl(BASEVIDWIDTH/2+62, kTop, pid, "<a_animated> Accept  <x_animated> Back  <y_animated> Grid", 1, TINY_FONT, 0);
+				}
 			}
 		}
 	}
 
-	// Explosions when you've made your final selection
-	M_DrawCharSelectExplosions(true, basex + 82, 22);
+	// render grid character select screen
+	if (!setup_listview)
+	{
+		// We have to loop twice -- first time to draw the drop shadows, a second time to draw the icons.
+		if (forceskin == false)
+		{
+			for (i = 0; i < 9; i++)
+			{
+				for (j = 0; j < 9; j++)
+				{
+					skin = setup_chargrid[i][j].skinlist[setup_page];
+					quadx = 4 * (i / 3);
+					quady = 4 * (j / 3);
+
+					// Here's a quick little cheat to save on drawing time!
+					// Don't draw a shadow if it'll get covered by another icon
+					if ((i % 3 < 2) && (j % 3 < 2))
+					{
+						if ((setup_chargrid[i+1][j].skinlist[setup_page] != -1)
+						&& (setup_chargrid[i][j+1].skinlist[setup_page] != -1)
+						&& (setup_chargrid[i+1][j+1].skinlist[setup_page] != -1))
+							continue;
+					}
+
+					if (skin != -1)
+						V_DrawScaledPatch(basex+ 82 + (i*16) + quadx + 1, 22 + (j*16) + quady + 1, 0, W_CachePatchName("ICONBACK", PU_CACHE));
+				}
+			}
+		}
+
+		// Draw this inbetween. These drop shadows should be covered by the stat graph, but the icons shouldn't.
+		V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
+
+		// Draw the icons now
+		for (i = 0; i < 9; i++)
+		{
+			if ((forceskin == true) && (i != skins[cv_forceskin.value]->kartspeed-1))
+				continue;
+
+			for (j = 0; j < 9; j++)
+			{
+				if (forceskin == true)
+				{
+					if (j != skins[cv_forceskin.value]->kartweight-1)
+						continue;
+					skin = cv_forceskin.value;
+				}
+				else
+				{
+					skin = setup_chargrid[i][j].skinlist[setup_page];
+				}
+
+				for (k = 0; k < setup_numplayers; k++)
+				{
+					if (setup_player[k].mdepth < CSSTEP_ASKCHANGES)
+						continue;
+					if (setup_player[k].gridx != i || setup_player[k].gridy != j)
+						continue;
+					break; // k == setup_numplayers means no one has it selected
+				}
+
+				quadx = 4 * (i / 3);
+				quady = 4 * (j / 3);
+
+				if (skin != -1)
+				{
+					UINT8 *colormap;
+
+					if (k == setup_numplayers)
+						colormap = R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_GREY, GTC_MENUCACHE);
+					else
+						colormap = R_GetTranslationColormap(skin, skins[skin]->prefcolor, GTC_MENUCACHE);
+
+					V_DrawMappedPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady, 0, faceprefix[skin][FACE_RANK], colormap);
+
+					// draw dot if there are more alts behind there!
+					if (forceskin == false && setup_page+1 < setup_chargrid[i][j].numskins)
+						V_DrawScaledPatch(basex + 82 + (i*16) + quadx, 22 + (j*16) + quady + 11, 0, W_CachePatchName("ALTSDOT", PU_CACHE));
+				}
+			}
+		}
+
+		// Explosions when you've made your final selection
+		M_DrawCharSelectExplosions(true, basex + 82, 22);
+	}
+	// render list character select screen
+	else
+	{
+		// the yellow borders around the profile views for each player are a
+		// single graphic combined with the stat chart/graph
+		// so I'd have to make a brand new one which won't be included right now
+		//V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
+
+		// the offset for the button tooltips at the top of the CSS
+		INT16 tooltipy = (BASEVIDHEIGHT/4) - 5;
+		// the screen's horizontal center, plus the offset for the profile settings menu
+		INT16 csscenterx = basex + (BASEVIDWIDTH/2);
+		
+		// the vertical position of each skin list entry
+		INT16 listy =
+		// render the 1st list entry at the middle of the screen
+		// i kinda just used arbitrary values here
+		tooltipy+48
+		// offset selected entry to be at the middle of the screen
+		// ---
+		// future list entries after the 0th entry are offset by +(entry order*18)
+		// (i.e. the listy += 18 per each loop cycle)
+		// so, re-offset that in order for the selected entry to be at the middle
+		// this pushes up entries preceding the selected one
+		// and, in practice, this enables the scrolling behavior for the list of characters
+		- setup_listselect*18
+		// interpolate the scrolling
+		+ Easing_OutSine(
+				M_DueFrac(setup_skinlist_slide.start, 5),
+				setup_skinlist_slide.dist*18,
+				0
+		);
+
+		// set a clip rect to cut off entries going above/below during transition
+		V_SetClipRect(0, (1+18)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (9*18)*FRACUNIT, 0);
+
+		for (l = 0; l < setup_numskinlist; l++, listy += 18)
+		{
+			// calculate distance between player-selected entry and loop index entry
+			INT16 dist = abs(setup_listselect - l);
+
+			// only 11 entries are rendered at once;
+			// the 9 visible on-screen, and two transparent ones top to
+			// bottom that are only seen in the interpolated transition
+			// for optimization, skip the entry if it's at a distance greater than 5 entries above or below
+			// also avoid rendering list entries other than the forceskin
+			if (dist > 5 || (setup_skinlist[l] != cv_forceskin.value && forceskin))
+			{
+				continue;
+			}
+
+			const char *name = skins[setup_skinlist[l]]->realname;
+
+			UINT8 font = KART_FONT;
+			UINT8 yoffsetfornamethatiswaytoolong = 0;
+
+			fixed_t namewidth = V_StringScaledWidth(
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				font,
+				name
+			);
+
+			if (namewidth >= 120*FRACUNIT)
+			{
+				font = TINY_FONT;
+				namewidth = V_StringScaledWidth(
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					font,
+					name
+				);
+				yoffsetfornamethatiswaytoolong = 3;
+			}
+
+			// render transparent entries only seen during transition
+			if (dist > 4)
+			{
+				// render name
+				V_DrawStringScaled(
+					(csscenterx * FRACUNIT) - (namewidth/2),
+					(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					FRACUNIT,
+					0,
+					NULL,
+					font,
+					name
+				);
+				
+				// transparent sticker goes on top of text to make it greyed-out
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, V_TRANSLUCENT, false);
+			}
+			// render normal entries
+			else
+			{
+				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
+
+				// render name
+				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect))
+				{
+					V_DrawStringScaled(
+						(csscenterx * FRACUNIT) - (namewidth/2),
+						(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						FRACUNIT,
+						(l == setup_listselect && font == TINY_FONT) ? V_SKYMAP : 0,
+						// if the entry is selected then apply skincolor_sapphire
+						(l == setup_listselect && font != TINY_FONT) ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						font,
+						name
+					);
+				}
+				// name has been selected, do graphical flourish
+				else
+				{
+					if ((setup_animcounter/10) & 1)
+					{
+						V_DrawStringScaled(
+							(csscenterx * FRACUNIT) - (namewidth/2),
+							(listy+2+yoffsetfornamethatiswaytoolong) * FRACUNIT,
+							FRACUNIT,
+							FRACUNIT,
+							FRACUNIT,
+							(l == setup_listselect && font == TINY_FONT) ? skincolors[sp->color].chatcolor : 0,
+							// apply selected player color
+							font != TINY_FONT ? R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE) : NULL,
+							font,
+							name
+						);
+					}
+				}
+			}
+
+			char stat[8] = "";
+			// currently doesn't pick up if character is Ironman, kinda want to keep that way? --Super
+			sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
+			stat[7] = '\0';
+
+			fixed_t statwidth = V_StringScaledWidth(
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				TINY_FONT,
+				stat
+			);
+
+			// render stat text
+			V_DrawStringScaled(
+				((csscenterx+72) * FRACUNIT) - (statwidth/2),
+				(listy+5) * FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				FRACUNIT,
+				0,
+				NULL,
+				TINY_FONT,
+				stat
+			);
+
+			// colormap for character icon
+			UINT8 *colormap = R_GetTranslationColormap(setup_skinlist[l], skins[setup_skinlist[l]]->prefcolor, GTC_MENUCACHE);
+
+			// character icon
+			V_DrawMappedPatch(basex + 82, listy, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+		}
+
+		V_ClearClipRect();
+	}
 
 	for (i = 0; i < MAXSPLITSCREENPLAYERS; i++)
 	{
@@ -2712,12 +2949,12 @@ void M_DrawCharacterSelect(void)
 		if (i >= setup_numplayers)
 			continue;
 
-		// Draw the cursors
-		if (i != priority)
+		// Draw the cursors (unless it's list view)
+		if (i != priority && !setup_listview)
 			M_DrawCharSelectCursor(i);
 	}
 
-	if (setup_numplayers > 0)
+	if (setup_numplayers > 0 && !setup_listview)
 	{
 		// Draw the priority player over the other ones
 		M_DrawCharSelectCursor(priority);
