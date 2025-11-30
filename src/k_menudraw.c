@@ -2022,7 +2022,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 		M_DrawCharSelectSprite(num, x+32, y+75, charflip);
 
 		// Radio
-		if (M_IsSkinValid(p))
+		if (M_IsSkinValid(p) && !setup_listview)
 			V_DrawCenteredThinString(x+32, y+85, 0, skins[setup_chargrid[p->gridx][p->gridy].skinlist[p->clonenum]]->realname);
 
 		M_DrawCharSelectCircle(p, x+32, y+64);
