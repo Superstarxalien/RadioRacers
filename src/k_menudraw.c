@@ -2645,11 +2645,21 @@ void M_DrawCharacterSelect(void)
 	// render list character select screen
 	else
 	{
-		// the yellow borders around the profile views for each player are a
-		// single graphic combined with the stat chart/graph
-		// so I'd have to make a brand new one which won't be included right now
-		//V_DrawScaledPatch(basex+ 3, 2, 0, W_CachePatchName((optionsmenu.profile ? "PR_STGRPH" : "STATGRPH"), PU_CACHE));
-
+		// draw player view borders
+		// we're using DUELGRPH so it's an individual border repeated 4 times
+		// as opposed to a single graphic as with STATGRPH
+		if (!optionsmenu.profile)
+		{
+			// top left
+			V_DrawScaledPatch(3, 2, 0, W_CachePatchName("DUELGRPH", PU_CACHE));
+			// bottom left
+			V_DrawScaledPatch(3, 2+99, 0, W_CachePatchName("DUELGRPH", PU_CACHE));
+			// top right
+			V_DrawScaledPatch(3+233, 2, 0, W_CachePatchName("DUELGRPH", PU_CACHE));
+			// bottom right
+			V_DrawScaledPatch(3+233, 2+99, 0, W_CachePatchName("DUELGRPH", PU_CACHE));
+		}
+		
 		// the offset for the button tooltips at the top of the CSS
 		INT16 tooltipy = (BASEVIDHEIGHT/4) - 5;
 		// the screen's horizontal center, plus the offset for the profile settings menu
@@ -2707,7 +2717,7 @@ void M_DrawCharacterSelect(void)
 				name
 			);
 
-			if (namewidth >= 120*FRACUNIT)
+			if (namewidth >= 116*FRACUNIT)
 			{
 				font = TINY_FONT;
 				namewidth = V_StringScaledWidth(
@@ -2720,6 +2730,8 @@ void M_DrawCharacterSelect(void)
 				);
 				yoffsetfornamethatiswaytoolong = 3;
 			}
+
+			UINT16 stickerwidth = 94;
 
 			// render transparent entries only seen during transition
 			if (dist > 4)
@@ -2738,12 +2750,12 @@ void M_DrawCharacterSelect(void)
 				);
 				
 				// transparent sticker goes on top of text to make it greyed-out
-				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, V_TRANSLUCENT, false);
+				K_DrawSticker(csscenterx - (stickerwidth/2), listy+4, stickerwidth, V_TRANSLUCENT, false);
 			}
 			// render normal entries
 			else
 			{
-				K_DrawSticker(basex + 82 + 16 + 2 + 12, listy+4, 98, 0, false);
+				K_DrawSticker(csscenterx - (stickerwidth/2), listy+4, stickerwidth, 0, false);
 
 				// render name
 				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect))
@@ -2798,7 +2810,7 @@ void M_DrawCharacterSelect(void)
 
 			// render stat text
 			V_DrawStringScaled(
-				((csscenterx+72) * FRACUNIT) - (statwidth/2),
+				((csscenterx+68) * FRACUNIT) - (statwidth/2),
 				(listy+5) * FRACUNIT,
 				FRACUNIT,
 				FRACUNIT,
