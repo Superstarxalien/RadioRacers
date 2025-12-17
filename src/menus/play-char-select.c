@@ -1514,7 +1514,7 @@ boolean M_CharacterSelectHandler(INT32 choice)
 		// this is ignored altogether upon switching to, or while in, list view
 		// since a loop needs to run in order to match the skin value to the sorted
 		// list which imo is best done upon pressing the view switch button
-		// as opposed to every single frame where this function needs to be ran
+		// as opposed to every single frame where this function needs to be ran --Super
 		if (!setup_listview)
 		{
 			if (forceskin)
