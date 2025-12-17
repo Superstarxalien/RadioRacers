@@ -2761,7 +2761,9 @@ void M_DrawCharacterSelect(void)
 				K_DrawSticker(csscenterx - (stickerwidth/2), listy+4, stickerwidth, 0, false);
 
 				// render name
-				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect))
+				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect)
+					&& !(l == setup_listselect && setup_scrollbar
+					&& !((setup_animcounter/10) & 1)))
 				{
 					V_DrawStringScaled(
 						(csscenterx * FRACUNIT) - (namewidth/2),
@@ -2769,9 +2771,9 @@ void M_DrawCharacterSelect(void)
 						FRACUNIT,
 						FRACUNIT,
 						FRACUNIT,
-						(l == setup_listselect && font == TINY_FONT) ? V_SKYMAP : 0,
-						// if the entry is selected then apply skincolor_sapphire
-						(l == setup_listselect && font != TINY_FONT) ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
+						(l == setup_listselect && font == TINY_FONT && !setup_scrollbar) ? V_SKYMAP : 0,
+						// if the entry is selected then apply skincolor_sapphire (unless you're in scrollbar mode)
+						(l == setup_listselect && font != TINY_FONT && !setup_scrollbar) ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
 						font,
 						name
 					);
