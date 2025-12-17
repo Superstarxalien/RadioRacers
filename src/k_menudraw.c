@@ -2843,7 +2843,7 @@ void M_DrawCharacterSelect(void)
 
 				// rescale selected character value to [0, 1] and multiply with clip rect height (which is the max scroll bar travel distance)
 				fixed_t scrollbaryfixed = (cliprecty*FRACUNIT) + FixedMul(FixedDiv(setup_listselect*FRACUNIT, (setup_numskinlist - 1)*FRACUNIT), (cliprectheight*FRACUNIT)) - ((scrollbarheight/2)*FRACUNIT);
-				UINT16 scrollbary = scrollbaryfixed>>FRACBITS;
+				UINT16 scrollbary = (scrollbaryfixed < cliprecty*FRACUNIT ? cliprecty*FRACUNIT : scrollbaryfixed)>>FRACBITS;
 				
 				// clamp max top and bottom position
 				scrollbary = scrollbary < cliprecty ? cliprecty : (scrollbary > (cliprecty + cliprectheight - scrollbarheight) ? (cliprecty + cliprectheight - scrollbarheight) : scrollbary);
