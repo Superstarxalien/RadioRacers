@@ -1105,10 +1105,12 @@ static boolean M_HandleCharacterList(void)
 	}
 	else if (M_MenuExtraPressed(0) && !setup_scrollbar)
 	{
+		UINT16 oldselect = setup_listselect;
+
 		setup_listselect = 0;
 		sp->skin = setup_skinlist[setup_listselect];
-		setup_skinlist_slide.dist = 0;
-		setup_skinlist_slide.start = 0;
+		setup_skinlist_slide.dist = setup_listselect - oldselect;
+		setup_skinlist_slide.start = I_GetTime();
 
 		S_StartSound(NULL, sfx_s3k7b);
 		M_SetMenuDelay(0);
