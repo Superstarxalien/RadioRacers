@@ -80,6 +80,7 @@ UINT16 setup_numskinlist = 0;
 UINT16 setup_listselect = 0;
 menu_anim_t setup_skinlist_slide;
 boolean setup_listview = false;
+boolean setup_scrollbar = false;
 
 static void M_PushMenuColor(setup_player_colors_t *colors, UINT16 newColor)
 {
@@ -324,6 +325,7 @@ void M_CharacterSelectInit(void)
 	setup_skinlist_slide.start = 0;
 	setup_skinlist_slide.dist = 0;
 	setup_listview = false;
+	setup_scrollbar = false;
 
 	for (i = 0; i < numskins; i++)
 	{
@@ -1000,47 +1002,116 @@ static boolean M_HandleCharacterList(void)
 
 	if (menucmd[0].dpad_ud > 0 || menucmd[0].dpad_ud < 0)
 	{
-		// do nothing other than play a sound if forceskin
-		if (forceskin)
+		if (!setup_scrollbar)
 		{
-			S_StartSound(NULL, sfx_s3k7b);
-			M_SetMenuDelay(0);
-		}
-		// if press down
-		else if (menucmd[0].dpad_ud > 0)
-		{
-			UINT16 oldselect = setup_listselect;
-			setup_listselect++;
-
-			// if scrolling past the bottom of the list
-			if (setup_listselect >= setup_numskinlist)
-				setup_listselect = 0;
-
-			sp->skin = setup_skinlist[setup_listselect];
-			setup_skinlist_slide.dist = setup_listselect - oldselect;
-			setup_skinlist_slide.start = I_GetTime();
-
-			S_StartSound(NULL, sfx_s3k5b);
-			M_SetMenuDelay(0);
-		}
-		// if press up
-		else if (menucmd[0].dpad_ud < 0)
-		{
-			UINT16 oldselect = setup_listselect;
-			
-			// if scrolling past the top of the list
-			if (setup_listselect == 0)
-				setup_listselect = setup_numskinlist-1;
+			// do nothing other than play a sound if forceskin
+			if (forceskin)
+			{
+				S_StartSound(NULL, sfx_s3k7b);
+				M_SetMenuDelay(0);
+			}
 			else
-				setup_listselect--;
+			{
+				// if press down
+				if (menucmd[0].dpad_ud > 0)
+				{
+					UINT16 oldselect = setup_listselect;
+					setup_listselect++;
 
-			sp->skin = setup_skinlist[setup_listselect];
-			setup_skinlist_slide.dist = setup_listselect - oldselect;
-			setup_skinlist_slide.start = I_GetTime();
+					// if scrolling past the bottom of the list
+					if (setup_listselect >= setup_numskinlist)
+						setup_listselect = 0;
 
+					sp->skin = setup_skinlist[setup_listselect];
+					setup_skinlist_slide.dist = setup_listselect - oldselect;
+					setup_skinlist_slide.start = I_GetTime();
+
+					S_StartSound(NULL, sfx_s3k5b);
+					M_SetMenuDelay(0);
+				}
+				// if press up
+				else if (menucmd[0].dpad_ud < 0)
+				{
+					UINT16 oldselect = setup_listselect;
+					
+					// if scrolling past the top of the list
+					if (setup_listselect == 0)
+						setup_listselect = setup_numskinlist-1;
+					else
+						setup_listselect--;
+
+					sp->skin = setup_skinlist[setup_listselect];
+					setup_skinlist_slide.dist = setup_listselect - oldselect;
+					setup_skinlist_slide.start = I_GetTime();
+
+					S_StartSound(NULL, sfx_s3k5b);
+					M_SetMenuDelay(0);
+				}
+			}
+		}
+		else
+		{
+			// if press down
+			if (menucmd[0].dpad_ud > 0)
+			{
+				setup_listselect += 5;
+
+				// if scrolling past the bottom of the list
+				if (setup_listselect >= setup_numskinlist)
+					setup_listselect = setup_numskinlist-1;
+
+				sp->skin = setup_skinlist[setup_listselect];
+				setup_skinlist_slide.dist = 0;
+				setup_skinlist_slide.start = 0;
+
+				S_StartSound(NULL, sfx_s3k5b);
+				M_SetMenuDelay(0);
+			}
+			// if press up
+			else if (menucmd[0].dpad_ud < 0)
+			{
+				// if scrolling past the top of the list
+				if (setup_listselect < 5)
+					setup_listselect = 0;
+				else
+					setup_listselect -= 5;
+
+				sp->skin = setup_skinlist[setup_listselect];
+				setup_skinlist_slide.dist = 0;
+				setup_skinlist_slide.start = 0;
+
+				S_StartSound(NULL, sfx_s3k5b);
+				M_SetMenuDelay(0);
+			}
+		}
+	}
+	else if ((menucmd[0].dpad_lr > 0 || menucmd[0].dpad_lr < 0)
+		&& (!forceskin || setup_numskinlist < 2))
+	{
+		// if press right
+		if (menucmd[0].dpad_lr > 0)
+		{
+			setup_scrollbar = true;
 			S_StartSound(NULL, sfx_s3k5b);
 			M_SetMenuDelay(0);
 		}
+		// if press left
+		else if (menucmd[0].dpad_lr < 0)
+		{
+			setup_scrollbar = false;
+			S_StartSound(NULL, sfx_s3k5b);
+			M_SetMenuDelay(0);
+		}
+	}
+	else if (M_MenuExtraPressed(0) && !setup_scrollbar)
+	{
+		setup_listselect = 0;
+		sp->skin = setup_skinlist[setup_listselect];
+		setup_skinlist_slide.dist = 0;
+		setup_skinlist_slide.start = 0;
+
+		S_StartSound(NULL, sfx_s3k7b);
+		M_SetMenuDelay(0);
 	}
 	else if (M_MenuButtonPressed(0, MBT_Y) || M_MenuConfirmPressed(0))
 	{
@@ -1064,7 +1135,7 @@ static boolean M_HandleCharacterList(void)
 			setup_listview = false;
 			S_StartSound(NULL, sfx_s3k65);
 		}
-		else if (M_MenuConfirmPressed(0))
+		else if (M_MenuConfirmPressed(0) && !setup_scrollbar)
 		{
 			M_HandleBeginningColorsOrFollowers(sp);
 			M_SetMenuDelay(0);

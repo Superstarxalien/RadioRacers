@@ -2685,8 +2685,11 @@ void M_DrawCharacterSelect(void)
 				0
 		);
 
+		UINT16 cliprecty = 1+18;
+		UINT16 cliprectheight = 9*18;
+
 		// set a clip rect to cut off entries going above/below during transition
-		V_SetClipRect(0, (1+18)*FRACUNIT, BASEVIDWIDTH*FRACUNIT, (9*18)*FRACUNIT, 0);
+		V_SetClipRect(0, cliprecty*FRACUNIT, BASEVIDWIDTH*FRACUNIT, cliprectheight*FRACUNIT, 0);
 
 		for (l = 0; l < setup_numskinlist; l++, listy += 18)
 		{
@@ -2796,7 +2799,7 @@ void M_DrawCharacterSelect(void)
 
 			char stat[8] = "";
 			// currently doesn't pick up if character is Ironman, kinda want to keep that way? --Super
-			sprintf(stat, "[%d/%d]", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
+			sprintf(stat, "%d/%d", skins[setup_skinlist[l]]->kartspeed, skins[setup_skinlist[l]]->kartweight);
 			stat[7] = '\0';
 
 			fixed_t statwidth = V_StringScaledWidth(
@@ -2810,7 +2813,7 @@ void M_DrawCharacterSelect(void)
 
 			// render stat text
 			V_DrawStringScaled(
-				((csscenterx+68) * FRACUNIT) - (statwidth/2),
+				((csscenterx+66) * FRACUNIT) - (statwidth/2),
 				(listy+5) * FRACUNIT,
 				FRACUNIT,
 				FRACUNIT,
@@ -2826,6 +2829,28 @@ void M_DrawCharacterSelect(void)
 
 			// character icon
 			V_DrawMappedPatch(basex + 82, listy, 0, faceprefix[setup_skinlist[l]][FACE_RANK], colormap);
+
+			// render scrollbar (doesn't show up with forcecharacter)
+			if (!forceskin || setup_numskinlist < 2)
+			{
+				// 512 is the arbitrary amount of characters til the scrollbar reaches its smallest height
+				// 4 is the minimum height of the scrollbar
+				fixed_t scrollbarheightfixed = FixedDiv((512 * 4)*FRACUNIT, setup_numskinlist*FRACUNIT);
+				UINT16 scrollbarheight = scrollbarheightfixed>>FRACBITS;
+
+				// clamp max height to half of scrollbar
+				scrollbarheight = scrollbarheight < 4 ? 4 : (scrollbarheight > (cliprectheight/2) ? (cliprectheight/2) : scrollbarheight);
+
+				// rescale selected character value to [0, 1] and multiply with clip rect height (which is the max scroll bar travel distance)
+				fixed_t scrollbaryfixed = (cliprecty*FRACUNIT) + FixedMul(FixedDiv(setup_listselect*FRACUNIT, (setup_numskinlist - 1)*FRACUNIT), (cliprectheight*FRACUNIT)) - ((scrollbarheight/2)*FRACUNIT);
+				UINT16 scrollbary = scrollbaryfixed>>FRACBITS;
+				
+				// clamp max top and bottom position
+				scrollbary = scrollbary < cliprecty ? cliprecty : (scrollbary > (cliprecty + cliprectheight - scrollbarheight) ? (cliprecty + cliprectheight - scrollbarheight) : scrollbary);
+
+				// draw the actual scrollbar (it's just a black bar)
+				V_DrawFill(csscenterx+73, scrollbary, 3, scrollbarheight, !!setup_scrollbar ? 0 : 31);
+			}
 		}
 
 		V_ClearClipRect();
