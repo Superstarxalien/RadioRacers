@@ -2835,7 +2835,7 @@ void M_DrawCharacterSelect(void)
 			{
 				// 512 is the arbitrary amount of characters til the scrollbar reaches its smallest height
 				// 4 is the minimum height of the scrollbar
-				fixed_t scrollbarheightfixed = FixedDiv((512 * 4)*FRACUNIT, setup_numskinlist*FRACUNIT);
+				fixed_t scrollbarheightfixed = FixedDiv((9*cliprectheight)*FRACUNIT, setup_numskinlist*FRACUNIT);
 				UINT16 scrollbarheight = scrollbarheightfixed>>FRACBITS;
 
 				// clamp max height to half of scrollbar
