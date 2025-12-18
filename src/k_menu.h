@@ -873,6 +873,7 @@ extern UINT16 setup_numskinlist;
 extern UINT16 setup_listselect;
 extern menu_anim_t setup_skinlist_slide;
 extern boolean setup_listview;
+extern boolean setup_scrollbar;
 
 #define CSROTATETICS 6
 
