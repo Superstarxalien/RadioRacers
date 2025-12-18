@@ -1002,6 +1002,7 @@ static boolean M_HandleCharacterList(void)
 
 	if (menucmd[0].dpad_ud > 0 || menucmd[0].dpad_ud < 0)
 	{
+		// regular controls
 		if (!setup_scrollbar)
 		{
 			// do nothing other than play a sound if forceskin
@@ -1049,6 +1050,7 @@ static boolean M_HandleCharacterList(void)
 				}
 			}
 		}
+		// scrollbar controls
 		else
 		{
 			// if press down
@@ -1085,6 +1087,7 @@ static boolean M_HandleCharacterList(void)
 			}
 		}
 	}
+	// toggle scrollbar mode on and off
 	else if ((menucmd[0].dpad_lr > 0 || menucmd[0].dpad_lr < 0)
 		&& (!forceskin || setup_numskinlist < 2))
 	{
@@ -1103,6 +1106,7 @@ static boolean M_HandleCharacterList(void)
 			M_SetMenuDelay(0);
 		}
 	}
+	// "go to top" button
 	else if (M_MenuExtraPressed(0) && !setup_scrollbar)
 	{
 		UINT16 oldselect = setup_listselect;
@@ -1132,11 +1136,13 @@ static boolean M_HandleCharacterList(void)
 			}
 		}
 
+		// go to grid mode
 		if (M_MenuButtonPressed(0, MBT_Y))
 		{
 			setup_listview = false;
 			S_StartSound(NULL, sfx_s3k65);
 		}
+		// pick character
 		else if (M_MenuConfirmPressed(0) && !setup_scrollbar)
 		{
 			M_HandleBeginningColorsOrFollowers(sp);

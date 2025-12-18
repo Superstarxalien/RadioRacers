@@ -2761,9 +2761,9 @@ void M_DrawCharacterSelect(void)
 				K_DrawSticker(csscenterx - (stickerwidth/2), listy+4, stickerwidth, 0, false);
 
 				// render name
+				// if scrollbar mode is on then selected entry will flash using setup_animcounter
 				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect)
-					&& !(l == setup_listselect && setup_scrollbar
-					&& !((setup_animcounter/10) & 1)))
+					&& !(l == setup_listselect && setup_scrollbar && !((setup_animcounter/10) & 1)))
 				{
 					V_DrawStringScaled(
 						(csscenterx * FRACUNIT) - (namewidth/2),
@@ -2835,15 +2835,15 @@ void M_DrawCharacterSelect(void)
 			// render scrollbar (doesn't show up with forcecharacter)
 			if (!forceskin || setup_numskinlist < 2)
 			{
-				// 512 is the arbitrary amount of characters til the scrollbar reaches its smallest height
-				// 4 is the minimum height of the scrollbar
+				// you can see 9 characters on list view at a time
+				// so we partition the scrollbar (which max scroll distance is the same as cliprectheight) into chunks of 9
 				fixed_t scrollbarheightfixed = FixedDiv((9*cliprectheight)*FRACUNIT, setup_numskinlist*FRACUNIT);
 				UINT16 scrollbarheight = scrollbarheightfixed>>FRACBITS;
 
 				// clamp max height to half of scrollbar
 				scrollbarheight = scrollbarheight < 4 ? 4 : (scrollbarheight > (cliprectheight/2) ? (cliprectheight/2) : scrollbarheight);
 
-				// rescale selected character value to [0, 1] and multiply with clip rect height (which is the max scroll bar travel distance)
+				// rescale selected character value to [0, 1] and multiply with clip rect height
 				fixed_t scrollbaryfixed = (cliprecty*FRACUNIT) + FixedMul(FixedDiv(setup_listselect*FRACUNIT, (setup_numskinlist - 1)*FRACUNIT), (cliprectheight*FRACUNIT)) - ((scrollbarheight/2)*FRACUNIT);
 				UINT16 scrollbary = (scrollbaryfixed < cliprecty*FRACUNIT ? cliprecty*FRACUNIT : scrollbaryfixed)>>FRACBITS;
 				
