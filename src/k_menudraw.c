@@ -2876,9 +2876,7 @@ void M_DrawCharacterSelect(void)
 				K_DrawSticker(csscenterx - (stickerwidth/2), listy+4, stickerwidth, 0, false);
 
 				// render name
-				// if scrollbar mode is on then selected entry will flash using setup_animcounter
-				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect)
-					&& !(l == setup_listselect && setup_scrollbar && !((setup_animcounter/10) & 1)))
+				if (!(sp->mdepth == CSSTEP_READY && l == setup_listselect))
 				{
 					V_DrawStringScaled(
 						(csscenterx * FRACUNIT) - (namewidth/2),
