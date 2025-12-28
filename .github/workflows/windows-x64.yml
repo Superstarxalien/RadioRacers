@@ -1,96 +1,117 @@
-Windows x64:
-  extends: .srb2ci
+name: Build radioracers
 
-  stage: build
+on:
+  workflow_dispatch:
 
-  when: manual
+jobs:
+  compile:
+    runs-on: ubuntu-latest
 
-  timeout: 2h
+    env:
+      VCPKG_TARGET_TRIPLET: x64-mingw-static
+      CC: x86_64-w64-mingw32-gcc
+      CXX: x86_64-w64-mingw32-g++
+      LD: x86_64-w64-mingw32-ld
 
-  allow_failure: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: compile executable
+        run:
+        - |
+            # vcpkg
+            echo -e "\e[0Ksection_start:`date +%s`:vcpkg-root[collapsed=true]\r\e[0KSetting vcpkg cache"
 
-  cache:
-    - key: ccache-$CI_JOB_NAME_SLUG-$CI_COMMIT_REF_SLUG
-      fallback_keys:
-        - ccache-$CI_JOB_NAME_SLUG-$CI_DEFAULT_BRANCH
-        - ccache-$CI_JOB_NAME_SLUG-master
-      paths:
-        - build/ccache
-        - build/ccache_statslog
+            export VCPKG_DEFAULT_BINARY_CACHE="$(pwd)/build/vcpkg-binary-cache"
 
-    - key: apt-$CI_JOB_IMAGE
-      paths:
-        - build/apt-cache
-      unprotect: true
+            mkdir -p "build/vcpkg-binary-cache"
 
-    - key: vcpkg-binary-cache-x64-mingw-static
-      paths:
-        - build/vcpkg-binary-cache
-      unprotect: true
+            echo -e "\e[0Ksection_end:`date +%s`:vcpkg-root\r\e[0K"
 
-  artifacts:
-    paths:
-      - "build.cmake/bin/"
-      - "build.cmake/src/config.h"
-    expose_as: "Win64"
-    name: "$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA-Win64"
+        - - |
+              # apt_toolchain
+              echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
+          - apt-get install g++-mingw-w64-x86-64-win32
+          - |
+              # apt_toolchain
+              echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
 
-  variables:
-    VCPKG_TARGET_TRIPLET: x64-mingw-static
-    CC: x86_64-w64-mingw32-gcc
-    CXX: x86_64-w64-mingw32-g++
-    LD: x86_64-w64-mingw32-ld
+        - - |
+              # apt_development
+              echo -e "\e[0Ksection_start:`date +%s`:apt_development[collapsed=true]\r\e[0KInstalling development packages"
+          - apt-get install ninja-build
+          - |
+              # apt_development
+              echo -e "\e[0Ksection_end:`date +%s`:apt_development\r\e[0K"
 
-  script:
-    - |
-        # vcpkg
-        echo -e "\e[0Ksection_start:`date +%s`:vcpkg-root[collapsed=true]\r\e[0KSetting vcpkg cache"
+        - - |
+              # cmake
+              echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
+          - |
+              cmake \
+                --preset ninja-release \
+                -B build.cmake \
+                -G "Unix Makefiles" \
+                -DCMAKE_COLOR_DIAGNOSTICS=OFF \
+                -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/toolchains/mingw.cmake \
+                -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
+                -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
+                -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
+                -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
+                -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
+          - |
+              # cmake
+              echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
 
-        export VCPKG_DEFAULT_BINARY_CACHE="$(pwd)/build/vcpkg-binary-cache"
+        - - |
+              # make
+              echo -e "\e[0Ksection_start:`date +%s`:make[collapsed=false]\r\e[0KCompiling SRB2"
+          - cmake --build build.cmake --parallel 1 -- --keep-going
+          - |
+              # make
+              echo -e "\e[0Ksection_end:`date +%s`:make\r\e[0K"
 
-        mkdir -p "build/vcpkg-binary-cache"
+  zip:
+    runs-on: ubuntu-latest
 
-        echo -e "\e[0Ksection_end:`date +%s`:vcpkg-root\r\e[0K"
+    steps:
+      - name: zip compiled build
+        run: |
+          cd build.cmake
+          zip radioracers-superstarxalien.zip bin
+          mv radioracers-superstarxalien.zip ../
 
-    - - |
-          # apt_toolchain
-          echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
-      - apt-get install g++-mingw-w64-x86-64-win32
-      - |
-          # apt_toolchain
-          echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
+  run-pk3-script:
+    runs-on: ubuntu-latest
 
-    - - |
-          # apt_development
-          echo -e "\e[0Ksection_start:`date +%s`:apt_development[collapsed=true]\r\e[0KInstalling development packages"
-      - apt-get install ninja-build
-      - |
-          # apt_development
-          echo -e "\e[0Ksection_end:`date +%s`:apt_development\r\e[0K"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Init Python 
+        uses: actions/setup-python@v5
+        with: 
+            python-version: '3.x'
 
-    - - |
-          # cmake
-          echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
-      - |
-          cmake \
-            --preset ninja-release \
-            -B build.cmake \
-            -G "Unix Makefiles" \
-            -DCMAKE_COLOR_DIAGNOSTICS=OFF \
-            -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/toolchains/mingw.cmake \
-            -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
-            -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
-            -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
-            -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
-            -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
-      - |
-          # cmake
-          echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
+      - name: Build radioracers.pk3
+        run: python radio/pk3/pk3make.py radio/pk3/build/radioracers.txt --force -o radio/pk3/out/radioracers.pk3 -b radio/pk3/src/radioracers
 
-    - - |
-          # make
-          echo -e "\e[0Ksection_start:`date +%s`:make[collapsed=false]\r\e[0KCompiling SRB2"
-      - cmake --build build.cmake --parallel 1 -- --keep-going
-      - |
-          # make
-          echo -e "\e[0Ksection_end:`date +%s`:make\r\e[0K"
+      - name: Build radioracers_plus.pk3
+        run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_plus.txt --force -o radio/pk3/out/radioracers_plus.pk3 -b radio/pk3/src/radioracers_plus
+
+      - name: Zip the assets
+        run: |
+          cd radio/pk3/out
+          zip radioracers_assets.zip radioracers.pk3 radioracers_plus.pk3
+          mv radioracers_assets.zip ../../../
+
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Upload radioracers as github release
+        uses: softprops/action-gh-release@v2
+        with:
+            tag_name: radioracers-superstarxalien-latest
+            token: ${{ secrets.GITHUB_TOKEN }}
+            files: radioracers-superstarxalien.zip
+          
