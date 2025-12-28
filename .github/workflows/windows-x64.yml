@@ -17,8 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: compile executable
-        run:
-        - |
+        run: |
             # vcpkg
             echo -e "\e[0Ksection_start:`date +%s`:vcpkg-root[collapsed=true]\r\e[0KSetting vcpkg cache"
 
