@@ -26,13 +26,13 @@ jobs:
       - name: apt_toolchain
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
-          apt-get install g++-mingw-w64-x86-64-win32
+          sudo apt-get install g++-mingw-w64-x86-64-win32
           echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
 
       - name: apt_development
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:apt_development[collapsed=true]\r\e[0KInstalling development packages"
-          apt-get install ninja-build
+          sudo apt-get install ninja-build
           echo -e "\e[0Ksection_end:`date +%s`:apt_development\r\e[0K"
 
       - name: cmake
