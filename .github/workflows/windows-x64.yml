@@ -46,7 +46,7 @@ jobs:
           -DCMAKE_COLOR_DIAGNOSTICS=OFF \
           -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/toolchains/mingw.cmake \
           -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake \
-          -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
+          -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}
           echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
 
       - name: make
