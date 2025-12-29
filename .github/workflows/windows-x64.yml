@@ -74,13 +74,13 @@ jobs:
           cd radio/pk3/out
           mv radioracers.pk3 ../../../build.cmake/bin
           mv radioracers_plus.pk3 ../../../build.cmake/bin
-          cd ../../../build.cmake
-          zip -r radioracers-superstarxalien.zip bin
+          cd ../../../build.cmake/bin
+          zip -r radioracers-superstarxalien.zip .
 
       - name: Upload radioracers as github release
         uses: softprops/action-gh-release@v2
         with:
             tag_name: radioracers-superstarxalien-latest
             token: ${{ secrets.GITHUB_TOKEN }}
-            files: radioracers-superstarxalien.zip
+            files: build.cmake/bin/radioracers-superstarxalien.zip
           
