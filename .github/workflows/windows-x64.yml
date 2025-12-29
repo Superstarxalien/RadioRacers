@@ -45,11 +45,8 @@ jobs:
           -G "Unix Makefiles" \
           -DCMAKE_COLOR_DIAGNOSTICS=OFF \
           -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/toolchains/mingw.cmake \
-          -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
-          -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
           -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake \
           -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
-          -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
           echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
 
       - name: make
