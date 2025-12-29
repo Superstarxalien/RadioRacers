@@ -37,6 +37,7 @@ jobs:
 
       - name: cmake
         run: |
+          sudo apt-get install nasm
           echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
           cmake \
           --preset ninja-release \
