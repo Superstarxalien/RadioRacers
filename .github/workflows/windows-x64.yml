@@ -58,16 +58,6 @@ jobs:
           cmake --build build.cmake --parallel 1 -- --keep-going
           echo -e "\e[0Ksection_end:`date +%s`:make\r\e[0K"
 
-  zip:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: zip compiled build
-        run: |
-          cd build.cmake
-          zip radioracers-superstarxalien.zip bin
-          mv radioracers-superstarxalien.zip ../
-
   run-pk3-script:
     runs-on: ubuntu-latest
 
@@ -85,14 +75,21 @@ jobs:
       - name: Build radioracers_plus.pk3
         run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_plus.txt --force -o radio/pk3/out/radioracers_plus.pk3 -b radio/pk3/src/radioracers_plus
 
-      - name: Zip the assets
+  zip:
+    runs-on: ubuntu-latest
+
+    needs: [compile, run-pk3-script]
+
+    steps:
+      - name: zip compiled build
         run: |
-          cd radio/pk3/out
-          zip radioracers_assets.zip radioracers.pk3 radioracers_plus.pk3
-          mv radioracers_assets.zip ../../../
+          zip radioracers-superstarxalien.zip radio/pk3/out/radioracers.pk3 radio/pk3/out/radioracers_plus.pk3 build.cmake/bin
+          mv radioracers-superstarxalien.zip
 
   release:
     runs-on: ubuntu-latest
+
+    needs: zip
 
     steps:
       - name: Upload radioracers as github release
