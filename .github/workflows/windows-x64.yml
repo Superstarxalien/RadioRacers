@@ -75,7 +75,7 @@ jobs:
           mv radioracers.pk3 ../../../build.cmake/bin
           mv radioracers_plus.pk3 ../../../build.cmake/bin
           cd ../../../build.cmake/bin
-          zip -R radioracers-superstarxalien.zip /*
+          zip -r radioracers-superstarxalien.zip .
 
       - name: Upload radioracers as github release
         uses: softprops/action-gh-release@v2
