@@ -84,7 +84,6 @@ jobs:
       - name: zip compiled build
         run: |
           zip -r radioracers-superstarxalien.zip . -i radio/pk3/out/radioracers.pk3 radio/pk3/out/radioracers_plus.pk3 /build.cmake/bin/
-          mv radioracers-superstarxalien.zip
 
   release:
     runs-on: ubuntu-latest
