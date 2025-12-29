@@ -39,14 +39,14 @@ jobs:
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
           cmake \
-          --preset ninja-x86_mingw_static_vcpkg-release \
+          --preset ninja-release \
           -B build.cmake \
           -G "Unix Makefiles" \
           -DCMAKE_COLOR_DIAGNOSTICS=OFF \
-          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/toolchains/mingw.cmake \
+          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/toolchains/mingw.cmake \
           -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
           -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
-          -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake \
           -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
           -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
           echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
