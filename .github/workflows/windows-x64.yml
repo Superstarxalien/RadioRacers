@@ -16,59 +16,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: compile executable
+      - name: vcpkg
         run: |
-            # vcpkg
-            echo -e "\e[0Ksection_start:`date +%s`:vcpkg-root[collapsed=true]\r\e[0KSetting vcpkg cache"
+          echo -e "\e[0Ksection_start:`date +%s`:vcpkg-root[collapsed=true]\r\e[0KSetting vcpkg cache"
+          export VCPKG_DEFAULT_BINARY_CACHE="$(pwd)/build/vcpkg-binary-cache"
+          mkdir -p "build/vcpkg-binary-cache"
+          echo -e "\e[0Ksection_end:`date +%s`:vcpkg-root\r\e[0K"
 
-            export VCPKG_DEFAULT_BINARY_CACHE="$(pwd)/build/vcpkg-binary-cache"
+      - name: apt_toolchain
+        run: |
+          echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
+          apt-get install g++-mingw-w64-x86-64-win32
+          echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
 
-            mkdir -p "build/vcpkg-binary-cache"
+      - name: apt_development
+        run: |
+          echo -e "\e[0Ksection_start:`date +%s`:apt_development[collapsed=true]\r\e[0KInstalling development packages"
+          apt-get install ninja-build
+          echo -e "\e[0Ksection_end:`date +%s`:apt_development\r\e[0K"
 
-            echo -e "\e[0Ksection_end:`date +%s`:vcpkg-root\r\e[0K"
+      - name: cmake
+        run: |
+          echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
+          cmake \
+          --preset ninja-release \
+          -B build.cmake \
+          -G "Unix Makefiles" \
+          -DCMAKE_COLOR_DIAGNOSTICS=OFF \
+          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/toolchains/mingw.cmake \
+          -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
+          -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
+          -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
+          -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
+          echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
 
-        - - |
-              # apt_toolchain
-              echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
-          - apt-get install g++-mingw-w64-x86-64-win32
-          - |
-              # apt_toolchain
-              echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
-
-        - - |
-              # apt_development
-              echo -e "\e[0Ksection_start:`date +%s`:apt_development[collapsed=true]\r\e[0KInstalling development packages"
-          - apt-get install ninja-build
-          - |
-              # apt_development
-              echo -e "\e[0Ksection_end:`date +%s`:apt_development\r\e[0K"
-
-        - - |
-              # cmake
-              echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
-          - |
-              cmake \
-                --preset ninja-release \
-                -B build.cmake \
-                -G "Unix Makefiles" \
-                -DCMAKE_COLOR_DIAGNOSTICS=OFF \
-                -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/toolchains/mingw.cmake \
-                -DSRB2_CONFIG_ENABLE_WEBM_MOVIES=OFF \
-                -DSRB2_CONFIG_ENABLE_DISCORDRPC=OFF \
-                -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
-                -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
-                -DSRB2_CONFIG_ALWAYS_MAKE_DEBUGLINK=ON
-          - |
-              # cmake
-              echo -e "\e[0Ksection_end:`date +%s`:cmake\r\e[0K"
-
-        - - |
-              # make
-              echo -e "\e[0Ksection_start:`date +%s`:make[collapsed=false]\r\e[0KCompiling SRB2"
-          - cmake --build build.cmake --parallel 1 -- --keep-going
-          - |
-              # make
-              echo -e "\e[0Ksection_end:`date +%s`:make\r\e[0K"
+      - name: make
+        run: |
+          echo -e "\e[0Ksection_start:`date +%s`:make[collapsed=false]\r\e[0KCompiling SRB2"
+          cmake --build build.cmake --parallel 1 -- --keep-going
+          echo -e "\e[0Ksection_end:`date +%s`:make\r\e[0K"
 
   zip:
     runs-on: ubuntu-latest
