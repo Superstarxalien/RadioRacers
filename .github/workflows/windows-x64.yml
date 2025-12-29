@@ -39,7 +39,7 @@ jobs:
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:cmake[collapsed=false]\r\e[0KBuilding Makefiles"
           cmake \
-          --preset ninja-release \
+          --preset ninja-x86_mingw_static_vcpkg-release \
           -B build.cmake \
           -G "Unix Makefiles" \
           -DCMAKE_COLOR_DIAGNOSTICS=OFF \
