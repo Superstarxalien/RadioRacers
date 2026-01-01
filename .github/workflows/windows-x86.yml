@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      VCPKG_TARGET_TRIPLET: x64-mingw-static
-      CC: x86_64-w64-mingw32-gcc
-      CXX: x86_64-w64-mingw32-g++
-      LD: x86_64-w64-mingw32-ld
+      VCPKG_TARGET_TRIPLET: x86-mingw-static
+      CC: i686-w64-mingw32-gcc
+      CXX: i686-w64-mingw32-g++
+      LD: i686-w64-mingw32-ld
 
     steps:
       - name: Checkout
@@ -26,7 +26,7 @@ jobs:
       - name: apt_toolchain
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
-          sudo apt-get install g++-mingw-w64-x86-64-win32
+          sudo apt-get install g++-mingw-w64-i686-win32
           echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
 
       - name: apt_development
