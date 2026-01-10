@@ -2813,7 +2813,7 @@ void M_DrawCharacterSelect(void)
 
 			// render stat text
 			V_DrawStringScaled(
-				((csscenterx+66) * FRACUNIT) - (statwidth/2),
+				((csscenterx+65) * FRACUNIT) - (statwidth/2),
 				(listy+5) * FRACUNIT,
 				FRACUNIT,
 				FRACUNIT,
@@ -2846,10 +2846,12 @@ void M_DrawCharacterSelect(void)
 				UINT16 scrollbary = (scrollbaryfixed < cliprecty*FRACUNIT ? cliprecty*FRACUNIT : scrollbaryfixed)>>FRACBITS;
 				
 				// clamp max top and bottom position
-				scrollbary = scrollbary < cliprecty ? cliprecty : (scrollbary > (cliprecty + cliprectheight - scrollbarheight) ? (cliprecty + cliprectheight - scrollbarheight) : scrollbary);
+				scrollbary = scrollbary < cliprecty+1 ? cliprecty+1 : (scrollbary > (cliprecty + cliprectheight - scrollbarheight - 1) ? (cliprecty + cliprectheight - scrollbarheight - 1) : scrollbary);
+
+				if (!!setup_scrollbar) V_DrawFill(csscenterx+73-1, scrollbary-1, 5, scrollbarheight+2, 0);
 
 				// draw the actual scrollbar (it's just a black bar)
-				V_DrawFill(csscenterx+73, scrollbary, 3, scrollbarheight, !!setup_scrollbar ? 0 : 31);
+				V_DrawFill(csscenterx+73, scrollbary, 3, scrollbarheight, 31);
 			}
 		}
 
