@@ -1140,6 +1140,7 @@ static boolean M_HandleCharacterList(void)
 		if (M_MenuButtonPressed(0, MBT_Y))
 		{
 			setup_listview = false;
+			setup_scrollbar = false;
 			S_StartSound(NULL, sfx_s3k65);
 		}
 		// pick character
