@@ -338,7 +338,7 @@ void M_CharacterSelectInit(void)
 		// i set this up as its own amount of skins as
 		// a list view of skins wouldn't be bound by "character alts"
 		// might have to change this eventually though --Super
-		setup_skinlist[i] = i;
+		setup_skinlist[setup_numskinlist] = i;
 		setup_numskinlist++;
 
 		if (setup_chargrid[x][y].numskins >= MAXCLONES)
