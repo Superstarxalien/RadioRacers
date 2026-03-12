@@ -717,6 +717,9 @@ consvar_t cv_chat_emotes_sort = Player("chat_emotes_sort", "Alphabetical").value
 	{2, "Favourites"}
 }).onchange(RR_ChatEmoteSort_OnChange).radio();
 
+// Server
+consvar_t cv_lastknownserver = Player("lastknownserver", "").dont_save().radio();
+
 /**
  * RadioRacers: END
  */
