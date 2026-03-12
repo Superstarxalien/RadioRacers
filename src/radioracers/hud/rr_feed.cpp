@@ -511,6 +511,7 @@ static ItemConfigForFeedUpdate getItemConfigForFeedDamageUpdate(mobj_t *mo) {
         case MT_ORBINAUT_SHIELD:
             return {"RRISORBN", 24, 22};
         case MT_JAWZ:
+        case MT_JAWZ_SHIELD:
             return {"RRISJAWZ", 30, 20};
         case MT_BANANA:
         case MT_BANANA_SHIELD:
