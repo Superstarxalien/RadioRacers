@@ -2392,7 +2392,7 @@ static void K_drawBackupItem(void)
 	boolean drawingOnPlayer = (cv_rouletteonplayer.value == 1 && r_splitscreen == 0);
 	const fixed_t baseHudScaleFixed = (drawingOnPlayer) ? RR_getItemBoxHudScale() : FRACUNIT;
 	const float_t baseHudScaleFloat = RR_getItemBoxHudScaleFloat();
-	INT32 backupitemflags = transflag|V_SLIDEIN;
+	INT32 backupitemflags = transflag|V_SLIDEIN|fflags;
 	
 	if (drawingOnPlayer) {
 		backupitemflags = V_20TRANS;
