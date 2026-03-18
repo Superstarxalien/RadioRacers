@@ -1597,7 +1597,6 @@ boolean serverlistmode = false;
 static boolean resendserverlistnode[MAXNETNODES];
 
 // Radio
-static char serverlisttempnodes[MAXNETNODES][16];
 serverextrainfo_t serverextrainfo[MAXNETNODES];
 serverextrainfo_t serverextrainfoqueue[MAXNETNODES];
 
@@ -1616,7 +1615,6 @@ static void SL_ClearServerList(INT32 connectedserver)
 	serverlistcount = 0;
 
 	memset(resendserverlistnode, 0, sizeof resendserverlistnode);
-	memset(serverlisttempnodes, 0, sizeof serverlisttempnodes);
 	memset(serverextrainfo, 0, sizeof serverextrainfo);
 	memset(serverextrainfoqueue, 0, sizeof serverextrainfoqueue);
 }
@@ -1745,8 +1743,6 @@ void CL_QueryServerList (msg_server_t *server_list)
 
 			resendserverlistnode[node] = true;
 
-			// Radio
-			strncpy(serverlisttempnodes[node], server_list[i].ip, 16);
 			// Leave this node open. It'll be closed if the
 			// request times out (CL_TimeoutServerList).
 		}
@@ -2461,11 +2457,6 @@ static void CL_ConnectToServer(void)
 		CON_LogMessage(va(M_GetText("Version: %d.%d\n"),
 		 serverlist[i].info.version, serverlist[i].info.subversion));
 	}
-	// Radio
-	if (serverlisttempnodes[servernode][0]) {
-		// THEN save the temporary IP
-		strlcpy(tempJoinedIP, serverlisttempnodes[servernode], 16);
-	}
 
 	SL_ClearServerList(servernode);
 
@@ -2506,10 +2497,8 @@ static void CL_ConnectToServer(void)
 	// It works... sometimes but not always which is weird.
 
 	tmpsave[0] = '\0'; // TEMPORARY -- connectedservername is currently only set for YOUR server
-	if (joinedIP[0]) { // false if we have "" which is \0
+	if (joinedIP[0]) // false if we have "" which is \0
 		M_AddToJoinedIPs(joinedIP, tmpsave); //connectedservername); -- as above
-		strlcpy(tempJoinedIPManual, joinedIP, MAX_LOGIP); // Radio
-	}
 
 	joinedIP[0] = '\0';	// And empty this for good measure regardless of whether or not we actually used it.
 
@@ -2618,6 +2607,9 @@ static void Command_connect(void)
 	{
 		setup_numplayers = 1;
 	}
+
+	// Radio - reconnect
+	CV_Set(&cv_lastknownserver, I_GetNodeAddress(servernode));
 
 	CL_ConnectToServer();
 }
@@ -4773,15 +4765,7 @@ static void reconnect_to_server(INT32 choice)
 {
 	if (choice == MA_YES)
 	{
-		const char* tempIP = (tempJoinedIP[0] != '\0') ? tempJoinedIP : tempJoinedIPManual;
-		if (tempIP) {
-			tempJoinedIP[0] = '\0';
-			tempJoinedIPManual[0] = '\0';
-			M_JoinIP(tempIP);
-		} else {
-			tempJoinedIP[0] = '\0';
-			tempJoinedIPManual[0] = '\0';
-		}
+		M_JoinIP(cv_lastknownserver.string);
 	}
 }
 

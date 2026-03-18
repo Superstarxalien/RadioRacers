@@ -120,6 +120,9 @@ extern consvar_t cv_battle_toggle_emerald_on_minimap;
 extern consvar_t cv_battle_toggle_ufo_timer_on_minimap;
 extern consvar_t cv_battle_toggle_winner_announcement;
 
+// Server
+extern consvar_t cv_lastknownserver; // Reconnect on server disconnect
+
 void RumbleEvents_OnChange(void);
 void Roulette_OnChange(void);
 #ifdef __cplusplus

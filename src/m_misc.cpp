@@ -170,8 +170,6 @@ g_takemapthumbnail_t g_takemapthumbnail = TMT_NO;
 
 char joinedIPlist[NUMLOGIP][2][MAX_LOGIP];
 char joinedIP[MAX_LOGIP];
-char tempJoinedIP[16]; // Radio
-char tempJoinedIPManual[MAX_LOGIP]; // Radio
 
 // This initializes the above array to have NULL evrywhere it should.
 void M_InitJoinedIPArray(void)

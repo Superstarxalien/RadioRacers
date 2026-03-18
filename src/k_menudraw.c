@@ -1116,6 +1116,7 @@ static const char *M_CreateSecretMenuOption(const char *str)
 void M_DrawGenericMenu(void)
 {
 	INT32 x = currentMenu->x, y = currentMenu->y, w, i, cursory = 0;
+	const INT32 highresflags = IS_WEIRD_RES() ? V_SNAPTOTOP : 0;
 
 	M_DrawMenuTooltips();
 
@@ -1159,9 +1160,9 @@ void M_DrawGenericMenu(void)
 					cursory = y;
 
 				if ((currentMenu->menuitems[i].status & IT_DISPLAY)==IT_STRING)
-					V_DrawMenuString(x, y, V_SNAPTOTOP, currentMenu->menuitems[i].text);
+					V_DrawMenuString(x, y, highresflags, currentMenu->menuitems[i].text);
 				else
-					V_DrawMenuString(x, y, highlightflags|V_SNAPTOTOP, currentMenu->menuitems[i].text);
+					V_DrawMenuString(x, y, highlightflags|highresflags, currentMenu->menuitems[i].text);
 
 				// Cvar specific handling
 				switch (currentMenu->menuitems[i].status & IT_TYPE)
@@ -1196,13 +1197,13 @@ void M_DrawGenericMenu(void)
 							default:
 								w = V_MenuStringWidth(cv->string, 0);
 								V_DrawMenuString(BASEVIDWIDTH - x - w, y,
-									((cv->flags & CV_CHEAT) && !CV_IsSetToDefault(cv) ? warningflags|V_SNAPTOTOP : highlightflags|V_SNAPTOTOP), cv->string);
+									((cv->flags & CV_CHEAT) && !CV_IsSetToDefault(cv) ? warningflags|highresflags : highlightflags|highresflags), cv->string);
 								if (i == itemOn)
 								{
 									V_DrawMenuString(BASEVIDWIDTH - x - 10 - w - (skullAnimCounter/5), y,
-											highlightflags|V_SNAPTOTOP, "\x1C"); // left arrow
+											highlightflags|highresflags, "\x1C"); // left arrow
 									V_DrawMenuString(BASEVIDWIDTH - x + 2 + (skullAnimCounter/5), y,
-											highlightflags|V_SNAPTOTOP, "\x1D"); // right arrow
+											highlightflags|highresflags, "\x1D"); // right arrow
 								}
 								break;
 						}
@@ -1254,14 +1255,14 @@ void M_DrawGenericMenu(void)
 	if (((currentMenu->menuitems[itemOn].status & IT_DISPLAY) == IT_PATCH)
 		|| ((currentMenu->menuitems[itemOn].status & IT_DISPLAY) == IT_NOTHING))
 	{
-		V_DrawScaledPatch(currentMenu->x + SKULLXOFF, cursory - 5, V_SNAPTOTOP,
+		V_DrawScaledPatch(currentMenu->x + SKULLXOFF, cursory - 5, highresflags,
 			W_CachePatchName("M_CURSOR", PU_CACHE));
 	}
 	else
 	{
-		V_DrawScaledPatch(currentMenu->x - 24, cursory, V_SNAPTOTOP,
+		V_DrawScaledPatch(currentMenu->x - 24, cursory, highresflags,
 			W_CachePatchName("M_CURSOR", PU_CACHE));
-		V_DrawMenuString(currentMenu->x, cursory, highlightflags|V_SNAPTOTOP, currentMenu->menuitems[itemOn].text);
+		V_DrawMenuString(currentMenu->x, cursory, highlightflags|highresflags, currentMenu->menuitems[itemOn].text);
 	}
 }
 
@@ -4854,6 +4855,8 @@ static void M_DrawServerCountAndHorizontalBar(void)
 	const char throbber[4] = {'-', '\\', '|', '/'};
 	UINT8 throbindex = (mpmenu.ticker/4) % 4;
 
+	const INT32 highresflags = IS_WEIRD_RES() ? V_SNAPTOTOP : 0;
+
 	switch (M_GetWaitingMode())
 	{
 		case M_WAITING_VERSION:
@@ -4888,7 +4891,7 @@ static void M_DrawServerCountAndHorizontalBar(void)
 		V_DrawRightAlignedMenuString(
 			BASEVIDWIDTH - currentMenu->x,
 			y,
-			highlightflags|V_SNAPTOTOP,
+			highlightflags|highresflags,
 			text
 		);
 	}
@@ -4896,13 +4899,13 @@ static void M_DrawServerCountAndHorizontalBar(void)
 	{
 		V_DrawRightAlignedMenuString(
 			BASEVIDWIDTH - currentMenu->x - 12, y,
-			highlightflags|V_SNAPTOTOP,
+			highlightflags|highresflags,
 			text
 		);
 
 		V_DrawCenteredString( // Only clean way to center the throbber without exposing character width
 			BASEVIDWIDTH - currentMenu->x - 4, y,
-			highlightflags|V_SNAPTOTOP,
+			highlightflags|highresflags,
 			va("%c", throbber[throbindex])
 		);
 	}
@@ -4929,7 +4932,8 @@ static inline void drawAsterisk(INT32 x, INT32 y, INT32 transflag) {
 }
 
 static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
-	const INT32 baseflags = transflag|V_SNAPTOTOP;
+	const INT32 highresflags = IS_WEIRD_RES() ? V_SNAPTOTOP : 0;
+	const INT32 baseflags = transflag|(highresflags);
 	const INT32 peekx = basex + 9;
 	const INT32 peeky = basey + 5;
 
@@ -4947,7 +4951,7 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 		(basex) << FRACBITS, 
 		(basey) << FRACBITS,
 		275<<FRACBITS,
-		(mpmenu.serverslide_y)<<FRACBITS, V_SNAPTOTOP
+		(mpmenu.serverslide_y)<<FRACBITS, highresflags
 	);
 
 	// --- EVERYTHING IN BETWEEN
@@ -5066,7 +5070,11 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 	char maptitlebuffer[40]; 
 	if (mpmenu.serverpreview_mapchecked) {
 		// 33 (d_clisrv.h) + " Zone" + "\0"
-		char* actualmaptitle = G_BuildMapTitle(mpmenu.serverpreview_map);
+		const boolean isValidMapNum = mpmenu.serverpreview_map > nummapheaders || !mapheaderinfo[mpmenu.serverpreview_map];
+		char* actualmaptitle = NULL;
+		if(isValidMapNum) {
+			actualmaptitle = G_BuildMapTitle(mpmenu.serverpreview_map);
+		}
 		if (actualmaptitle == NULL) {
 			snprintf(maptitlebuffer, sizeof(maptitlebuffer), "%s", maptitle);
 		} else {
@@ -5186,21 +5194,6 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 				V_DrawFill(plrinfo_x, plrinfo_y, plr_placeholder_w, 8, 25|baseflags);
 				plrinfo_y += 10;
 			}
-			playercount++;
-		}
-	} else {
-		// Draw placeholders
-		for (UINT8 i = 0; i < servermaxplayers; i++) {
-			// New list every 5 players
-			if (playercount > 0 && playercount % 5 == 0) {
-				plrinfo_y = plrinfo_y_default;
-				plrinfo_x += (longestname_default>>FRACBITS) + 10;
-				longestname = longestname_default;
-				playercount = 0;
-			}
-
-			V_DrawFill(plrinfo_x, plrinfo_y, plr_placeholder_w, 8, 25|baseflags);
-			plrinfo_y += 10;
 			playercount++;
 		}
 	}
