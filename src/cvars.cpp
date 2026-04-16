@@ -583,7 +583,7 @@ consvar_t cv_gingeritemtimersoffset = Player("huditemtimersoffset", "0").floatin
 consvar_t cv_powersound = Player("powersoundhc", "Off").on_off().radio();
 consvar_t cv_powersoundjoke = Player("powersoundjokehc", "On").on_off().onchange_noinit(KartExtraPowerSound_OnChange).radio();
 
-consvar_t cv_show_riders_finish_ticker = Player("ridersfinishticker", "On").on_off().onchange_noinit(KartFinishLineTicker_OnChange);
+consvar_t cv_show_riders_finish_ticker = Player("ridersfinishticker", "On").on_off().onchange_noinit(KartFinishLineTicker_OnChange).radio();
 
 // Rumble Events
 consvar_t cv_morerumbleevents = Player("morerumbleevents", "On").on_off().onchange(RumbleEvents_OnChange).radio();
