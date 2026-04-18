@@ -5719,11 +5719,12 @@ static void K_drawKartSpeedometer(boolean gametypeinfoshown)
 	 * 
 	 * Normal HUD
 	 * No Rings, No lives? fy = LAPS_Y - 0
-	 * No laps, no exp? fy = LAPS_Y - 14
+	 * No laps, no exp? fy = LAPS_Y + 14
 	 * 
 	 * Mini/Splitscreen HUD
-	 * No Rings, No lives? fy = LAPS_Y - 10(?)
-	 * No laps, no exp? fy = LAPS_Y - 20 (?)
+	 * Default? fy = LAPS_Y - 2
+	 * No Rings, No lives? fy = LAPS_Y + 10
+	 * No laps, no exp? fy = LAPS_Y + 20
 	 */
 	if (DRAW_MINI_HUD_DETAILS) {
 		fy = LAPS_Y - 2;
