@@ -4,8 +4,6 @@
 
 <p></p>
 
-<p align="right">RadioRacers <span style="font-size: 0.8rem !important">(this is for SEO)</span></p>
-
 A [Dr. Robotnik's Ring Racers](https://www.kartkrew.org/) fork.
 <br><small>Last updated for **v2.4**.</small>
 
@@ -48,7 +46,7 @@ For details on customization, such as adding your own emotes and usability tips,
 In the Server Browser, you can "peek" into a server to view key details, such as the current level and connected players.
 </details>
 
-...and [more](https://github.com/blondedradio/RadioRacers/pulls).
+...and [more](https://github.com/blondedradio/RadioRacers/pulls?q=is%3Apr+label%3Aenhancement).
 
 ## Getting Started
 1. Get the [**latest copy**](https://www.kartkrew.org/) of Dr. Robontik's Ring Racers installed on your system.
@@ -61,7 +59,7 @@ In the Server Browser, you can "peek" into a server to view key details, such as
 ### Compiling
 If you don't know how to compile, either attempt it yourself (good practice) or ask someone you trust to do it for you.
 
-If you want to try it yourself, follow the [instructions](https://github.com/KartKrewDev/RingRacers?tab=readme-ov-file#development) in the original README to compile the build.<br/>
+If you want to try it yourself, follow the [instructions](https://github.com/KartKrewDev/RingRacers?tab=readme-ov-file#development) in the original README to compile the build on Linux/Windows.<br/>
 If you're on Windows 10 (or above), try following [this](https://blondedradio.github.io/rr-compile-windows-guide/) guide.
 
 However, if you grab a build from — say — a random Discord channel, *please* encourage whoever shared it to include [MD5 hashes](https://linuxsecurity.com/features/what-are-checksums-why-should-you-be-using-them) with the executable. It's spooky out here.
