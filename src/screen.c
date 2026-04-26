@@ -535,7 +535,7 @@ void SCR_DisplayTicRate(void)
 	UINT32 benchmark = (cap == 0) ? I_GetRefreshRate() : cap;
 	INT32 x = 317;
 	const boolean isActuallyDrawingInput = isDrawingInput && cv_inputdisplaytogglesize.value;
-	const boolean isDrawingPing = isPingDrawn && r_splitscreen == 0;
+	const boolean isDrawingPing = isPingDrawn && cv_hud_displaypingbesideticrate.value && r_splitscreen == 0;
 
 	if (isDrawingPing)
 	{
@@ -598,16 +598,21 @@ void SCR_DisplayLocalPing(void)
 	UINT32 mindelay = playerdelaytable[consoleplayer];
 	UINT32 ping = playerpingtable[consoleplayer];
 	UINT32 pl = playerpacketlosstable[consoleplayer];
-	
-	// RADIO: To the side looks cleaner then showing it vertically
-	// INT32 dispy = cv_ticrate.value ? 170 : 181;
-	INT32 dispy = 189;
-	INT32 dispx = 298;
 
-	if (isDrawingInput && cv_inputdisplaytogglesize.value)
-		dispx = 270;
+	INT32 dispx = 307;
+	INT32 dispy = cv_ticrate.value ? 170 : 181;
 
-	HU_drawPing(dispx * FRACUNIT, dispy * FRACUNIT, ping, mindelay, pl, V_SNAPTORIGHT | V_SNAPTOBOTTOM, 1);
+	if (cv_hud_displaypingbesideticrate.value)
+	{
+		// RADIO: To the side looks cleaner then showing it vertically
+		dispy = 189;
+		dispx = 298;
+
+		if (isDrawingInput && cv_inputdisplaytogglesize.value)
+			dispx = 270;
+	}
+
+	HU_drawPing(dispx * FRACUNIT, dispy * FRACUNIT, ping, mindelay, pl, V_SNAPTORIGHT | V_SNAPTOBOTTOM, cv_hud_displaypingbesideticrate.value ? 1 : 0);
 }
 
 
