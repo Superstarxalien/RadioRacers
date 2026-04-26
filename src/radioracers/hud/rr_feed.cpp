@@ -53,6 +53,8 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
         boolean is_self_hit {false};            // Self-hit (how emabrassing)
         boolean is_dplayer_attacker {false};     // Is the display player the attacker?
         UINT8 amps {0};                         // Amps awarded
+        INT32 attacker_colour {0};              // Attacker color (White by default)
+        INT32 victim_colour {0};                // Victim color (White by default)
 
         // Drawer
         Draw row;
@@ -65,6 +67,7 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
                     row
                         .x(-attacker_name_width)
                         .scale(FEED_UPDATE_SCALE)
+                        .flags(attacker_colour)
                         .text(attacker.c_str());
 
                     row = row.x(-(attacker_name_width + c.x_offset)).colormap(c.colormap);
@@ -72,7 +75,7 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
             } else {                
                 UINT8 *item_recolormap = (c.should_flash) ? c.colormap : c.item_recolormap;
                 if (!is_self_hit) {
-                    row.scale(FEED_UPDATE_SCALE).text(attacker.c_str());
+                    row.scale(FEED_UPDATE_SCALE).flags(attacker_colour).text(attacker.c_str());
                     
                     // Then, the item
                     row = row.x(attacker_name_width + c.x_offset).colormap(item_recolormap);
@@ -105,10 +108,10 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
         void draw_victim(boolean reverse) {
             int victim_name_width = FeedUpdateUtils::getNameWidth(victim);
             if (reverse) {
-                row.x(-(victim_name_width)).scale(FEED_UPDATE_SCALE).text(victim.c_str());
+                row.x(-(victim_name_width)).scale(FEED_UPDATE_SCALE).flags(victim_colour).text(victim.c_str());
                 row = row.x(-(victim_name_width + c.x_offset)).colormap(c.colormap);
             } else {
-                row.scale(FEED_UPDATE_SCALE).text(victim.c_str());
+                row.scale(FEED_UPDATE_SCALE).flags(victim_colour).text(victim.c_str());
                 row = row.x(victim_name_width + c.x_offset).colormap(static_cast<UINT8*>(NULL));
             }
         }
@@ -177,8 +180,10 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
             const boolean &self_hit,
             const boolean &is_dplayer_attacker,
             const boolean &about_self,
-            const UINT8 &amps
-        ): victim(v), attacker(a), item(i), is_self_hit(self_hit), is_dplayer_attacker(is_dplayer_attacker), amps(amps) {
+            const UINT8 &amps,
+            const INT32 &attacker_colour,
+            const INT32 &victim_colour
+        ): victim(v), attacker(a), item(i), is_self_hit(self_hit), is_dplayer_attacker(is_dplayer_attacker), amps(amps), attacker_colour(attacker_colour), victim_colour(victim_colour) {
             is_about_self = about_self;
         }
 
@@ -190,6 +195,12 @@ class PlayerFeedUpdate : public BaseFeedUpdate {
             INT32 hud_flags = config.hudflags;
             boolean reverse = config.position == FEED_POSITION_RIGHT;
             boolean center = config.position == FEED_POSITION_MIDDLE;
+
+            // Check if the colours aren't an impossible value
+            if (attacker_colour > V_TANMAP)
+                attacker_colour = 0;
+            if (victim_colour > V_TANMAP)
+                victim_colour = 0;
 
             // If the update doesn't concern the main player
             // then draw at a higher translucency
@@ -714,6 +725,10 @@ static boolean canUseHudfeed(void) {
     return !RR_IsBattle() && radioracers_usehudfeed && cv_hudfeed_enabled.value;
 }
 
+static INT32 getPlayerChatColour(player_t *p) {
+    return skincolors[p->skincolor].chatcolor;
+}
+
 // Push a player interaction to the feed.
 void RR_PushPlayerDamageToFeed(mobj_t *source, mobj_t *target, mobj_t *inflictor, UINT8 amps) {
     if (!canUseHudfeed()) return;
@@ -768,6 +783,10 @@ void RR_PushPlayerDamageToFeed(mobj_t *source, mobj_t *target, mobj_t *inflictor
     std::string attacker = player_names[source_plyr-players];
     std::string victim = player_names[target_plyr-players];
 
+
+    INT32 attacker_colour = getPlayerChatColour(source_plyr);
+    INT32 victim_colour = getPlayerChatColour(target_plyr);
+
     // Cap off player names if they're too long
     // (maybe?)
 
@@ -785,7 +804,9 @@ void RR_PushPlayerDamageToFeed(mobj_t *source, mobj_t *target, mobj_t *inflictor
             self_hit,
             isDisplayPlayerAttacker(source_plyr),
             isFeedUpdateAboutMainPlayer(source_plyr, target_plyr),
-            amps
+            amps,
+            attacker_colour,
+            victim_colour
         )
     );
 }
@@ -806,6 +827,9 @@ void RR_PushPlayerDeathToFeed(mobj_t *source, mobj_t *target, mobj_t *inflictor)
     std::string attacker = player_names[source_plyr-players];
     std::string victim = player_names[target_plyr-players];
 
+    INT32 attacker_colour = getPlayerChatColour(source_plyr);
+    INT32 victim_colour = getPlayerChatColour(target_plyr);
+
     const boolean self_hit = source_plyr == target_plyr;
     
     // Push to the feed
@@ -817,7 +841,9 @@ void RR_PushPlayerDeathToFeed(mobj_t *source, mobj_t *target, mobj_t *inflictor)
             self_hit,
             isDisplayPlayerAttacker(source_plyr),
             isFeedUpdateAboutMainPlayer(source_plyr, target_plyr),
-            0
+            0,
+            attacker_colour,
+            victim_colour
         )
     );
 }
@@ -840,6 +866,9 @@ void RR_PushPlayerInteractionToFeed(mobj_t *source, mobj_t *target, playerattack
     std::string attacker = player_names[source_plyr-players];
     std::string victim = player_names[target_plyr-players];
 
+    INT32 attacker_colour = getPlayerChatColour(source_plyr);
+    INT32 victim_colour = getPlayerChatColour(target_plyr);
+
     // Cap off player names if they're too long
     // (maybe?)
 
@@ -856,7 +885,9 @@ void RR_PushPlayerInteractionToFeed(mobj_t *source, mobj_t *target, playerattack
             self_hit,
             isDisplayPlayerAttacker(source_plyr),
             isFeedUpdateAboutMainPlayer(source_plyr, target_plyr),
-            amps
+            amps,
+            attacker_colour,
+            victim_colour
         )
     );
 }
