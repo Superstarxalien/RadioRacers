@@ -83,6 +83,9 @@ static menuitem_t OPTIONS_RadioRacersHudBattle[] =
 	{IT_STRING | IT_CVAR, "Sphere Gauge Position", "Toggle the Sphere Gauge's HUD position.",
 		NULL, {.cvar = &cv_spheremeteronplayer}, 0, 0},
 
+	{IT_STRING | IT_CVAR, "Power-Up Counter Position", "Toggle the HUD position of the Combat UFO Power-Up counter.",
+		NULL, {.cvar = &cv_poweruponbottom}, 0, 0},
+
 	{IT_STRING | IT_CVAR, "Emerald HUD", "Toggle an alternate take on the Emerald display in the HUD.",
 		NULL, {.cvar = &cv_customemeraldhud}, 0, 0},
 
