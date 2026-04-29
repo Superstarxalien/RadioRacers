@@ -696,6 +696,8 @@ consvar_t cv_hud_hidelapemblem = Player("hidelapemblem", "Off").on_off().radio()
 consvar_t cv_hud_usehighresportraits = Player("usehighresportraits", "Yes").yes_no().radio();
 // Toggle a more compact version of the details in the bottom-left of the HUD for races
 consvar_t cv_hud_compact = Player("usecompacthud", "No").yes_no().radio();
+// Display delay counter beside FPS counter
+consvar_t cv_hud_displaypingbesideticrate = Player("displaypingbesideticrate", "Yes").yes_no().radio();
 // Restore SRB2Kart behaviour when viewing in-game rankings (i.e. having to hold the button)
 consvar_t cv_holdbuttonforscoreboard = Player("holdbuttonforscoreboard", "No").yes_no().radio();
 // Toggle between ANALOG and DIGITAL input display

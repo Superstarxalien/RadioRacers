@@ -225,6 +225,9 @@ menuitem_t OPTIONS_RadioRacersHud[] =
 	{IT_STRING | IT_CVAR, "Use Higher Resolution Portraits", "Draw higher resolution portraits in the minirankings.",
 		NULL, {.cvar = &cv_hud_usehighresportraits}, 0, 0},
 
+	{IT_STRING | IT_CVAR, "Display Delay Counter Beside FPS", "Toggle if the delay counter should be displayed next to the FPS counter.",
+		NULL, {.cvar = &cv_hud_displaypingbesideticrate}, 0, 0},
+
 	{IT_HEADER, "Roulette Options", NULL,
 		NULL, {NULL}, 0, 0},
 
