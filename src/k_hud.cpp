@@ -2949,8 +2949,12 @@ void K_DrawKartPositionNumXY(
 static void K_DrawKartPositionNum(UINT8 num)
 {
 	UINT8 splitIndex = (r_splitscreen > 0) ? 1 : 0;
+	fixed_t scale = FRACUNIT;
+
 	// RADIO: It's pretty big already
-	fixed_t scale = FRACUNIT/2;
+	if (cv_toggle_position_number.value == 1)
+		scale = FRACUNIT/2;
+
 	fixed_t fx = 0, fy = 0;
 	transnum_t trans = static_cast<transnum_t>(0);
 	INT32 fflags = 0;
@@ -2982,7 +2986,9 @@ static void K_DrawKartPositionNum(UINT8 num)
 	{
 		const boolean isDrawingInput = gamestate == GS_LEVEL && cv_drawinput.value && cv_inputdisplaytogglesize.value;
 		fx = BASEVIDWIDTH << FRACBITS;
-		fy = (BASEVIDHEIGHT - (isDrawingInput ? 14 : 10)) << FRACBITS;
+		fy = BASEVIDHEIGHT << FRACBITS;
+		if (cv_toggle_position_number.value == 1)
+			fy = (BASEVIDHEIGHT - (isDrawingInput ? 14 : 10)) << FRACBITS;
 		fflags = V_SNAPTOBOTTOM|V_SNAPTORIGHT;
 	}
 	else if (r_splitscreen == 1)	// for this splitscreen, we'll use case by case because it's a bit different.
@@ -9431,7 +9437,7 @@ void K_drawKartHUD(void)
 						}
 					}
 				}
-				else if (!islonesome && !K_Cooperative() && cv_toggle_position_number.value)
+				else if (!islonesome && !K_Cooperative() && cv_toggle_position_number.value < 2)
 				{
 					K_DrawKartPositionNum(stplyr->position);
 				}
