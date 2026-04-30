@@ -709,8 +709,12 @@ consvar_t cv_inputdisplaytogglesize = Player("inputdisplaytogglesize", "Mini").v
 	{0, "Normal"}, 
 	{1, "Mini"}
 }).radio();
+consvar_t cv_toggle_position_number = Player("positionnumbertoggle", "Small").values({
+	{0, "Vanilla"}, 
+	{1, "Small"},
+	{2, "Off"}
+}).radio();
 
-consvar_t cv_toggle_position_number = Player("positionnumbertoggle", "On").on_off().radio();
 consvar_t cv_toggle_race_minimap = Player("raceminimaptoggle", "On").on_off().radio();
 consvar_t cv_toggle_trick_cool = Player("tricktexttoggle", "On").on_off().radio();
 consvar_t cv_toggle_race_standings = Player("racestandingstoggle", "On").on_off().radio();
