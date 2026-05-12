@@ -5212,7 +5212,7 @@ static void HWR_ProjectSprite(mobj_t *thing)
 			vis->colormap = R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_NICKEL, GTC_CACHE);
 		} else if (isVoltageAura) {
 			UINT8 sparkColor = K_DriftSparkColor(stplyr, stplyr->driftcharge);
-			vis->colormap = R_GetTranslationColormap(TC_RAINBOW,sparkColor, GTC_CACHE);
+			vis->colormap = R_GetTranslationColormap(TC_RAINBOW, (skincolornum_t)sparkColor, GTC_CACHE);
 		}
 	}
 
