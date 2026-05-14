@@ -95,7 +95,7 @@ static trackingResult_t _getBaseRouletteCoordinatesForTrackingPlayer(void)
 static itembox_tracking_coordinates_t _getBaseRouletteCoordinates(int width, int height)
 {
     // Initialize the coordinates..
-    itembox_tracking_coordinates_t coords = { .x=0, .y=0 };
+    itembox_tracking_coordinates_t coords = {0, 0};
 
     // Firstly, get the tracking coordinates
     const trackingResult_t _tracking_coords = _getBaseRouletteCoordinatesForTrackingPlayer();
@@ -172,8 +172,8 @@ static roulette_offset_spacing_t _getRouletteSpacingOffset(fixed_t space, fixed_
     const int new_roulette_offset = FixedMul(offset, FixedDiv(new_roulette_spacing, space));
 
     const roulette_offset_spacing_t roulette_offset_spacing = {
-        .space=new_roulette_spacing, 
-        .offset=new_roulette_offset
+        new_roulette_spacing, 
+        new_roulette_offset
     };
     return roulette_offset_spacing;
 }
@@ -300,11 +300,11 @@ float RR_getRingBoxHudScaleFloat(void)
 itembox_tracking_coordinates_t RR_getRouletteCoordinatesForKartItem(void)
 {
     const roulette_type_info_t info = {
-        .scale = RR_getItemBoxHudScale(),
-        .scale_f = RR_getItemBoxHudScaleFloat(),
-        .GRAPHIC_WIDTH = ITEM_BOX_WIDTH,
-        .GRAPHIC_HEIGHT = ITEM_BOX_HEIGHT,
-        .position = _getItemBoxHudPosition()
+        RR_getItemBoxHudScale(),
+        RR_getItemBoxHudScaleFloat(),
+        ITEM_BOX_WIDTH,
+        ITEM_BOX_HEIGHT,
+        _getItemBoxHudPosition()
     };
 
     return _getRouletteCoordinates(info);
@@ -313,11 +313,11 @@ itembox_tracking_coordinates_t RR_getRouletteCoordinatesForKartItem(void)
 itembox_tracking_coordinates_t RR_getRouletteCoordinatesForRingBox(void)
 {
     const roulette_type_info_t info = {
-        .scale = RR_getRingBoxHudScale(),
-        .scale_f = RR_getRingBoxHudScaleFloat(),
-        .GRAPHIC_WIDTH = RING_BOX_WIDTH,
-        .GRAPHIC_HEIGHT = RING_BOX_HEIGHT,
-        .position = _getRingBoxHudPosition()
+        RR_getRingBoxHudScale(),
+        RR_getRingBoxHudScaleFloat(),
+        RING_BOX_WIDTH,
+        RING_BOX_HEIGHT,
+        _getRingBoxHudPosition()
     };
 
     return _getRouletteCoordinates(info);

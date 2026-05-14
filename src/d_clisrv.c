@@ -2337,15 +2337,7 @@ static boolean CL_ServerConnectionTicker(const char *tmpsave, tic_t *oldtic, tic
 			}
 			I_UpdateNoVsync(); // page flip or blit buffer
 
-#ifdef HWRENDER
-			// Only take screenshots after drawing.
-			if (moviemode && rendermode == render_opengl)
-				M_LegacySaveFrame();
-			if (rendermode == render_opengl && takescreenshot)
-				M_DoLegacyGLScreenShot();
-#endif
-
-			if ((moviemode || takescreenshot) && rendermode == render_soft)
+			if ((moviemode || takescreenshot) && rendermode != render_none)
 				I_CaptureVideoFrame();
 			S_UpdateSounds();
 			S_UpdateClosedCaptions();
@@ -2767,7 +2759,7 @@ void CL_RemovePlayer(INT32 playernum, kickreason_t reason)
 
 	K_CheckBumpers();
 	P_CheckRacers();
-	
+
 	// Reset map headers' justPlayed and anger records
 	// when there are no players in a dedicated server.
 	// Otherwise maps get angry at newly-joined players
@@ -6960,8 +6952,6 @@ boolean TryRunTics(tic_t realtics)
 
 	if (ticking)
 	{
-		boolean tickInterp = true;
-
 		// run the count * tics
 		while (neededtic > gametic)
 		{
@@ -7022,12 +7012,9 @@ boolean TryRunTics(tic_t realtics)
 
 				boolean run = (gametic % NEWTICRATERATIO) == 0;
 
-				if (run && tickInterp)
+				if (run)
 				{
-					// Update old view state BEFORE ticking so resetting
-					// the old interpolation state from game logic works.
 					R_UpdateViewInterpolation();
-					tickInterp = false; // do not update again in sped-up tics
 				}
 
 				G_Ticker(run);

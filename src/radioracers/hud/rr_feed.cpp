@@ -528,10 +528,10 @@ static ItemConfigForFeedUpdate getItemConfigForFeedDamageUpdate(mobj_t *mo) {
         case MT_BANANA_SHIELD:
             return {"RRISBANA", 18, 19};
         case MT_SPBEXPLOSION: {
-            ItemConfigForFeedUpdate spbConfig = {"RRISSPB", 21, 22, {false, true}, .y_offset = -2};
+            ItemConfigForFeedUpdate spbConfig = {"RRISSPB", 21, 22, {false, true}, {}, -2};
             if (mo->threshold) {
                 if (mo->threshold == KITEM_EGGMAN) {
-                    spbConfig = {"RRISEGGM", 26, 16, {false, true}, .y_offset = 0};
+                    spbConfig = {"RRISEGGM", 26, 16, {false, true}, {}, 0};
                 }
             }
             return spbConfig;
@@ -561,44 +561,48 @@ static ItemConfigForFeedUpdate getItemConfigForFeedDamageUpdate(mobj_t *mo) {
 }
 
 const ItemConfigForFeedUpdate shrinkItemConfig = {
-        .patch = "RRISSHRK", 
-        .width = 12, 
-        .height = 16, 
-        .animation_config = {.should_flash = true, .flashing_colour = SKINCOLOR_ORANGE}, 
-        .y_offset = 0
+        "RRISSHRK", 
+        12, 
+        16, 
+        {{}, true, {}, {}, SKINCOLOR_ORANGE}, 
+        {},
+        0
 };
 const ItemConfigForFeedUpdate dropTargetItemConfig = {
-    .patch = "RRISDTRG", 
-    .width = 30, 
-    .height = 14
+    "RRISDTRG", 
+    30, 
+    14
 };
 static ItemConfigForFeedUpdate getItemConfigForFeedAttackUpdate(playerattacks_t attack) {
     switch (attack) {
         case ATTACK_SNIPE:
             // Whenever the SEGA! jingle plays
             return {
-                .patch = "RRFSNIP", 
-                .width = 90, 
-                .height = 31,
-                .animation_config {
-                    .animated = true,
-                    .animated_frames = 2,
+                "RRFSNIP", 
+                90, 
+                31,
+                {
+                    true,
+                    {},
+                    2,
                 },
-                .patch_scale = 0.25f
+                0.25f
             };
         case ATTACK_FLAMEDASH:
             return {"RRISFLMS", 18, 18};
         case ATTACK_HYUDORO:
             return {
-                .patch = "RRISHYU",
-                .width = 21,
-                .height = 24,
+                "RRISHYU",
+                21,
+                24,
                 {
-                    .animated = true,
-                    .animated_frames = 9,
-                    .tics_per_frame = 4
+                    true,
+                    {},
+                    9,
+                    4
                 },
-                .y_offset = -2
+                {},
+                -2
             };
         case ATTACK_SHRINK:
             return shrinkItemConfig;
@@ -608,18 +612,24 @@ static ItemConfigForFeedUpdate getItemConfigForFeedAttackUpdate(playerattacks_t 
         case ATTACK_DROPTARGET_MEDIUM_HEALTH:
             // When the drop target has been hit once
             return {
-                .patch = dropTargetItemConfig.patch,
-                .width = dropTargetItemConfig.width,
-                .height = dropTargetItemConfig.height,
-                .recolour = SKINCOLOR_GOLD
+                dropTargetItemConfig.patch,
+                dropTargetItemConfig.width,
+                dropTargetItemConfig.height,
+                {},
+                {},
+                {},
+                SKINCOLOR_GOLD
             };
         case ATTACK_DROPTARGET_LOW_HEALTH:
             // When the drop target has been hit twice
             return {
-                .patch = dropTargetItemConfig.patch,
-                .width = dropTargetItemConfig.width,
-                .height = dropTargetItemConfig.height,
-                .recolour = SKINCOLOR_RED
+                dropTargetItemConfig.patch,
+                dropTargetItemConfig.width,
+                dropTargetItemConfig.height,
+                {},
+                {},
+                {},
+                SKINCOLOR_RED
             };
         case ATTACK_BUBBLESHIELD:
             return {"RRISBUBS", 18, 18};
@@ -629,32 +639,36 @@ static ItemConfigForFeedUpdate getItemConfigForFeedAttackUpdate(playerattacks_t 
             // see PIT_LightningShieldAttack
             return {"RRISTHNS", 18, 18};
         case ATTACK_INVINCIBILITY:
-            return {"RRISINV", 30, 27, {true, false, 6}, .y_offset = -2};
+            return {"RRISINV", 30, 27, {true, false, 6}, {}, -2};
         case ATTACK_GROW:
             return {
-                .patch = "RRISGROW", 
-                .width = 16, 
-                .height = 21, 
+                "RRISGROW", 
+                16, 
+                21, 
                 {
-                    .should_flash = true,
-                    .flashing_colour = SKINCOLOR_BLUEBERRY
+                    {},
+                    true,
+                    {},
+                    {},
+                    SKINCOLOR_BLUEBERRY
                 }
             };
         case ATTACK_STONESHOE_TRAP:
-            return {.patch = "RRISSHTR", .width = 30, .height = 26, .patch_scale = .4f, .y_offset = -2};
+            return {"RRISSHTR", 30, 26, {}, .4f, -2};
         case ATTACK_TOXOMISTER_CLOUD:
             return {"RRISTOXO", 23, 22};
         case ATTACK_PITFALL:
             return {
-                .patch = "RRPTFLL",
-                .width = 21,
-                .height = 15,
-                .animation_config {
-                    .animated = true,
-                    .animated_frames = 2,
+                "RRPTFLL",
+                21,
+                15,
+                {
+                    true,
+                    {},
+                    2,
                 },
-                .patch_scale = 0.5f,
-                .y_offset = -1
+                0.5f,
+                -1
             };
         default:
             break;
@@ -668,11 +682,11 @@ static ItemConfigForFeedUpdate getItemConfigForGlobalFeedUpdate(globalfeedevent_
             return shrinkItemConfig;
         case EVENT_SPB:
             return {
-                .patch = "RRSPBHR", 
-                .width = 13, 
-                .height = 17,
-                .animation_config = {.animated = true, .animated_frames = 2, .tics_per_frame = 1},  
-                .patch_scale = .5f,
+                "RRSPBHR", 
+                13, 
+                17,
+                {true, {}, 2, 1},  
+                .5f,
             };
         default:
             break;
@@ -916,12 +930,14 @@ void RR_PushGlobalGradeEventToFeed(player_t* player, gp_rank_e rank, boolean per
     std::string grade_patch = fmt::format("R_CUPRN{0}", grade_letter);
 
     ItemConfigForFeedUpdate gradeConfig = {
-        .patch = grade_patch,
-        .width = 14,
-        .height = 12,
-        .patch_scale = .6f,
-        .recolour = grade_rank_colormap,
-        .rainbow = (showSRanks)
+        grade_patch,
+        14,
+        12,
+        {},
+        .6f,
+        {},
+        grade_rank_colormap,
+        (showSRanks)
     };
         
     const std::string player_name = player_names[player-players];
@@ -940,18 +956,19 @@ void RR_PushGlobalFaultEventToFeed(player_t* player) {
 
     // Big red 'X'
     ItemConfigForFeedUpdate faultConfig = {
-        .patch = "K_NOBLNS",
-        .width = 25,
-        .height = 22,
+        "K_NOBLNS",
+        25,
+        22,
     };
 
     // 20% chance
     if(M_RandomChance(FRACUNIT/20)) {
         faultConfig = {
-            .patch = "RRHFFAUL",
-            .width = 37,
-            .height = 47,
-            .patch_scale = .18f
+            "RRHFFAUL",
+            37,
+            47,
+            {},
+            .18f
         };
     }
 
@@ -997,14 +1014,15 @@ void RR_UpdateHudFeedConfig(void) {
 
 static void dummyupdate(void) {
     ItemConfigForFeedUpdate bubble = {
-        .patch = "RRFSNIP", 
-        .width = 90, 
-        .height = 31,
-        .animation_config {
-            .animated = true,
-            .animated_frames = 2,
+        "RRFSNIP", 
+        90, 
+        31,
+        {
+            true,
+            {},
+            2,
         },
-        .patch_scale = 0.25f
+        0.25f
     };
     // hudfeed.push(
     //     std::make_unique<PlayerFeedUpdate>(
