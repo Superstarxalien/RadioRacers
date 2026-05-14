@@ -57,7 +57,9 @@ In the Server Browser, you can "peek" into a server to view key details, such as
 5. Run `ringracers_radioracers.exe`.
 
 ### Compiling
-If you don't know how to compile, either attempt it yourself (good practice) or ask someone you trust to do it for you. 
+If you don't know how to compile, you can either: 
+* attempt it yourself (good practice)
+* or ask someone you trust to do it for you
 
 If you do grab a build from — say — a random Discord channel, *please* encourage whoever shared it to include [MD5 hashes](https://linuxsecurity.com/features/what-are-checksums-why-should-you-be-using-them) with the executable. It's spooky out here.
 
@@ -71,7 +73,7 @@ I recommend following the [instructions](https://github.com/KartKrewDev/RingRace
 > * **ninja-x64_windows_vcpkg-develop**
 > * **ninja-x64_windows_vcpkg-release**
 > 
-> <small> You'll most likely want `ninja-x64_windows_vcpkg-release`.</small>
+> You'll most likely want `ninja-x64_windows_vcpkg-release`.
 
 #### Windows
 If you're on Windows 10 (or above), try following Eidolon's [guide](https://ringracers.miraheze.org/wiki/User:Eidolon/Ring_Racers_Build_Guide).
