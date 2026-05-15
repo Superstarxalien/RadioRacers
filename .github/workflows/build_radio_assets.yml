@@ -21,10 +21,13 @@ jobs:
       - name: Build radioracers_plus.pk3
         run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_plus.txt --force -o radio/pk3/out/radioracers_plus.pk3 -b radio/pk3/src/radioracers_plus
 
+      - name: Build radioracers_servcfg.pk3
+        run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_servcfg.txt --force -o radio/pk3/out/radioracers_servcfg.pk3 -b radio/pk3/src/radioracers_servcfg
+
       - name: Zip the assets
         run: |
           cd radio/pk3/out
-          zip radioracers_assets.zip radioracers.pk3 radioracers_plus.pk3
+          zip radioracers_assets.zip radioracers.pk3 radioracers_plus.pk3 radioracers_servcfg.pk3
           mv radioracers_assets.zip ../../../
 
       # Just print a directory tree of the radioracers folder
@@ -47,9 +50,14 @@ jobs:
           \`\`\`
           $(tree radio/pk3/src/radioracers_plus)
           \`\`\`
+
+          - **radioracers_servcfg.pk3**
+          \`\`\`
+          $(tree radio/pk3/src/radioracers_servcfg)
+          \`\`\`
           EOF
         
-      - name: Upload radioracers and radioracers_plus as github release
+      - name: Upload all radio assets as github release
         uses: softprops/action-gh-release@v2
         with:
             tag_name: latest-radio-assets
