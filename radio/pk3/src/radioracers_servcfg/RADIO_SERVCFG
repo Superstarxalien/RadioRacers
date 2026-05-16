@@ -3,5 +3,6 @@
 #
 # Uncomment the features that you're okay with enabling.
 
-# radio_hakimode on
-# radio_ringsaccessibility on
+#radio_hakimode on
+#radio_ringsaccessibility on
+#radio_bttl_emerald_on_minimap on

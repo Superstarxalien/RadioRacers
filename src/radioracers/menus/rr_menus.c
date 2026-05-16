@@ -98,7 +98,7 @@ static menuitem_t OPTIONS_RadioRacersHudBattle[] =
 	{IT_HEADER, "Toggle HUD Elements", NULL,
 		NULL, {NULL}, 0, 0},
 
-	{IT_STRING | IT_CVAR, "Emeralds", "Show emerald positions in the minimap?",
+	{IT_STRING | IT_CVAR, "Emeralds", "Show emerald positions in the minimap? \x82(Disabled in netgames.)",
 		NULL, {.cvar = &cv_battle_toggle_emerald_on_minimap}, 0, 0},
 
 	{IT_STRING | IT_CVAR, "Combat UFO Timer", "Show where and how long until the next Combat UFO spawns?",

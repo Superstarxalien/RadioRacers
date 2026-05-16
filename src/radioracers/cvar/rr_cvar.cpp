@@ -69,6 +69,12 @@ void KartHaki_OnChange(void)
     CONS_Printf(M_GetText("Your observation haki will be turned \x82%s\x80 next round.\n"), cv_applyhaki.string);
 }
 
+void EmeraldsMinimap_OnChange(void)
+{
+    if (!FakeNetCvar_OnChange(&cv_battle_toggle_emerald_on_minimap))
+        return;
+}
+
 void AccessibilityRings_OnChange(void)
 {
     if (!FakeNetCvar_OnChange(&cv_accessibility_rings_hide))

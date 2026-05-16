@@ -1082,6 +1082,7 @@ void RR_resetRadioFakeNetCvars(void)
     // Don't think this is right
     cv_applyhaki.enablefornetgames = false;
     cv_accessibility_rings_hide.enablefornetgames = false;
+    cv_battle_toggle_emerald_on_minimap.enablefornetgames = false;
 }
 
 /** Initialize anything relating to RadioRacers */

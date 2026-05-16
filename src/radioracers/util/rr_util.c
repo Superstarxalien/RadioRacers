@@ -122,6 +122,14 @@ static boolean canGhost(void)
     return cv_accessibility_rings_hide.value && r_splitscreen == 0;
 }
 
+boolean RR_ShouldShowEmeraldsInMinimap(void)
+{
+    if (netgame && !cv_battle_toggle_emerald_on_minimap.enablefornetgames) {
+        return false;
+    }
+    return cv_battle_toggle_emerald_on_minimap.value;
+}
+
 boolean RR_ShouldGhostRing(mobj_t *mo)
 {
     return canGhost() &&
