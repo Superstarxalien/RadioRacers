@@ -1031,7 +1031,9 @@ static void ParseRadioServerConfig(
 
         if (should_enable_feature) {
             radio_cvar->enablefornetgames = true;
-            toggled_features.push_back(cvar_str);
+            toggled_features.push_back(
+                (radio_cvar->description != NULL) ? radio_cvar->description : cvar_str
+            );
         }
     }
 }

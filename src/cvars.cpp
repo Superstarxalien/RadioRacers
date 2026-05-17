@@ -540,13 +540,23 @@ consvar_t cv_votesnitch = Player("votesnitch", "On").on_off().radio();
 consvar_t cv_applylocalencore = Player("localencore", "Off").values({{0, "Off"}, {1, "On"}}).dont_save().onchange_noinit(KartLocalEncore_OnChange).radio();
 
 // Observation Haki
-consvar_t cv_applyhaki = Player("radio_hakimode", "Off").values({{0, "Off"}, {1, "On"}}).dont_save().onchange_noinit(KartHaki_OnChange).radio().is_fake_netcvar();
+consvar_t cv_applyhaki = Player("radio_hakimode", "Off")
+.values({{0, "Off"}, {1, "On"}})
+.description("Observation Haki")
+.dont_save()
+.onchange_noinit(KartHaki_OnChange)
+.radio()
+.is_fake_netcvar();
 
 // Show 'S' ranks in the tally and player standings
 consvar_t cv_show_s_ranks = Player("showperfectranks", "On").on_off().radio();
 
 // Rings Ghost Accessibility
-consvar_t cv_accessibility_rings_hide = Player("radio_ringsaccessibility", "On").on_off().onchange_noinit(AccessibilityRings_OnChange).radio().is_fake_netcvar();
+consvar_t cv_accessibility_rings_hide = Player("radio_ringsaccessibility", "On").on_off()
+.onchange_noinit(AccessibilityRings_OnChange)
+.description("Ghost Rings")
+.radio()
+.is_fake_netcvar();
 
 // Hudfeed
 consvar_t cv_hudfeed_enabled = Player("hudfeed", "Yes").yes_no().onchange_noinit(RR_Hudfeed_OnChange).radio();
@@ -659,7 +669,7 @@ consvar_t cv_poweruponbottom = Player("poweruponbottom", "Bottom").values({
 consvar_t cv_battle_toggle_winner_announcement = Player("bttl_toggle_winner_announcement", "On").on_off().radio();
 
 // Emerald locations on minimap
-consvar_t cv_battle_toggle_emerald_on_minimap = Player("radio_bttl_emerald_on_minimap", "On").on_off().onchange_noinit(EmeraldsMinimap_OnChange).radio().is_fake_netcvar();
+consvar_t cv_battle_toggle_emerald_on_minimap = Player("radio_bttl_emerald_on_minimap", "On").on_off().onchange_noinit(EmeraldsMinimap_OnChange).description("Display Emeralds on Minimap").radio().is_fake_netcvar();
 consvar_t cv_battle_toggle_ufo_timer_on_minimap = Player("bttl_ufo_timer_on_minimap", "On").on_off().radio();
 
 // Toggle tracking players in the HUD
