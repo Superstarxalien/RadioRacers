@@ -1073,7 +1073,7 @@ void RR_CheckForServerConfig(UINT16 wadnum) {
                     CONS_Printf("\x82* %s\n", feature.c_str());
                 }
             } else {
-                CONS_Printf("\n\x83[\x82RADIO\x83: No features have been toggled.\n\n");
+                CONS_Printf("\n\x83[\x82RADIO\x83]: No features have been toggled.\n\n");
             }
         }
     }

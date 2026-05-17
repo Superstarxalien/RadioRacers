@@ -15,6 +15,10 @@ Compatible with the vanilla client; all changes made so far are client-side.
 
 > Many thanks to [GenericHeroGuy](https://github.com/GenericHeroGuy) for his work on [`pk3make.py`](https://github.com/GenericHeroGuy/ringracers-scripts), which is used to automate the building process for the assets.
 
+## Netgames
+
+Playing or hosting online? Give this a [read](./radio/netgames/README.md).
+
 ## Features
 
 Including, but not limited to:
@@ -81,7 +85,5 @@ If you're on Windows 10 (or above), try following Eidolon's [guide](https://ring
 ---
 
 Original README [here](https://github.com/KartKrewDev/RingRacers?tab=readme-ov-file#dr-robotniks-ring-racers).
-
----
 
 
