@@ -17,7 +17,7 @@ Compatible with the vanilla client; all changes made so far are client-side.
 
 ## Netgames
 
-Playing or hosting online? Give this a [read](./radio/netgames/README.md).
+If you plan on using this build online or you're a server owner, read [this](./radio/netgames/README.md).
 
 ## Features
 
