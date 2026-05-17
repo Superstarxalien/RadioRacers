@@ -179,6 +179,8 @@ struct consvar_t //NULL, NULL, 0, NULL, NULL |, 0, NULL, NULL, 0, 0, NULL
 
 	// Radio only
 	boolean is_radio_cvar; // By default, this is empty/false
+	boolean is_fake_netcvar; // Net cvar workaround
+	boolean enablefornetgames; // By default, this is empty/false
 
 #ifdef __cplusplus
 	struct Builder;

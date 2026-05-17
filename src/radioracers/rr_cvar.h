@@ -52,6 +52,8 @@ extern consvar_t cv_targetrackplayers;  // Toggle the TARGET HUD graphics for ot
 
 void KartLocalEncore_OnChange(void);
 void KartHaki_OnChange(void);
+void EmeraldsMinimap_OnChange(void);
+void AccessibilityRings_OnChange(void);
 void KartExtraPowerSound_OnChange(void);
 void KartFinishLineTicker_OnChange(void);
 void RR_ChatEmotes_OnChange(void);
