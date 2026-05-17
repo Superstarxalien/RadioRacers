@@ -122,7 +122,6 @@ extern consvar_t cv_hudfeed_show_amps; // Show the amps in the feed?
 
 // HUD -- Battle
 extern consvar_t cv_battle_toggle_emerald_on_minimap; 
-extern consvar_t cv_battle_toggle_ufo_timer_on_minimap;
 extern consvar_t cv_battle_toggle_winner_announcement;
 
 // Server

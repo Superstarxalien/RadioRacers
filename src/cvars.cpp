@@ -670,7 +670,6 @@ consvar_t cv_battle_toggle_winner_announcement = Player("bttl_toggle_winner_anno
 
 // Emerald locations on minimap
 consvar_t cv_battle_toggle_emerald_on_minimap = Player("radio_bttl_emerald_on_minimap", "On").on_off().onchange_noinit(EmeraldsMinimap_OnChange).description("Display Emeralds on Minimap").radio().is_fake_netcvar();
-consvar_t cv_battle_toggle_ufo_timer_on_minimap = Player("bttl_ufo_timer_on_minimap", "On").on_off().radio();
 
 // Toggle tracking players in the HUD
 consvar_t cv_targetrackplayers = Player("targetrackplayers", "Yes").yes_no().radio();
