@@ -21,25 +21,25 @@ jobs:
       - name: osxcross Config
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:osxcross_Config[collapsed=true]\r\e[0Kosxcross Config"
-          echo "\e[0K$OSXCROSS_TARGET_DIR"
-          echo "\e[0K$PATH"
-          echo "\e[0K$OSXCROSS_TARGET"
-          echo "\e[0K$OSXCROSS_HOST"
-          echo "\e[0K$OSXCROSS_SDK"
+          echo -e "\e[0K$OSXCROSS_TARGET_DIR"
+          echo -e "\e[0K$PATH"
+          echo -e "\e[0K$OSXCROSS_TARGET"
+          echo -e "\e[0K$OSXCROSS_HOST"
+          echo -e "\e[0K$OSXCROSS_SDK"
           export VCPKG_CHAINLOAD_TOOLCHAIN_FILE=${OSXCROSS_TARGET_DIR}/toolchain.cmake
-          echo "\e[0Khey"
+          echo -e "\e[0Khey"
           export PATH="/opt/osxcross.arm64:${PATH}"
-          echo "\e[0Khi"
+          echo -e "\e[0Khi"
           $(osxcross-conf)
-          echo "\e[0Kwhats up"
+          echo -e "\e[0Kwhats up"
           export OSXCROSS_HOST=arm64-apple-${OSXCROSS_TARGET}
-          echo "\e[0Knot much"
+          echo -e "\e[0Knot much"
           export VCPKG_DEFAULT_TRIPLET=arm64-osx
-          echo "\e[0Kyou?"
+          echo -e "\e[0Kyou?"
           export CC=${OSXCROSS_TARGET_DIR}/bin/${OSXCROSS_HOST}-clang
-          echo "\e[0Kcurrently in hell"
+          echo -e "\e[0Kcurrently in hell"
           export CXX=${OSXCROSS_TARGET_DIR}/bin/${OSXCROSS_HOST}-clang++
-          echo "\e[0Kdamn thats rough"
+          echo -e "\e[0Kdamn thats rough"
           export SDKROOT=${OSXCROSS_SDK}
           echo -e "\e[0Ksection_end:`date +%s`:osxcross_Config\r\e[0K"
 
