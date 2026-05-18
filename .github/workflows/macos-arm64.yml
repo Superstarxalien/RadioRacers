@@ -12,7 +12,7 @@ jobs:
       CCACHE_CPP2: yes
 
     steps:
-      - uses: ../actions/osxcross.yml
+      - uses: ./actions/osxcross.yml
         with:
           osx-version: "26.1"
 
