@@ -121,6 +121,8 @@ runs:
           sudo apt-get upgrade tzdata
           sudo apt-get install g++-aarch64-linux-gnu
           sudo apt-get install \
+          libglib2.0-dev-bin:arm64 \
+          libglib2.0-dev-bin-linux:arm64
           libcurl4-openssl-dev:arm64 \
           libgme-dev:arm64 \
           libibus-1.0-dev:arm64 \
