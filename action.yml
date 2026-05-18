@@ -54,12 +54,12 @@ runs:
           sudo dpkg --add-architecture arm64
 
           sudo tee /etc/apt/sources.list.d/arm64-cross.sources <<-EOF
-          Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports
-          Suites: jammy jammy-updates
-          Components: main restricted universe
-          Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            Types: deb
+            URIs: http://ports.ubuntu.com/ubuntu-ports
+            Suites: jammy jammy-updates
+            Components: main restricted universe
+            Architectures: arm64
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
           EOF
 
           sudo apt-get update
