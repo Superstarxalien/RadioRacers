@@ -21,6 +21,11 @@ jobs:
       - name: osxcross Config
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:osxcross_Config[collapsed=true]\r\e[0Kosxcross Config"
+          echo "$OSXCROSS_TARGET_DIR"
+          echo "$PATH"
+          echo "$OSXCROSS_TARGET"
+          echo "$OSXCROSS_HOST"
+          echo "$OSXCROSS_SDK"
           export VCPKG_CHAINLOAD_TOOLCHAIN_FILE=${OSXCROSS_TARGET_DIR}/toolchain.cmake
           export PATH="/opt/osxcross.arm64:${PATH}"
           $(osxcross-conf)
