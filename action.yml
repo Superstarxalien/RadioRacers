@@ -53,7 +53,7 @@ runs:
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
 
-          sudo tee /etc/apt/sources.list.d/ubuntu.sources <<< 'EOF'
+          cat <<EOF > /etc/apt/sources.list.d/ubuntu.sources
           Types: deb
           URIs: http://ports.ubuntu.com/ubuntu-ports/
           Suites: noble noble-updates noble-backports
