@@ -91,8 +91,6 @@ runs:
           sudo apt-get upgrade tzdata
           sudo apt-get install g++-aarch64-linux-gnu
           sudo apt-get install \
-          libglib2.0-dev-bin \
-          libglib2.0-dev-bin-linux
           libcurl4-openssl-dev \
           libgme-dev \
           libibus-1.0-dev \
