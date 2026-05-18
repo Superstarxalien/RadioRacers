@@ -53,7 +53,7 @@ runs:
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
 
-          sudo tee /etc/apt/sources.list.d/arm64-cross.sources <<< 'EOF'
+          sudo tee /etc/apt/sources.list.d/arm64-cross.sources <<-EOF
           Types: deb
           URIs: http://ports.ubuntu.com/ubuntu-ports
           Suites: jammy jammy-updates
