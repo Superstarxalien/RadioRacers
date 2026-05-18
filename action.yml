@@ -82,6 +82,8 @@ runs:
       with:
         key: ${{ runner.os }}-osxcross-${{ inputs.osx-version }}
         path: |
+          ~/.cargo/registry
+          ~/.cargo/git
           ${{ env.OSXCROSS_TARGET }}
           ${{ env.OSXCROSS_FOLDER }}/target/bi
           
