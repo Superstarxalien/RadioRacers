@@ -53,7 +53,7 @@ runs:
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
           # Add the ARM64 package source (Ubuntu ports repository)
-          sudo tee /etc/apt/sources.list.d/arm64-cross.sources << 'EOF'
+          sudo tee /etc/apt/sources.list.d/arm64-cross.sources
           Types: deb
           URIs: http://ports.ubuntu.com/ubuntu-ports
           Suites: jammy jammy-updates
@@ -128,84 +128,6 @@ runs:
           unzip \
           zip
           sudo apt-get upgrade
-        else
-          dpkg --add-architecture arm64
-          # Add the ARM64 package source (Ubuntu ports repository)
-          tee /etc/apt/sources.list.d/arm64-cross.sources << 'EOF'
-          Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports
-          Suites: jammy jammy-updates
-          Components: main restricted universe
-          Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          EOF
-          apt-get update
-          apt-get install --no-install-recommends -y \
-          bash \
-          binutils-multiarch-dev \
-          build-essential \
-          ca-certificates \
-          clang \
-          g++ \
-          ccache \
-          nasm \
-          lld \
-          ninja-build \
-          cmake \
-          git \
-          libbz2-dev \
-          libmpc-dev \
-          libmpfr-dev \
-          libgmp-dev \
-          liblzma-dev \
-          libpsi3-dev \
-          libssl-dev \
-          libxml2-dev \
-          libz-dev \
-          llvm-dev \
-          lzma-dev \
-          make \
-          patch \
-          python3 \
-          uuid-dev \
-          wget \
-          xz-utils \
-          bzip2 \
-          openssl \
-          patch \
-          zlib1g-dev
-          apt-get install apt-utils
-          apt-get install auto-apt-proxy
-          apt-get upgrade tzdata
-          apt-get install g++-aarch64-linux-gnu
-          apt-get install \
-          libcurl4-openssl-dev:arm64 \
-          libgme-dev:arm64 \
-          libibus-1.0-dev:arm64 \
-          libjack-dev:arm64 \
-          libltdl-dev:arm64 \
-          libminiupnpc-dev:arm64 \
-          libopenmpt-dev:arm64 \
-          libpng-dev:arm64 \
-          libsdl2-dev:arm64 \
-          libsdl2-mixer-dev:arm64 \
-          libvorbis-dev:arm64 \
-          libvpx-dev:arm64 \
-          libyuv-dev:arm64
-          apt-get install \
-          autoconf \
-          autopoint \
-          bison \
-          curl \
-          jq \
-          libssl-dev \
-          libtool \
-          libunwind-dev \
-          python3-jinja2 \
-          tar \
-          unzip \
-          zip
-          apt-get upgrade
         fi
         echo "::endgroup::"
 
