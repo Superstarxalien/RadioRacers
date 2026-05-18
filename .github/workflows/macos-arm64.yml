@@ -12,12 +12,13 @@ jobs:
       CCACHE_CPP2: yes
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - uses: ./actions/action.yml
         with:
           osx-version: "26.1"
 
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: osxcross Config
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:osxcross_Config[collapsed=true]\r\e[0Kosxcross Config"
