@@ -121,21 +121,21 @@ runs:
           sudo apt-get upgrade tzdata
           sudo apt-get install g++-aarch64-linux-gnu
           sudo apt-get install \
-          libglib2.0-dev-bin:arm64 \
-          libglib2.0-dev-bin-linux:arm64
-          libcurl4-openssl-dev:arm64 \
-          libgme-dev:arm64 \
-          libibus-1.0-dev:arm64 \
-          libjack-dev:arm64 \
-          libltdl-dev:arm64 \
-          libminiupnpc-dev:arm64 \
-          libopenmpt-dev:arm64 \
-          libpng-dev:arm64 \
-          libsdl2-dev:arm64 \
-          libsdl2-mixer-dev:arm64 \
-          libvorbis-dev:arm64 \
-          libvpx-dev:arm64 \
-          libyuv-dev:arm64
+          libglib2.0-dev-bin \
+          libglib2.0-dev-bin-linux
+          libcurl4-openssl-dev \
+          libgme-dev \
+          libibus-1.0-dev \
+          libjack-dev \
+          libltdl-dev \
+          libminiupnpc-dev \
+          libopenmpt-dev \
+          libpng-dev \
+          libsdl2-dev \
+          libsdl2-mixer-dev \
+          libvorbis-dev \
+          libvpx-dev \
+          libyuv-dev
           sudo apt-get install \
           autoconf \
           autopoint \
@@ -183,6 +183,21 @@ runs:
         SDK_VERSION: "${{ inputs.osx-version }}"
         UNATTENDED: "yes"
       run: |
+        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}/target" >> $GITHUB_ENV
+        echo "OSXCROSS_SDK_DIR=${OSXCROSS_TARGET_DIR/SDK" >> $GITHUB_ENV
+        echo "OSXCROSS_SDK=${OSXCROSS_TARGET_DIR}/SDK/MacOSX${{ inputs.osx-version }}.sdk" >> $GITHUB_ENV
+        echo "OSXCROSSVER=${{ inputs.osx-version }}" >> $GITHUB_ENV
+        echo "OSXCROSS_CCTOOLS_PATH=${OSXCROSS_TARGET_DIR}/bin" >> $GITHUB_ENV
+        echo "OSXCROSS_TARGET=arm64" >> $GITHUB_ENV
+        echo "CMAKE_TOOLCHAIN_FILE=${OSXCROSS_TARGET_DIR}/toolchain.cmake" >> $GITHUB_ENV
+        echo "MACOSX_DEPLOYMENT_TARGET=${OSXCROSSVER}" >> $GITHUB_ENV
+        echo "VCPKG_ROOT=/opt/vcpkg" >> $GITHUB_ENV
+        echo "VCPKG_BINARY_SOURCES=clear;files,/opt/vcpkg.bcache,read;default,readwrite" >> $GITHUB_ENV
+        echo "VCPKG_DOWNLOADS=/opt/vcpkg.downloads" >> $GITHUB_ENV
+        echo "VCPKG_OSX_SYSROOT=/osxcross/SDK/MacOSX${OSXCROSSVER}.sdk" >> $GITHUB_ENV
+        echo "VCPKG_OVERLAY_TRIPLETS=/opt/vcpkg.triplets" >> $GITHUB_ENV
+        echo "POWERSHELL_TELEMETRY_OPTOUT=1" >> $GITHUB_ENV
+        echo "EMSCRIPTEN_ROOT=/usr/share/emscripten" >> $GITHUB_ENV
         cd "$GITHUB_ACTION_PATH/osxcross"
         bash ./build.sh
 
@@ -211,11 +226,3 @@ runs:
           local file="$(find "$OSXCROSS_FOLDER/target/bin" -name "$1")"
           echo "$(basename $file)"
         }
-
-        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}/target" >> $GITHUB_ENV
-        echo "OSXCROSS_SDK_DIR=${OSXCROSS_FOLDER}/tarballs" >> $GITHUB_ENV
-        echo "OSXCROSS_SDK=${OSXCROSS_FOLDER}/tarballs/MacOSX${{ inputs.osx-version }}.sdk" >> $GITHUB_ENV
-        echo "OSXCROSSVER=${{ inputs.osx-version }}" >> $GITHUB_ENV
-        echo "OSXCROSS_CCTOOLS_PATH=${OSXCROSS_FOLDER}/target/bin" >> $GITHUB_ENV
-        echo "OSXCROSS_TARGET=arm64" >> $GITHUB_ENV
-        echo "CMAKE_TOOLCHAIN_FILE=${OSXCROSS_FOLDER}/target/toolchain.cmake" >> $GITHUB_ENV
