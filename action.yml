@@ -53,8 +53,7 @@ runs:
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
 
-          cat <<EOF > /etc/apt/sources.list.d/ubuntu.sources
-          Types: deb
+          echo 'Types: deb
           URIs: http://ports.ubuntu.com/ubuntu-ports/
           Suites: noble noble-updates noble-backports
           Components: main restricted universe multiverse
@@ -64,8 +63,7 @@ runs:
           URIs: http://ports.ubuntu.com/ubuntu-ports/
           Suites: noble-security
           Components: main restricted universe multiverse
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          EOF
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg' | tee /etc/apt/sources.list.d/ubuntu.sources
 
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
