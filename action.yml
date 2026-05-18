@@ -52,6 +52,15 @@ runs:
 
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
+          # Add the ARM64 package source (Ubuntu ports repository)
+          sudo tee /etc/apt/sources.list.d/arm64-cross.sources << 'EOF'
+          Types: deb
+          URIs: http://ports.ubuntu.com/ubuntu-ports
+          Suites: jammy jammy-updates
+          Components: main restricted universe
+          Architectures: arm64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          EOF
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
           bash \
@@ -121,6 +130,15 @@ runs:
           sudo apt-get upgrade
         else
           dpkg --add-architecture arm64
+          # Add the ARM64 package source (Ubuntu ports repository)
+          tee /etc/apt/sources.list.d/arm64-cross.sources << 'EOF'
+          Types: deb
+          URIs: http://ports.ubuntu.com/ubuntu-ports
+          Suites: jammy jammy-updates
+          Components: main restricted universe
+          Architectures: arm64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          EOF
           apt-get update
           apt-get install --no-install-recommends -y \
           bash \
