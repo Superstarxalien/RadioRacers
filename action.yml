@@ -118,7 +118,7 @@ runs:
           echo "$(basename $file)"
         }
 
-        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}/target/" >> $GITHUB_ENV
+        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}" >> $GITHUB_ENV
         echo "OSXCROSS_SDK_DIR=${OSXCROSS_TARGET_DIR}/SDK/" >> $GITHUB_ENV
         echo "OSXCROSS_SDK=${OSXCROSS_TARGET_DIR}/SDK/MacOSX${{ inputs.osx-version }}.sdk" >> $GITHUB_ENV
         echo "OSXCROSSVER=${{ inputs.osx-version }}" >> $GITHUB_ENV
