@@ -52,10 +52,22 @@ runs:
 
         if hash sudo 2>/dev/null; then
           sudo apt-get update
-          sudo apt-get install -y -qq clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libgmp-dev  cmake libxml2-dev libssl-dev xz-utils
+          sudo apt-get install apt-utils auto-apt-proxy tzdata g++-aarch64-linux-gnu libcurl4-openssl-dev:arm64 libgme-dev:arm64 libibus-1.0-dev:arm64 libjack-dev:arm64 libltdl-dev:arm64 libminiupnpc-dev:arm64  libopenmpt-dev:arm64 libpng-dev:arm64 libsdl2-dev:arm64 libsdl2-mixer-dev:arm64 libvorbis-dev:arm64 libvpx-dev:arm64 libyuv-dev:arm64
+          sudo apt-get -t bookworm-backports install cmake
+          sudo apt-get install cmake
+          sudo apt-get install g++ clang make git ccache nasm lld ninja-build
+          sudo apt-get install bash bzip2 openssl patch wget
+          sudo apt-get install debian-ports-archive-keyring
+          sudo apt-get install autoconf autopoint bison curl jq libssl-dev libtool libunwind-dev python3-jinja2 tar unzip zip
         else
           apt-get update
-          apt-get install -y -qq clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libgmp-dev  cmake libxml2-dev libssl-dev xz-utils
+          apt-get install apt-utils auto-apt-proxy tzdata g++-aarch64-linux-gnu libcurl4-openssl-dev:arm64 libgme-dev:arm64 libibus-1.0-dev:arm64 libjack-dev:arm64 libltdl-dev:arm64 libminiupnpc-dev:arm64  libopenmpt-dev:arm64 libpng-dev:arm64 libsdl2-dev:arm64 libsdl2-mixer-dev:arm64 libvorbis-dev:arm64 libvpx-dev:arm64 libyuv-dev:arm64
+          apt-get -t bookworm-backports install cmake
+          apt-get install cmake
+          apt-get install g++ clang make git ccache nasm lld ninja-build
+          apt-get install bash bzip2 openssl patch wget
+          apt-get install debian-ports-archive-keyring
+          apt-get install autoconf autopoint bison curl jq libssl-dev libtool libunwind-dev python3-jinja2 tar unzip zip
         fi
         echo "::endgroup::"
 
