@@ -51,16 +51,41 @@ runs:
         echo "::group::Installing Deps"
 
         if hash sudo 2>/dev/null; then
-          sudo dpkg --add-architecture arm64
-          # Add the ARM64 package source (Ubuntu ports repository)
-          sudo tee /etc/apt/sources.list.d/arm64-cross.sources
+          cat <<EOF > deb822sources
           Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports
-          Suites: jammy jammy-updates
+          URIs: http://archive.ubuntu.com/ubuntu/
+          Suites: noble
           Components: main restricted universe
+          Architectures: amd64
+          
+          Types: deb
+          URIs: http://security.ubuntu.com/ubuntu/
+          Suites: noble-security
+          Components: main restricted universe
+          Architectures: amd64
+          
+          Types: deb
+          URIs: http://archive.ubuntu.com/ubuntu/
+          Suites: noble-updates
+          Components: main restricted universe
+          Architectures: amd64
+          
+          Types: deb
+          URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble
+          Components: main restricted multiverse universe
           Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          
+          Types: deb
+          URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble-updates
+          Components: main restricted multiverse universe
+          Architectures: arm64
           EOF
+  
+          sudo mv deb822sources /etc/apt/sources.list.d/ubuntu.sources
+          sudo dpkg --add-architecture arm64
+
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
           bash \
