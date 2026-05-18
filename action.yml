@@ -150,9 +150,13 @@ runs:
       env:
         SDK_VERSION: "${{ inputs.osx-version }}"
         UNATTENDED: "yes"
+        OSXCROSS_TARGET_DIR: "${OSXCROSS_FOLDER}"
+        OSXCROSS_SDK_DIR: "${OSXCROSS_TARGET_DIR}/SDK"
+        OSXCROSS_SDK: "${OSXCROSS_TARGET_DIR}/SDK/MacOSX${{ inputs.osx-version }}.sdk"
+        OSXCROSS_TARGET: "arm64"
       run: |
-        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}/target" >> $GITHUB_ENV
-        echo "OSXCROSS_SDK_DIR=${OSXCROSS_TARGET_DIR/SDK" >> $GITHUB_ENV
+        echo "OSXCROSS_TARGET_DIR=${OSXCROSS_FOLDER}" >> $GITHUB_ENV
+        echo "OSXCROSS_SDK_DIR=${OSXCROSS_TARGET_DIR}/SDK" >> $GITHUB_ENV
         echo "OSXCROSS_SDK=${OSXCROSS_TARGET_DIR}/SDK/MacOSX${{ inputs.osx-version }}.sdk" >> $GITHUB_ENV
         echo "OSXCROSSVER=${{ inputs.osx-version }}" >> $GITHUB_ENV
         echo "OSXCROSS_CCTOOLS_PATH=${OSXCROSS_TARGET_DIR}/bin" >> $GITHUB_ENV
