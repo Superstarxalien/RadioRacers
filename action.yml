@@ -52,8 +52,8 @@ runs:
 
         if hash sudo 2>/dev/null; then
           sudo dpkg --add-architecture arm64
-          # Add the ARM64 package source (Ubuntu ports repository)
-          sudo tee /etc/apt/sources.list.d/arm64-cross.sources
+
+          sudo tee /etc/apt/sources.list.d/arm64-cross.sources <<< 'EOF'
           Types: deb
           URIs: http://ports.ubuntu.com/ubuntu-ports
           Suites: jammy jammy-updates
@@ -61,6 +61,7 @@ runs:
           Architectures: arm64
           Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
           EOF
+
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
           bash \
