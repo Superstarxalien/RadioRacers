@@ -51,36 +51,6 @@ runs:
         echo "::group::Installing Deps"
 
         if hash sudo 2>/dev/null; then
-          sudo dpkg --add-architecture arm64
-
-          echo 'Types: deb
-          URIs: http://archive.ubuntu.com/ubuntu/
-          Suites: noble noble-updates noble-backports
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-          Types: deb
-          URIs: http://archive.ubuntu.com/ubuntu/
-          Suites: noble-security
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-          Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports/
-          Suites: noble noble-updates noble-backports
-          Components: main restricted universe multiverse
-          Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-          Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports/
-          Suites: noble-security
-          Components: main restricted universe multiverse
-          Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg' | sed 's/^[ \t]*//;s/[ \t]*$//' | sudo tee /etc/apt/sources.list.d/ubuntu.sources
-
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
           bash \
