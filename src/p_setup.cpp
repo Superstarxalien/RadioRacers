@@ -9842,6 +9842,7 @@ UINT16 P_PartialAddWadFile(const char *wadfilename)
 
 	/** RADIO: Inject */
 	RR_AddAllEmotes(wadnum);
+	RR_CheckForServerConfig(wadnum);
 
 	// For anything that has to be done over every wadfile at once, see P_MultiSetupWadFiles.
 

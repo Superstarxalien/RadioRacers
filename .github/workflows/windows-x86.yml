@@ -66,11 +66,15 @@ jobs:
       - name: Build radioracers_plus.pk3
         run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_plus.txt --force -o radio/pk3/out/radioracers_plus.pk3 -b radio/pk3/src/radioracers_plus
 
+      - name: Build radioracers_servcfg.pk3
+        run: python radio/pk3/pk3make.py radio/pk3/build/radioracers_servcfg.txt --force -o radio/pk3/out/radioracers_servcfg.pk3 -b radio/pk3/src/radioracers_servcfg
+
       - name: zip compiled build
         run: |
           cd radio/pk3/out
           mv radioracers.pk3 ../../../build.cmake/bin
           mv radioracers_plus.pk3 ../../../build.cmake/bin
+          mv radioracers_servcfg.pk3 ../../../build.cmake/bin
           cd ../../../build.cmake/bin
           zip -r radioracers-superstarxalien.zip .
 

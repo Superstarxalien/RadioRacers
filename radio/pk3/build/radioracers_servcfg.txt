@@ -1,0 +1,4 @@
+$basepath src/radioracers_servcfg/
+$output out/radioracers_servcfg.pk3
+
+**

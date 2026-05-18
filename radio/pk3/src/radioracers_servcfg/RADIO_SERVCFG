@@ -1,0 +1,13 @@
+# Here is an example of a server configuration for RadioRacers clients.
+# You can copy this text lump to a different addon, or just host this PK3.
+#
+# Uncomment the features that you're okay with enabling.
+
+# Observation Haki
+#radio_hakimode on
+
+# Ghost Rings
+#radio_ringsaccessibility on
+
+# Display Emeralds on Minimap
+#radio_bttl_emerald_on_minimap on
