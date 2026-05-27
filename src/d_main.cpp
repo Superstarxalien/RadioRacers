@@ -314,14 +314,14 @@ void D_ProcessEvents(boolean callresponders)
 		I_unlock_mutex(con_mutex);
 #endif
 
-		// update keys current state
-		G_MapEventsToControls(ev);
-
 		if (eaten)
 		{
 			hu_keystrokes = true;
 			continue; // ate the event
 		}
+
+		// update keys current state
+		G_MapEventsToControls(ev);
 
 		if (!callresponders)
 			continue; // eat

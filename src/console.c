@@ -1004,8 +1004,11 @@ boolean CON_Responder(event_t *ev)
 	else if (ev->type == ev_text)
 	{
 		if (!consoletoggle && consoleready)
+		{
 			CON_InputAddChar(key);
-		return true;
+			return true;
+		}
+		return false;
 	}
 
 	// Always eat ctrl/shift/alt if console open, so the menu doesn't get ideas
