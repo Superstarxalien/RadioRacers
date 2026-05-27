@@ -191,6 +191,7 @@ static void M_CloseVirtualKeyboard(void)
 {
 	menutyping.menutypingclose = true;	// close menu.
 	menutyping.queryfn(menutyping.cache);
+	I_SetTextInputMode(false);
 }
 
 void M_AbortVirtualKeyboard(void)
@@ -206,7 +207,7 @@ void M_AbortVirtualKeyboard(void)
 		M_GoBack(0);
 }
 
-void M_MenuTypingInput(INT32 key)
+void M_MenuTypingInput(INT32 key, boolean istext)
 {
 	const UINT8 pid = 0;
 
@@ -217,10 +218,18 @@ void M_MenuTypingInput(INT32 key)
 		M_SwitchVirtualKeyboard(gamepad);
 		if (gamepad)
 			return;
+
+		I_SetTextInputMode(true);
 	}
 
 	if (!menutyping.active)
 		return;
+
+	if (key == KEY_BACKSPACE || key == KEY_DEL ||
+		(ctrldown && (key == 'c' || key == 'C' || key == KEY_INS
+		|| key == 'x' || key == 'X' || key == 'v' || key == 'V'))
+		|| (shiftdown && (key == KEY_INS || key == KEY_DEL)))
+		istext = true;
 
 	// Fade-in
 
@@ -259,7 +268,7 @@ void M_MenuTypingInput(INT32 key)
 				return;
 			}
 
-			if (menutyping.keyboardtyping)
+			if (menutyping.keyboardtyping && istext)
 			{
 				M_ChangeStringCvar(key);
 				return;

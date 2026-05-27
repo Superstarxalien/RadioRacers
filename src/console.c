@@ -1171,6 +1171,7 @@ boolean CON_Responder(event_t *ev)
 			return true;
 		}
 
+		// bound to 'CTRL + =' on US QWERTY, so disable if holding ALT
 		if (!altdown)
 		{
 			// Zoom

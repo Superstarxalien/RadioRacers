@@ -1224,7 +1224,7 @@ static void M_HandleMenuInput(void)
 	// Typing for CV_IT_STRING
 	if (menutyping.active)
 	{
-		M_MenuTypingInput(-1);
+		M_MenuTypingInput(-1, false);
 		return;
 	}
 

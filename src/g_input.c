@@ -20,6 +20,7 @@
 #include "hu_stuff.h" // need HUFONT start & end
 #include "d_net.h"
 #include "console.h"
+#include "i_system.h"
 #include "i_joy.h" // JOYAXISRANGE
 #include "r_draw.h" // GTC_ macros for assigning gamepad indicator colors
 #include "v_video.h" // V_GetColor for assigning gamepad indictaor colors
@@ -465,10 +466,17 @@ void G_MapEventsToControls(event_t *ev)
 
 	switch (ev->type)
 	{
+		case ev_text:
+			if (ev->data1 < NUMINPUTS)
+			{
+				M_MenuTypingInput(ev->data1, true);
+			}
+
+			break;
 		case ev_keydown:
 			if (ev->data1 < NUMINPUTS)
 			{
-				M_MenuTypingInput(ev->data1);
+				M_MenuTypingInput(ev->data1, false);
 
 				if (ev->data2) // OS repeat? We handle that ourselves
 				{
