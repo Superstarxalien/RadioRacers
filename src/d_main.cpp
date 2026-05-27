@@ -300,6 +300,9 @@ void D_ProcessEvents(boolean callresponders)
 
 		HandleGamepadDeviceEvents(ev);
 
+		if (CON_PreResponder(ev))
+			continue;
+
 		// console input
 #ifdef HAVE_THREADS
 		I_lock_mutex(&con_mutex);

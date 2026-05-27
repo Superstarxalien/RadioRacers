@@ -313,6 +313,14 @@ boolean I_HasOpenURL(void);
 
 void I_OpenURL(const char *data);
 
+/** \brief Sets text input mode. When enabled, keyboard inputs will respect dead keys.
+ */
+void I_SetTextInputMode(boolean active);
+
+/** \brief Retrieves current text input mode.
+ */
+boolean I_GetTextInputMode(void);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

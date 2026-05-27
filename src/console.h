@@ -24,6 +24,7 @@ extern "C" {
 
 void CON_Init(void);
 
+boolean CON_PreResponder(event_t *ev);
 boolean CON_Responder(event_t *ev);
 
 #ifdef HAVE_THREADS

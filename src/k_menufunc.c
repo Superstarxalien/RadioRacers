@@ -22,6 +22,7 @@
 #include "console.h"
 #include "hu_stuff.h"
 #include "s_sound.h"
+#include "i_system.h"
 #include "v_video.h"
 #include "f_finale.h"
 #include "m_misc.h"
@@ -80,6 +81,12 @@ CV_PossibleValue_t dummystaff_cons_t[] = {{0, "MIN"}, {999, "MAX"}, {0, NULL}};
 // =========================================================================
 // BASIC MENU HANDLING
 // =========================================================================
+
+void M_UpdateItemOn(void)
+{
+	I_SetTextInputMode((currentMenu->menuitems[itemOn].status & IT_CVARTYPE) == IT_CV_STRING ||
+		(currentMenu->menuitems[itemOn].status & IT_TYPE) == IT_KEYHANDLER);
+}
 
 static void M_AddFloatVar(consvar_t *cv, fixed_t step)
 {
@@ -273,6 +280,7 @@ boolean M_NextOpt(void)
 
 	M_UpdateMenuBGImage(false);
 	M_FlipKartGamemodeMenu(true);
+	M_UpdateItemOn();
 
 	return true;
 }
@@ -302,6 +310,7 @@ boolean M_PrevOpt(void)
 
 	M_UpdateMenuBGImage(false);
 	M_FlipKartGamemodeMenu(true);
+	M_UpdateItemOn();
 
 	return true;
 }
@@ -425,6 +434,7 @@ boolean M_Responder(event_t *ev)
 				M_Options(0);
 				currentMenu = &OP_SoundOptionsDef;
 				itemOn = 0;
+				M_UpdateItemOn();
 				return true;
 
 			case KEY_F5: // Video Mode
@@ -885,6 +895,7 @@ void M_StartControlPanel(void)
 
 		itemOn = currentMenu->lastOn;
 		M_UpdateMenuBGImage(true);
+		M_UpdateItemOn();
 
 #ifdef HAVE_DISCORDRPC
 		// currentMenu changed during GS_MENU
@@ -1025,6 +1036,7 @@ void M_SetupNextMenu(menu_t *menudef, boolean notransition)
 
 	M_UpdateMenuBGImage(false);
 	M_PlayMenuJam();
+	M_UpdateItemOn();
 
 #ifdef HAVE_DISCORDRPC
 	if (gamestate == GS_MENU)

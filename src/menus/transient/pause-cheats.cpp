@@ -59,6 +59,7 @@ void menu_mode(int mode)
 	PAUSE_CheatsDef.extra1 = mode;
 
 	itemOn = g_menu_cursors[menu_mode()];
+	M_UpdateItemOn();
 }
 
 void list_cvars()

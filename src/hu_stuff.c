@@ -87,6 +87,7 @@ static player_t *plr;
 boolean hu_keystrokes; // :)
 boolean chat_keydown;
 boolean chat_on; // entering a chat message?
+boolean chat_on_first_event; // blocker for first chat input event
 boolean g_voicepushtotalk_on; // holding PTT?
 static char w_chat[HU_MAXMSGLEN + 1];
 static size_t c_input = 0; // let's try to make the chat input less shitty.
@@ -1128,7 +1129,7 @@ boolean HU_Responder(event_t *ev)
 		}
 	}
 
-	if (ev->type != ev_keydown)
+	if (ev->type != ev_keydown && ev->type != ev_text)
 		return false;
 
 	// only KeyDown events now...
@@ -1163,12 +1164,17 @@ boolean HU_Responder(event_t *ev)
 
 	if (!chat_on)
 	{
+		if (ev->type == ev_text)
+			return false;
+
 		// enter chat mode
 		if ((ev->data1 == gamecontrol[0][gc_talk][0] || ev->data1 == gamecontrol[0][gc_talk][1]
 			|| ev->data1 == gamecontrol[0][gc_talk][2] || ev->data1 == gamecontrol[0][gc_talk][3])
 			&& netgame && !OLD_MUTE) // check for old chat mute, still let the players open the chat incase they want to scroll otherwise.
 		{
+			I_SetTextInputMode(true);
 			chat_on = true;
+			chat_on_first_event = false;
 			w_chat[0] = 0;
 			teamtalk = false;
 			chat_scrollmedown = true;
@@ -1191,6 +1197,32 @@ boolean HU_Responder(event_t *ev)
 	{
 		INT32 c = (INT32)ev->data1;
 
+		if (!chat_on_first_event)
+		{
+			// since the text event is sent immediately after the keydown event,
+			// we need to make sure that nothing is displayed once the chat
+			// opens, otherwise a 't' would be outputted.
+			chat_on_first_event = true;
+			return true;
+		}
+
+		if (ev->type == ev_text)
+		{
+			if ((c < HU_FONTSTART || c > HU_FONTEND || !fontv[HU_FONT].font[c-HU_FONTSTART])
+				&& c != ' ') // Allow spaces, of course
+			{
+				return false;
+			}
+
+			if (CHAT_MUTE || strlen(w_chat) >= HU_MAXMSGLEN)
+				return true;
+
+			memmove(&w_chat[c_input + 1], &w_chat[c_input], strlen(w_chat) - c_input + 1);
+			w_chat[c_input] = c;
+			c_input++;
+			return true;
+		}
+
 		// Ignore modifier keys
 		// Note that we do this here so users can still set
 		// their chat keys to one of these, if they so desire.
@@ -1205,10 +1237,8 @@ boolean HU_Responder(event_t *ev)
 		&& ev->data1 != gamecontrol[0][gc_talkkey][1])*/)
 			return false;
 
-		c = CON_ShiftChar(c);
-
 		// pasting. pasting is cool. chat is a bit limited, though :(
-		if ((c == 'v' || c == 'V') && ctrldown)
+		if (c == 'v' && ctrldown)
 		{
 			const char *paste;
 			size_t chatlen;
@@ -1236,6 +1266,7 @@ boolean HU_Responder(event_t *ev)
 			if (!CHAT_MUTE)
 				HU_sendChatMessage();
 
+			I_SetTextInputMode(false);
 			chat_on = false;
 			c_input = 0; // reset input cursor
 			chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
@@ -1246,6 +1277,7 @@ boolean HU_Responder(event_t *ev)
 			|| c == gamecontrol[0][gc_teamkey][0] || c == gamecontrol[0][gc_teamkey][1])
 			&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
 		{
+			I_SetTextInputMode(false);
 			chat_on = false;
 			c_input = 0; // reset input cursor
 			I_UpdateMouseGrab();
@@ -1275,16 +1307,6 @@ boolean HU_Responder(event_t *ev)
 				c_input += M_JumpWord(&w_chat[c_input]);
 			else
 				c_input++;
-		}
-		else if ((c >= HU_FONTSTART && c <= HU_FONTEND && fontv[HU_FONT].font[c-HU_FONTSTART])
-			|| c == ' ') // Allow spaces, of course
-		{
-			if (CHAT_MUTE || strlen(w_chat) >= HU_MAXMSGLEN)
-				return true;
-
-			memmove(&w_chat[c_input + 1], &w_chat[c_input], strlen(w_chat) - c_input + 1);
-			w_chat[c_input] = c;
-			c_input++;
 		}
 		else if (c == KEY_BACKSPACE)
 		{

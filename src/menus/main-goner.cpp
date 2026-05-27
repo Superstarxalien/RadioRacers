@@ -876,6 +876,7 @@ void M_GonerRailroad(bool set)
 		return;
 
 	itemOn = destsize-1;
+	M_UpdateItemOn();
 	S_StartSound(NULL, sfx_s3k63);
 }
 
@@ -995,6 +996,7 @@ void M_GonerTick(void)
 
 		M_GonerRailroad(false);
 		itemOn = 1;
+		M_UpdateItemOn();
 
 		lastseenlevel = gamedata->gonerlevel;
 	}

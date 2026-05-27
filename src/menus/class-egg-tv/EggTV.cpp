@@ -363,6 +363,7 @@ bool EggTV::select()
 
 			mode_.change(Mode::kReplay, enhanceZoom_.stopping_point());
 			itemOn = 0; // WATCH REPLAY
+			M_UpdateItemOn();
 
 			return true;
 

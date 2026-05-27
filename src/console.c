@@ -638,13 +638,7 @@ static void CON_MoveConsole(void)
 
 INT32 CON_ShiftChar(INT32 ch)
 {
-	if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-	{
-		// Standard Latin-script uppercase translation
-		if (shiftdown ^ capslock)
-			ch = shiftxform[ch];
-	}
-	else if (ch >= KEY_KEYPAD7 && ch <= KEY_KPADDEL)
+	if (ch >= KEY_KEYPAD7 && ch <= KEY_KPADDEL)
 	{
 		// Numpad keycodes mapped to printable equivalent
 		const char keypad_translation[] =
@@ -661,12 +655,6 @@ INT32 CON_ShiftChar(INT32 ch)
 	{
 		// Ditto, but non-contiguous keycode
 		ch = '/';
-	}
-	else
-	{
-		// QWERTY keycode translation
-		if (shiftdown)
-			ch = shiftxform[ch];
 	}
 
 	return ch;
@@ -921,12 +909,25 @@ static void AdjustTextSize(INT32 n)
 	CV_SetValue(&cv_constextsize, (cur << V_SCALEPATCHSHIFT) & V_SCALEPATCHMASK);
 }
 
+//
+// Same as CON_Responder, but is process before everything else, so it cannot be blocked.
+//
+boolean CON_PreResponder(event_t *ev)
+{
+	if (ev->type == ev_keydown && shiftdown == 1 && ev->data1 == KEY_ESCAPE)
+	{
+		I_SetTextInputMode(con_destlines == 0); // inverse, since this is changed next tic.
+		consoletoggle = true;
+		return true;
+	}
+
+	return false;
+}
+
 // Handles console key input
 //
 boolean CON_Responder(event_t *ev)
 {
-	static UINT8 consdown = false; // console is treated differently due to rare usage
-
 	// sequential completions a la 4dos
 	static char completion[80];
 
@@ -943,18 +944,15 @@ boolean CON_Responder(event_t *ev)
 		return false;
 
 	// let go keyup events, don't eat them
-	if (ev->type != ev_keydown && ev->type != ev_console)
+	if (ev->type != ev_keydown && ev->type != ev_text && ev->type != ev_console)
 	{
-		if (ev->data1 == gamecontrol[0][gc_console][0] || ev->data1 == gamecontrol[0][gc_console][1]
-		|| ev->data1 == gamecontrol[0][gc_console][2] || ev->data1 == gamecontrol[0][gc_console][3])
-			consdown = false;
 		return false;
 	}
 
 	key = ev->data1;
 
 	// check for console toggle key
-	if (ev->type != ev_console)
+	if (ev->type == ev_keydown)
 	{
 		#ifndef DEVELOP // I have driven this course 45 times and I just want to give myself rocketsneakers
 		if (modeattacking || marathonmode)
@@ -975,20 +973,18 @@ boolean CON_Responder(event_t *ev)
 				return false;
 		}
 
-		if (key == gamecontrol[0][gc_console][0] || key == gamecontrol[0][gc_console][1]
-			|| key == gamecontrol[0][gc_console][2] || key == gamecontrol[0][gc_console][3])
+		if ((key == gamecontrol[0][gc_console][0] || key == gamecontrol[0][gc_console][1]
+			|| key == gamecontrol[0][gc_console][2] || key == gamecontrol[0][gc_console][3]) && !shiftdown)
 		{
-			if (consdown) // ignore repeat
-				return true;
+			I_SetTextInputMode(con_destlines == 0); // inverse, since this is changed next tic.
 			consoletoggle = true;
-			consdown = true;
 			return true;
 		}
 
 		// check other keys only if console prompt is active
 		if (!consoleready && key < NUMINPUTS) // metzgermeister: boundary check!!
 		{
-			if (! menuactive && bindtable[key])
+			if (!menuactive && bindtable[key])
 			{
 				COM_BufAddText(bindtable[key]);
 				COM_BufAddText("\n");
@@ -1000,9 +996,16 @@ boolean CON_Responder(event_t *ev)
 		// escape key toggle off console
 		if (key == KEY_ESCAPE)
 		{
+			I_SetTextInputMode(false);
 			consoletoggle = true;
 			return true;
 		}
+	}
+	else if (ev->type == ev_text)
+	{
+		if (!consoletoggle && consoleready)
+			CON_InputAddChar(key);
+		return true;
 	}
 
 	// Always eat ctrl/shift/alt if console open, so the menu doesn't get ideas
@@ -1049,7 +1052,7 @@ boolean CON_Responder(event_t *ev)
 	}
 	else if (key == KEY_BACKSPACE)
 	{
-		if (ctrldown)
+		if (ctrldown && input_cur != 0)
 		{
 			input_sel = M_JumpWordReverse(inputlines[inputline], input_cur);
 			CON_InputDelSelection();
@@ -1129,7 +1132,9 @@ boolean CON_Responder(event_t *ev)
 
 		if (key == 'x' || key == 'X')
 		{
-			if (input_sel > input_cur)
+			if (input_sel == input_cur) // Don't replace the clipboard without a text selection
+				return true;
+			else if (input_sel > input_cur)
 				I_ClipboardCopy(&inputlines[inputline][input_cur], input_sel-input_cur);
 			else
 				I_ClipboardCopy(&inputlines[inputline][input_sel], input_cur-input_sel);
@@ -1139,7 +1144,9 @@ boolean CON_Responder(event_t *ev)
 		}
 		else if (key == 'c' || key == 'C')
 		{
-			if (input_sel > input_cur)
+			if (input_sel == input_cur) // Don't replace the clipboard without a text selection
+				return true;
+			else if (input_sel > input_cur)
 				I_ClipboardCopy(&inputlines[inputline][input_cur], input_sel-input_cur);
 			else
 				I_ClipboardCopy(&inputlines[inputline][input_sel], input_cur-input_sel);
@@ -1164,16 +1171,19 @@ boolean CON_Responder(event_t *ev)
 			return true;
 		}
 
-		// Zoom
-		if (key == '=')
+		if (!altdown)
 		{
-			AdjustTextSize(1);
-			return true;
-		}
-		else if (key == '-')
-		{
-			AdjustTextSize(-1);
-			return true;
+			// Zoom
+			if (key == '=')
+			{
+				AdjustTextSize(1);
+				return true;
+			}
+			else if (key == '-')
+			{
+				AdjustTextSize(-1);
+				return true;
+			}
 		}
 
 		// ...why shouldn't it eat the key? if it doesn't, it just means you
@@ -1348,7 +1358,8 @@ boolean CON_Responder(event_t *ev)
 
 	if (input_sel != input_cur)
 		CON_InputDelSelection();
-	CON_InputAddChar(key);
+	if (ev->type == ev_console)
+		CON_InputAddChar(key);
 
 	return true;
 }

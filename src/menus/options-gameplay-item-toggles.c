@@ -163,6 +163,7 @@ void M_HandleItemToggles(INT32 choice)
 		itemOn = next;
 
 		M_SetMenuDelay(pid);
+		M_UpdateItemOn();
 	}
 
 	else if (menucmd[pid].dpad_lr < 0)
@@ -179,6 +180,7 @@ void M_HandleItemToggles(INT32 choice)
 		itemOn = next;
 
 		M_SetMenuDelay(pid);
+		M_UpdateItemOn();
 	}
 
 	else if (menucmd[pid].dpad_ud > 0)
@@ -191,6 +193,7 @@ void M_HandleItemToggles(INT32 choice)
 		itemOn = next;
 
 		M_SetMenuDelay(pid);
+		M_UpdateItemOn();
 	}
 
 	else if (menucmd[pid].dpad_ud < 0)
@@ -207,6 +210,7 @@ void M_HandleItemToggles(INT32 choice)
 		itemOn = next;
 
 		M_SetMenuDelay(pid);
+		M_UpdateItemOn();
 	}
 
 	else if (M_MenuConfirmPressed(pid))
