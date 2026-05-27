@@ -144,6 +144,7 @@ void M_OpenPauseMenu(void)
 	chat_keydown = false;
 
 	itemOn = currentMenu->lastOn = mpause_continue;	// Make sure we select "RESUME GAME" by default
+	M_UpdateItemOn();
 
 	// Now the hilarious balancing act of deciding what options should be enabled and which ones shouldn't be!
 	// By default, disable anything sensitive:

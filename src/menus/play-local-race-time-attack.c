@@ -98,6 +98,7 @@ boolean M_TimeAttackInputs(INT32 ch)
 
 		S_StartSound(NULL, sfx_s3k5b);
 		M_SetMenuDelay(pid);
+		M_UpdateItemOn();
 
 		return true;
 	}
@@ -404,7 +405,10 @@ void CV_SPBAttackChanged(void)
 		}
 
 		if (currentMenu == &PLAY_TimeAttackDef)
+		{
 			itemOn = PLAY_TimeAttackDef.lastOn;
+			M_UpdateItemOn();
+		}
 
 		Z_Free(gpath);
 	}

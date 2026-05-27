@@ -204,6 +204,7 @@ static void M_PlaybackTick(void)
 void M_SetPlaybackMenuPointer(void)
 {
 	itemOn = playback_pause;
+	M_UpdateItemOn();
 }
 
 void M_PlaybackRewind(INT32 choice)

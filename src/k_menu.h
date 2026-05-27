@@ -750,6 +750,7 @@ boolean M_Responder(event_t *ev);
 boolean M_MenuButtonPressed(UINT8 pid, UINT32 bt);
 boolean M_MenuButtonHeld(UINT8 pid, UINT32 bt);
 
+void M_UpdateItemOn(void);
 boolean M_ChangeStringCvar(INT32 choice);
 void M_ChangeCvarDirect(INT32 choice, consvar_t *cv);
 boolean M_NextOpt(void);

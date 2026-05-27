@@ -814,49 +814,65 @@ void I_GetConsoleEvents(void)
 	// we use this when sending back commands
 	event_t ev = {};
 	char key = 0;
-	ssize_t d;
+	struct pollfd pfd =
+	{
+		.fd = STDIN_FILENO,
+		.events = POLLIN,
+		.revents = 0,
+	};
 
 	if (!consolevent)
 		return;
 
-	ev.type = ev_console;
-	if (read(STDIN_FILENO, &key, 1) == -1 || !key)
-		return;
+	for (;;)
+	{
+		if (poll(&pfd, 1, 0) < 1 || !(pfd.revents & POLLIN))
+			return;
 
-	// we have something
-	// backspace?
-	// NOTE TTimo testing a lot of values .. seems it's the only way to get it to work everywhere
-	if ((key == tty_erase) || (key == 127) || (key == 8))
-	{
-		if (tty_con.cursor > 0)
+		ev.type = ev_console;
+		ev.data1 = 0;
+		if (read(STDIN_FILENO, &key, 1) == -1 || !key)
+			return;
+
+		// we have something
+		// backspace?
+		// NOTE TTimo testing a lot of values .. seems it's the only way to get it to work everywhere
+		if ((key == tty_erase) || (key == 127) || (key == 8))
 		{
-			tty_con.cursor--;
-			tty_con.buffer[tty_con.cursor] = '\0';
-			tty_Back();
+			if (tty_con.cursor > 0)
+			{
+				tty_con.cursor--;
+				tty_con.buffer[tty_con.cursor] = '\0';
+				tty_Back();
+			}
+			ev.data1 = KEY_BACKSPACE;
 		}
-		ev.data1 = KEY_BACKSPACE;
-	}
-	else if (key < ' ') // check if this is a control char
-	{
-		if (key == '\n')
+		else if (key < ' ') // check if this is a control char
 		{
-			tty_Clear();
-			tty_con.cursor = 0;
-			ev.data1 = KEY_ENTER;
+			if (key == '\n')
+			{
+				tty_Clear();
+				tty_con.cursor = 0;
+				ev.data1 = KEY_ENTER;
+			}
+			else if (key == 0x4) // ^D, aka EOF
+			{
+				// shut down, most unix programs behave this way
+				I_Quit();
+			}
+			else continue;
 		}
-		else return;
+		else if (tty_con.cursor < sizeof (tty_con.buffer))
+		{
+			// push regular character
+			ev.data1 = tty_con.buffer[tty_con.cursor] = key;
+			tty_con.cursor++;
+			// print the current line (this is differential)
+			write(STDOUT_FILENO, &key, 1);
+		}
+		if (ev.data1) D_PostEvent(&ev);
+		//tty_FlushIn();
 	}
-	else
-	{
-		// push regular character
-		ev.data1 = tty_con.buffer[tty_con.cursor] = key;
-		tty_con.cursor++;
-		// print the current line (this is differential)
-		d = write(STDOUT_FILENO, &key, 1);
-	}
-	if (ev.data1) D_PostEvent(&ev);
-	//tty_FlushIn();
-	(void)d;
 }
 
 #elif defined (_WIN32)
@@ -2666,5 +2682,18 @@ UINT32 I_GetFreeMem(UINT32 *total)
 
 // note CPUAFFINITY code used to reside here
 void I_RegisterSysCommands(void) {}
+
+void I_SetTextInputMode(boolean active)
+{
+	if (active)
+		SDL_StartTextInput();
+	else
+		SDL_StopTextInput();
+}
+
+boolean I_GetTextInputMode(void)
+{
+	return SDL_IsTextInputActive();
+}
 
 #endif // HAVE_SDL

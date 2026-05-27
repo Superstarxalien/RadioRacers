@@ -73,6 +73,7 @@ static void M_DiscordRequestTick(void)
 			{
 				M_SetupNextMenu(currentMenu->prevMenu, true);
 				itemOn = mpause_continue;
+				M_UpdateItemOn();
 			}
 			else
 				M_ClearMenus(true);
