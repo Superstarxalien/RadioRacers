@@ -1008,6 +1008,11 @@ boolean CON_Responder(event_t *ev)
 			CON_InputAddChar(key);
 			return true;
 		}
+		if (consoletoggle)
+		{
+			if (menutyping.keyboardtyping) I_SetTextInputMode(true);
+			return true;
+		}
 		return false;
 	}
 
