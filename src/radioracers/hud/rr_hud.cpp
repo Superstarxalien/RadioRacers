@@ -368,7 +368,6 @@ void RR_addPlayerToFinshTicker(player_t *player)
 
     /**
      * TODO: 
-     *  * Handle player ties
      *  * Rare spectate case (just check player flags)
      */
     playerFinishTickerQueue.push_back(
