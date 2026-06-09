@@ -263,6 +263,7 @@ void M_ServersMenu(INT32 choice)
 	PLAY_MP_ServerBrowserDef.prevMenu = currentMenu;
 	M_SetupNextMenu(&PLAY_MP_ServerBrowserDef, false);
 	itemOn = 0;
+	M_UpdateItemOn();
 
 #ifdef SERVERLISTDEBUG
 	M_ServerListFillDebug();
