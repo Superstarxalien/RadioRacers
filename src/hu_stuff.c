@@ -1185,7 +1185,9 @@ boolean HU_Responder(event_t *ev)
 			|| ev->data1 == gamecontrol[0][gc_teamtalk][2] || ev->data1 == gamecontrol[0][gc_teamtalk][3])
 			&& netgame && !OLD_MUTE)
 		{
+			I_SetTextInputMode(true);
 			chat_on = true;
+			chat_on_first_event = false;
 			w_chat[0] = 0;
 			teamtalk = G_GametypeHasTeams();	// Don't teamtalk if we don't have teams.
 			chat_scrollmedown = true;
