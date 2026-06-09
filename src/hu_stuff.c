@@ -1255,8 +1255,50 @@ void HU_clearChatChars(void)
 }
 
 // Handle HU_Responder for Radio-related functionality
-static boolean RR_HU_Responder(INT32 c)
+static boolean RR_HU_Responder(event_t *ev)
 {
+	INT32 c = (INT32)ev->data1;
+
+	if (ev->type == ev_text)
+	{
+		if ((c < HU_FONTSTART || c > HU_FONTEND || !fontv[HU_FONT].font[c-HU_FONTSTART])
+			&& c != ' ') // Allow spaces, of course
+		{
+			return false;
+		}
+
+		if (CHAT_MUTE || strlen(w_chat) >= HU_MAXMSGLEN)
+			return true;
+		
+		/**
+		 * RADIO: Starting to search for an emote, enable the preview
+		 */
+		RR_CheckChatInputForEmotePreview(c);
+		RR_CheckChatInputForEmoteMenu(c);
+		
+		if (is_emote_menu_on) { 
+			return true;
+		}
+
+		memmove(&w_chat[c_input + 1], &w_chat[c_input], strlen(w_chat) - c_input + 1);
+		w_chat[c_input] = c;
+		c_input++;
+	}
+
+	// Ignore modifier keys
+	// Note that we do this here so users can still set
+	// their chat keys to one of these, if they so desire.
+	if (ev->data1 == KEY_LSHIFT || ev->data1 == KEY_RSHIFT
+	 || ev->data1 == KEY_LCTRL || ev->data1 == KEY_RCTRL
+	 || ev->data1 == KEY_LALT || ev->data1 == KEY_RALT)
+		return true;
+
+	// Ignore non-keyboard keys, except when the talk key is bound
+	if (ev->data1 >= NUMKEYS
+	/*&& (ev->data1 != gamecontrol[0][gc_talkkey][0]
+	&& ev->data1 != gamecontrol[0][gc_talkkey][1])*/)
+		return false;
+
 	if (c == KEY_ENTER)
 	{
 		if (!CHAT_MUTE)
@@ -1272,17 +1314,18 @@ static boolean RR_HU_Responder(INT32 c)
 			RR_RemoveEmoteChatInputLog();
 		}
 		
+		I_SetTextInputMode(false);
 		RR_ResetEmoteSearchQuery();
 		chat_on = false;
 		c_input = 0; // reset input cursor
 		chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
 		I_UpdateMouseGrab();
-	} else if ((c == 'f' || c == 'F') && ctrldown) { // Favouriting
+	} else if (c == 'f' && ctrldown) { // Favouriting
 		if (is_emote_menu_on) {
 			RR_UpdateFavouriteEmotes();
 			return true;
 		}
-	} else if(c == '=' && ctrldown) { // Sorting
+	} else if(c == '=' && ctrldown && !altdown) { // Sorting
 		if (!is_emote_preview_on && is_emote_menu_on) {
 			CV_AddValue(&cv_chat_emotes_sort, 1);
 			return true;
@@ -1292,6 +1335,7 @@ static boolean RR_HU_Responder(INT32 c)
 		|| c == gamecontrol[0][gc_teamkey][0] || c == gamecontrol[0][gc_teamkey][1])
 		&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
 	{
+		I_SetTextInputMode(false);
 		RR_ResetAllEmoteChatInfo();
 		chat_on = false;
 		c_input = 0; // reset input cursor
@@ -1371,29 +1415,9 @@ static boolean RR_HU_Responder(INT32 c)
 			return true;
 		}
 	}
-	else if ((c == KEY_END || (ctrldown && (c == 'e' || c == 'E'))) && !OLDCHAT) {
+	else if ((c == KEY_END || (ctrldown && c == 'e')) && !OLDCHAT) {
 		RR_ToggleEmoteMenu();
 		return true;
-	}
-	else if ((c >= HU_FONTSTART && c <= HU_FONTEND && fontv[HU_FONT].font[c-HU_FONTSTART])
-		|| c == ' ') // Allow spaces, of course
-	{
-		if (CHAT_MUTE || strlen(w_chat) >= HU_MAXMSGLEN)
-			return true;
-		
-		/**
-		 * RADIO: Starting to search for an emote, enable the preview
-		 */
-		RR_CheckChatInputForEmotePreview(c);
-		RR_CheckChatInputForEmoteMenu(c);
-		
-		if (is_emote_menu_on) { 
-			return true;
-		}
-
-		memmove(&w_chat[c_input + 1], &w_chat[c_input], strlen(w_chat) - c_input + 1);
-		w_chat[c_input] = c;
-		c_input++;
 	}
 	else if (c == KEY_BACKSPACE)
 	{
@@ -1529,6 +1553,10 @@ boolean HU_Responder(event_t *ev)
 			return true;
 		}
 
+		if (cv_chat_emotes.value) {
+			return RR_HU_Responder(ev);
+		}
+
 		if (ev->type == ev_text)
 		{
 			if ((c < HU_FONTSTART || c > HU_FONTEND || !fontv[HU_FONT].font[c-HU_FONTSTART])
@@ -1583,9 +1611,6 @@ boolean HU_Responder(event_t *ev)
 			memcpy(&w_chat[c_input], paste, pastelen); // copy all of that.
 			c_input += pastelen;
 			return true;
-		}
-		else if(cv_chat_emotes.value) {
-			return RR_HU_Responder(c);
 		}
 		else if (c == KEY_ENTER)
 		{
