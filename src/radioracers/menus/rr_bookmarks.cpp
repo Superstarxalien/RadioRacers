@@ -495,7 +495,6 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         changed_bookmark = true;
         changed_direction = true;
 
-        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
 	}
     else if (menucmd[pid].dpad_ud < 0) // Up
@@ -504,7 +503,6 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         changed_bookmark = true;
         changed_direction = true;
 
-        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
 	}
     else if (M_MenuButtonPressed(pid, MBT_L))
