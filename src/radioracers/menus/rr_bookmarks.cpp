@@ -467,11 +467,13 @@ boolean RRM_BookmarkHandler(INT32 choice) {
     size_t current_row = bookmark_idx / COLUMNS;
     size_t current_col = bookmark_idx % COLUMNS;
     bool changed_bookmark = false;
+    bool changed_direction = false;
 
     if (menucmd[pid].dpad_lr > 0) // Right
     {
         bookmark_idx = (current_col + 1) % COLUMNS + current_row * COLUMNS;
         changed_bookmark = true;
+        changed_direction = true;
 
         S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
@@ -480,6 +482,7 @@ boolean RRM_BookmarkHandler(INT32 choice) {
     {
         bookmark_idx = (current_col + (COLUMNS-1)) % COLUMNS + current_row * COLUMNS;
         changed_bookmark = true;
+        changed_direction = true;
         
         S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
@@ -488,6 +491,7 @@ boolean RRM_BookmarkHandler(INT32 choice) {
 	{
         bookmark_idx = current_col + ((current_row + 1) % ROWS) * COLUMNS;
         changed_bookmark = true;
+        changed_direction = true;
 
         S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
@@ -496,6 +500,7 @@ boolean RRM_BookmarkHandler(INT32 choice) {
 	{
         bookmark_idx = current_col + ((current_row + (ROWS-1)) % ROWS) * COLUMNS;
         changed_bookmark = true;
+        changed_direction = true;
 
         S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
@@ -505,6 +510,7 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         M_NextPage();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
+        changed_direction = true;
     }
     else if (M_MenuButtonPressed(pid, MBT_Z))
     {
@@ -523,6 +529,14 @@ boolean RRM_BookmarkHandler(INT32 choice) {
 
     if (changed_bookmark)
         memset(&bookmarkmenu.preview_follower, 0, sizeof(bookmark_menu_follower_anim_t));
+
+    // Prematurely end the stage if the player moves the cursor
+    if (changed_direction) {
+        if (bookmarkmenu.stage != BMENU_STAGE_BROWSING) {
+            bookmarkmenu.stage_timer = 0;
+            bookmarkmenu.stage = BMENU_STAGE_BROWSING;
+        }
+    }
 
     return false;
 }
