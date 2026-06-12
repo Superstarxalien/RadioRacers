@@ -22,6 +22,7 @@
 #include "../../p_local.h"
 #include "../../r_state.h"
 #include "../../z_zone.h"
+#include "../../s_sound.h"
 #include "../../v_video.h"
 #include "../../command.h"
 
@@ -376,6 +377,8 @@ static void M_HandleBookmarkSave(void)
             bookmarkmenu.stage = BMENU_STAGE_OVERWRITTEN;
         }
     }
+
+    S_StartSound(NULL, sfx_tmxsuc);
 }
 
 static void M_HandleBookmarkDelete(void)
@@ -401,7 +404,7 @@ static void M_HandleBookmarkDelete(void)
     bookmarkmenu.current_page = global_bookmark_idx / (ROWS * COLUMNS);
     bookmark_idx = global_bookmark_idx % (ROWS * COLUMNS);
 
-
+    S_StartSound(NULL, sfx_s3k7b); 
     RR_VerifyBookmarks();
 }
 
@@ -452,6 +455,8 @@ static void M_HandleBookmarkApply(void)
     CV_SetValue(&cv_followercolor[0], static_cast<INT16>(followercolornum));
 
     bookmarkmenu.stage = BMENU_STAGE_APPLIED_BOOKMARK;
+
+    S_StartSound(NULL, sfx_s3k63);
 }
 
 boolean RRM_BookmarkHandler(INT32 choice) {
@@ -467,24 +472,32 @@ boolean RRM_BookmarkHandler(INT32 choice) {
     {
         bookmark_idx = (current_col + 1) % COLUMNS + current_row * COLUMNS;
         changed_bookmark = true;
+
+        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
     }
     else if(menucmd[pid].dpad_lr < 0) // Left
     {
         bookmark_idx = (current_col + (COLUMNS-1)) % COLUMNS + current_row * COLUMNS;
         changed_bookmark = true;
+        
+        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
     }
     else if (menucmd[pid].dpad_ud > 0) // Down
 	{
         bookmark_idx = current_col + ((current_row + 1) % ROWS) * COLUMNS;
         changed_bookmark = true;
+
+        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
 	}
     else if (menucmd[pid].dpad_ud < 0) // Up
 	{
         bookmark_idx = current_col + ((current_row + (ROWS-1)) % ROWS) * COLUMNS;
         changed_bookmark = true;
+
+        S_StartSound(NULL, sfx_s3k5b);
         M_SetMenuDelay(pid);
 	}
     else if (M_MenuButtonPressed(pid, MBT_L))
@@ -586,7 +599,7 @@ void RRM_BookmarkTick(void) {
 
     if (bookmarkmenu.stage != BMENU_STAGE_BROWSING) {
         if (bookmarkmenu.stage_timer == 0) {
-            bookmarkmenu.stage_timer = 30;
+            bookmarkmenu.stage_timer = TICRATE-5;
         } else {
             bookmarkmenu.stage_timer--;
             if (bookmarkmenu.stage_timer == 0)
