@@ -82,6 +82,9 @@ extern void RR_SaveFavouriteEmotes(void);
 extern void RR_UpdateEmoteUsageVector(void);
 extern void RR_FavouriteEmote(char* name);
 extern void RR_UnfavouriteEmote(char* name);
+extern void RR_SaveBookmarks(void);
+extern void RR_LoadBookmarks(void);
+extern void RR_RefreshBookmarks(void);
 
 #ifdef __cplusplus
 } // extern "C"

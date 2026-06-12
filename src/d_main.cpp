@@ -2008,7 +2008,7 @@ void D_SRB2Main(void)
 	CON_SetLoadingProgress(LOADED_ACSINIT);
 
 	// RadioRacers: .. right around here
-	RR_Init();
+	// RR_Init();
 
 
 	//------------------------------------------------ COMMAND LINE PARAMS
@@ -2375,6 +2375,8 @@ void D_SRB2Main(void)
 		I_Error("Something is wrong with the loading bar! (got %d, expected %d)\n", con_startup_loadprogress, LOADED_ALLDONE);
 		return;
 	}
+
+	RR_Init();
 }
 
 const char *D_Home(void)

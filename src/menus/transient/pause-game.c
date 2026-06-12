@@ -23,6 +23,7 @@
 #include "../../d_main.h"
 
 #include "../../radioracers/rr_setup.h"
+#include "../../radioracers/rr_menu.h"
 
 #ifdef HAVE_DISCORDRPC
 #include "../../discord.h"
@@ -81,6 +82,9 @@ menuitem_t PAUSE_Main[] =
 
 	{IT_STRING | IT_CALL, "PLAYER SETUP", "M_ICOCHR",
 		NULL, {.routine = M_CharacterSelect}, 0, 0},
+
+	{IT_STRING | IT_CALL, "BOOKMARKS", "M_ICOCHR",
+		NULL, {.routine = RRM_BookmarkSelect}, 0, 0},
 
 	{IT_STRING | IT_SUBMENU, "CHEATS", "M_ICOCHT",
 		NULL, {.submenu = &PAUSE_CheatsDef}, 0, 0},
@@ -165,6 +169,7 @@ void M_OpenPauseMenu(void)
 
 	PAUSE_Main[mpause_spectatetoggle].status = IT_DISABLED;
 	PAUSE_Main[mpause_psetup].status = IT_DISABLED;
+	PAUSE_Main[mpause_bookmarks].status = IT_DISABLED;
 	PAUSE_Main[mpause_cheats].status = IT_DISABLED;
 
 	Dummymenuplayer_OnChange();	// Make sure the consvar is within bounds of the amount of splitscreen players we have.
@@ -177,6 +182,7 @@ void M_OpenPauseMenu(void)
 	if (K_CanChangeRules(false))
 	{
 		PAUSE_Main[mpause_psetup].status = IT_STRING | IT_CALL;
+		PAUSE_Main[mpause_bookmarks].status = IT_STRING | IT_CALL;
 
 		if (M_SecretUnlocked(SECRET_ADDONS, true))
 		{
