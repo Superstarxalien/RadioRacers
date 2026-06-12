@@ -690,6 +690,7 @@ static void M_DrawCurrentCharAndFollower(
     INT16 namey = icony+16+2;
 
     // Icon
+    V_DrawScaledPatch(iconx + 1, icony - 1, 0, static_cast<patch_t*>(W_CachePatchName("ICONBACK", PU_CACHE)));
     V_DrawMappedPatch(iconx, icony, 0, faceprefix[p->skin][FACE_RANK], charcolormap);
 
     // Character name
@@ -707,6 +708,7 @@ static void M_DrawCurrentCharAndFollower(
             skins[p->skin]
         );
 
+        V_DrawScaledPatch(iconx, icony - 1, 0, static_cast<patch_t*>(W_CachePatchName("ICONBACK", PU_CACHE)));
         V_DrawMappedPatch(
             iconx, 
             icony, 
@@ -773,6 +775,7 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
     }
 
     // Character Icon
+    V_DrawScaledPatch(iconx + 1, icony - 1, 0, static_cast<patch_t*>(W_CachePatchName("ICONBACK", PU_CACHE)));
     V_DrawMappedPatch(iconx, icony, 0, skinicon, charcolormap);
 
     // Character Name
@@ -800,6 +803,7 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
         }
 
         // Follower Icon
+        V_DrawScaledPatch(followericonx, icony - 1, 0, static_cast<patch_t*>(W_CachePatchName("ICONBACK", PU_CACHE)));
         V_DrawMappedPatch(followericonx, icony, 0, followerskinicon, followercolormap);
     
         // Follower Name
