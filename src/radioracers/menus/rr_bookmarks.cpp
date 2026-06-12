@@ -378,7 +378,7 @@ static void M_HandleBookmarkSave(void)
         }
     }
 
-    S_StartSound(NULL, sfx_tmxsuc);
+    S_StartSound(NULL, sfx_tmxunx);
 }
 
 static void M_HandleBookmarkDelete(void)
@@ -414,8 +414,10 @@ static void M_HandleBookmarkApply(void)
         return;
 
     characterbookmarkparent_t *bookmark_parent = FetchSelectedBookmarkParent();
-    if (IsBookmarkUnusable(bookmark_parent))
+    if (IsBookmarkUnusable(bookmark_parent)) {
+        S_StartSound(NULL, sfx_s3k7b); 
         return;
+    }
 
     characterbookmark_t *bookmark = &bookmark_parent->bookmark;
     
@@ -998,7 +1000,7 @@ static void M_DrawPreviewCharacterCard(INT16 x, INT16 y, characterbookmarkparent
     V_DrawCenteredFileString(x+37, y-4, 0, "PREVIEW");
 
     if (bookmarked_applied)
-        V_DrawCenteredString(x+39, y+40, V_GREENMAP, "Applied!");
+        V_DrawCenteredString(x+39, y+40, V_GREENMAP, "Confirmed!");
 
     // ERRORS AND WARNINGS
     M_DrawPreviewWarningsAndErrors(y, current_bookmark_parent);
