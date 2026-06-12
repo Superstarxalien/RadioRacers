@@ -76,6 +76,7 @@ static const uint32_t OLD_RING_INTEGER = 0x524E474F;
 boolean found_radioracers = false;
 boolean found_radioracers_plus = false;
 boolean radioracers_usemuteicons = false;
+boolean radioracers_usebookmarkicons = false;
 boolean radioracers_usehakiencore = false;
 boolean radioracers_useendkey = false;
 boolean radioracers_usehudfeed = false;
@@ -1270,6 +1271,11 @@ void RR_Init(void) {
         // Mute icon for Pause Menu
         if (W_LumpExists("M_ICOMUT") && W_LumpExists("M_ICOMU2")) {
             radioracers_usemuteicons = true;
+        }
+
+        // Bookmark icon for Pause Menu
+        if (W_LumpExists("M_ICOBKM") && W_LumpExists("M_ICOBK2")) {
+            radioracers_usebookmarkicons = true;
         }
     
         // The haki mode thing - this is just Sky Sanctuary's encore palette

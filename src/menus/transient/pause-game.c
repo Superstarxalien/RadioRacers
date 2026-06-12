@@ -34,6 +34,7 @@
 
 // RadioRacers
 char mutePlayersPauseIcon[] = "M_ICOADM";
+char bookmarkPauseIcon[] = "M_ICOCHR";
 
 menuitem_t PAUSE_Main[] =
 {
@@ -83,7 +84,7 @@ menuitem_t PAUSE_Main[] =
 	{IT_STRING | IT_CALL, "PLAYER SETUP", "M_ICOCHR",
 		NULL, {.routine = M_CharacterSelect}, 0, 0},
 
-	{IT_STRING | IT_CALL, "BOOKMARKS", "M_ICOCHR",
+	{IT_STRING | IT_CALL, "BOOKMARKS", bookmarkPauseIcon,
 		NULL, {.routine = RRM_BookmarkSelect}, 0, 0},
 
 	{IT_STRING | IT_SUBMENU, "CHEATS", "M_ICOCHT",
@@ -133,6 +134,10 @@ void M_OpenPauseMenu(void)
 	// Radio Racers
 	if (radioracers_usemuteicons)
 		strncpy(mutePlayersPauseIcon, "M_ICOMUT", (sizeof mutePlayersPauseIcon - 1));
+	
+	if (radioracers_usebookmarkicons)
+		strncpy(bookmarkPauseIcon, "M_ICOBKM", (sizeof bookmarkPauseIcon - 1));
+
 
 	currentMenu = &PAUSE_MainDef;
 
