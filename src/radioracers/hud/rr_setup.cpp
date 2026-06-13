@@ -1143,8 +1143,10 @@ void RR_SaveBookmarks(void) {
 void RR_LoadBookmarks(void) {
     const char *filepath = va("%s" PATHSEP "%s", srb2home, RADIO_BOOKMARKS_FILE);
     std::ifstream file(filepath);
-    if (!file)
+    if (!file) {
+        bookmarks_processed = true;
         return;
+    }
 
     std::string line;
 
