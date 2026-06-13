@@ -703,6 +703,22 @@ static boolean M_DrawFollowerSprite(
 	return true;
 }
 
+static void M_DrawBackgroundForCharAndFollower(INT16 x, INT16 y)
+{
+    V_DrawFill(
+        x+2,
+        y-1,
+        75,
+        21,
+        27|V_20TRANS
+    );
+
+    if (found_radioracers) {
+        V_DrawScaledPatch(x+2, y-4, 0, static_cast<patch_t*>(W_CachePatchName("BOOKCUR2", PU_CACHE)));
+    }
+
+}
+
 static void M_DrawCurrentCharAndFollower(
     INT16 x,
     INT16 y,
@@ -723,7 +739,13 @@ static void M_DrawCurrentCharAndFollower(
     INT16 namex = x+39;
     INT16 iconx = (hasfollower) ? namex - 16: namex - (16/2);
     INT16 icony = y+93;
-    INT16 namey = icony+16+2;
+    INT16 namey = icony+16+5;
+
+    // Background for name and followers
+    M_DrawBackgroundForCharAndFollower(x, namey);
+
+    if (!hasfollower)
+        namey += 5;
 
     // Icon
     V_DrawScaledPatch(iconx + 1, icony - 1, 0, static_cast<patch_t*>(W_CachePatchName("ICONBACK", PU_CACHE)));
@@ -762,7 +784,7 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
     INT16 namex = x+39;
     INT16 iconx = namex - 16;
     INT16 icony = y+93;
-    INT16 namey = icony+16+2;
+    INT16 namey = icony+16+5;
 
     if(current_bookmark_parent == NULL)
         return;
@@ -777,12 +799,18 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
         V_DrawCenteredThinString(namex, icony + 11, V_REDMAP, "Check your file.");
         return;
     }
-    
+
+    // Background for name and followers
+    M_DrawBackgroundForCharAndFollower(x, namey);
+
     // Draw the character first
     characterbookmark_t *bookmark = &current_bookmark_parent->bookmark;
 
     const bool has_follower = current_bookmark_parent->follower_present;
     iconx = (has_follower) ? namex- 16 : namex - (16/2);
+
+    if (!has_follower) 
+        namey += 5;
 
     UINT8* charcolormap = NULL;
     INT32 skinstringflags = V_YELLOWMAP;
