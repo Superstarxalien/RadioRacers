@@ -1101,7 +1101,8 @@ static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index, bool highlighted
     x += 2;
 
     if (!bookmark_valid) {
-        V_DrawMappedPatch(x, y+1, 0, valid_bulb, M_GetErrorColormap());
+        V_DrawMappedPatch(x, y+1, flags, valid_bulb, M_GetErrorColormap());
+        V_DrawThinString(x+10, y, V_REDMAP|flags, "CORRUPT");
         return;
     }
 
