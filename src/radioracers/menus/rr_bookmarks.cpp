@@ -1291,9 +1291,6 @@ void RRM_DrawCharacterBookmarks(void) {
 
     std::string bookmark_buttons = M_GetText(va("%s%s", bookmark_action.c_str(), delete_action.c_str()));
     
-    if (current_bookmark_parent != NULL && !current_bookmark_parent->valid) {
-        bookmark_buttons = "<y> Delete";
-    }
     K_DrawGameControl(
         start_x+75, 
         8, 
