@@ -63,6 +63,7 @@ extern struct bookmarkmenu_s
     tic_t follower_timer;
     tic_t stage_timer;
     size_t current_page;
+    boolean show_info;
     UINT8 stage;
 } bookmarkmenu;
 

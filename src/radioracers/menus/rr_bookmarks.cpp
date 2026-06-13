@@ -526,7 +526,7 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         changed_bookmark = true;
         changed_direction = true;
     }
-    else if (M_MenuButtonPressed(pid, MBT_Z))
+    else if (M_MenuExtraPressed(pid))
     {
         M_HandleBookmarkSave();
         M_SetMenuDelay(pid);
@@ -536,6 +536,10 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         M_HandleBookmarkDelete();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
+    }
+    else if (M_MenuButtonPressed(pid, MBT_R)) {
+        bookmarkmenu.show_info ^= true;
+        M_SetMenuDelay(pid);
     } else if (M_MenuConfirmPressed(pid)) {
         M_HandleBookmarkApply();
         M_SetMenuDelay(pid);
@@ -710,6 +714,9 @@ static boolean M_DrawFollowerSprite(
 
 static void M_DrawBackgroundForCharAndFollower(INT16 x, INT16 y)
 {
+    if (!bookmarkmenu.show_info)
+        return;
+    
     V_DrawFill(
         x+2,
         y-1,
@@ -757,7 +764,8 @@ static void M_DrawCurrentCharAndFollower(
     V_DrawMappedPatch(iconx, icony, 0, faceprefix[p->skin][FACE_RANK], charcolormap);
 
     // Character name
-    V_DrawCenteredThinString(namex, namey, 0, skins[p->skin]->realname);
+    if (bookmarkmenu.show_info)
+        V_DrawCenteredThinString(namex, namey, 0, skins[p->skin]->realname);
     
     // Then the follower
     if (hasfollower) {
@@ -780,7 +788,8 @@ static void M_DrawCurrentCharAndFollower(
             R_GetTranslationColormap(TC_DEFAULT, static_cast<skincolornum_t>(fcolor), GTC_MENUCACHE)
         );
         
-        V_DrawCenteredThinString(namex, followernamey, 0, followers[p->followerskin].name);
+        if (bookmarkmenu.show_info)
+            V_DrawCenteredThinString(namex, followernamey, 0, followers[p->followerskin].name);
     }
 }
 
@@ -848,7 +857,8 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
     V_DrawMappedPatch(iconx, icony, 0, skinicon, charcolormap);
 
     // Character Name
-    V_DrawCenteredThinString(namex, namey, skinstringflags, skinstring);
+    if (bookmarkmenu.show_info)
+        V_DrawCenteredThinString(namex, namey, skinstringflags, skinstring);
 
     // Now the follower (if present)
     UINT8* followercolormap = NULL;
@@ -876,7 +886,8 @@ static void M_DrawPreviewCharAndFollower(INT16 x, INT16 y, characterbookmarkpare
         V_DrawMappedPatch(followericonx, icony, 0, followerskinicon, followercolormap);
     
         // Follower Name
-        V_DrawCenteredThinString(namex, followernamey, followerskinstringflags, followerskinstring);
+        if (bookmarkmenu.show_info)
+            V_DrawCenteredThinString(namex, followernamey, followerskinstringflags, followerskinstring);
     }
 
     // Draw a little indicator if the character is "incomplete"
@@ -1235,7 +1246,7 @@ void RRM_DrawCharacterBookmarks(void) {
     // DRAWING THE MENU (to select)
     const INT16 start_x = 87;
 
-    INT16 row_y = 30;
+    INT16 row_y = 33;
     INT16 row_x = start_x;
     INT16 bookmark_menu_index = M_GetPageOffset();
 
@@ -1277,7 +1288,7 @@ void RRM_DrawCharacterBookmarks(void) {
             page_button_x + 145, 
             page_button_y, 
             0, 
-            "<a_animated> Accept", 
+            std::string("<a_animated> \x83").append("Accept").c_str(), 
             2, 
             TINY_FONT, 
             0
@@ -1315,12 +1326,11 @@ void RRM_DrawCharacterBookmarks(void) {
     M_DrawBookmarkCursor(cursor_row_x, cursor_row_y);
 
     // Buttons
-    const int button_x = start_x + 75;
     const int button_y = 8;
 
     std::string bookmark_action = (current_bookmark_parent != NULL) ? 
-        "<z> \x82Overwrite" :
-        "<z> Bookmark";
+        "<c> \x82Overwrite" :
+        "<c> Bookmark";
     if (current_bookmark_parent == NULL && M_AreBookmarksFull()) {
         bookmark_action = std::string("\x85").append("Bookmarks full.");
     }
@@ -1329,11 +1339,21 @@ void RRM_DrawCharacterBookmarks(void) {
     std::string bookmark_buttons = M_GetText(va("%s%s", bookmark_action.c_str(), delete_action.c_str()));
     
     K_DrawGameControl(
-        start_x+75, 
-        8, 
+        start_x - 5, 
+        button_y, 
         0, 
         bookmark_buttons.c_str(),
-        1, 
+        0, 
+        TINY_FONT, 
+        0
+    );
+    
+    K_DrawGameControl(
+        start_x + 150, 
+        button_y,
+        0, 
+        "<r_animated> Info", 
+        2, 
         TINY_FONT, 
         0
     );
