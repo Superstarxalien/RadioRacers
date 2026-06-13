@@ -356,7 +356,7 @@ static bool M_HandleBookmarkOverwrite()
         return false;
     }
     characterbookmarkparent_t new_bookmark = M_BuildBookmarkForPlayer(p);
-    char_bookmarks[bookmark_idx] = new_bookmark;
+    char_bookmarks[M_GetPageOffset() + bookmark_idx] = new_bookmark;
 
     return true;
 }
@@ -387,6 +387,10 @@ static void M_HandleBookmarkSave(void)
         }
     }
 
+    player_t* p = &players[g_localplayers[0]];
+    if (p != NULL && p->skin != -1) {
+        S_StartSound(NULL, skins[p->skin]->soundsid[S_sfx[sfx_kattk1].skinsound]);
+    }
     S_StartSound(NULL, sfx_tmxunx);
 }
 
@@ -467,6 +471,7 @@ static void M_HandleBookmarkApply(void)
 
     bookmarkmenu.stage = BMENU_STAGE_APPLIED_BOOKMARK;
 
+    S_StartSound(NULL, skins[bookmark->skin]->soundsid[S_sfx[sfx_kattk2].skinsound]);
     S_StartSound(NULL, sfx_s3k63);
 }
 
