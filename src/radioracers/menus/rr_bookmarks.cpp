@@ -122,6 +122,11 @@ void RR_InitBookmarkCommands(void) {
 MISC
 **/
 
+static bool M_AreBookmarksFull(void)
+{
+    return char_bookmarks.size() == MAX_BOOKMARKS;
+}
+
 static size_t M_GetMaxPagesForBookmarkMenu() {
     size_t bookmarks_size = (char_bookmarks.size() + 1 < MAX_BOOKMARKS) ? char_bookmarks.size() + 1 : char_bookmarks.size();
     return std::ceil(
@@ -361,6 +366,12 @@ static void M_HandleBookmarkSave(void)
 {
     if (bookmarkmenu.stage != BMENU_STAGE_BROWSING)
         return;
+
+    // The console command already checks for this, but something user-friendly is better
+    if (M_AreBookmarksFull()) {
+        S_StartSound(NULL, sfx_s3k7b);
+        return;
+    }
 
     if (FetchSelectedBookmarkParent() == NULL) {
         COM_BufInsertText("bookmark");
@@ -1269,9 +1280,15 @@ void RRM_DrawCharacterBookmarks(void) {
     M_DrawBookmarkCursor(cursor_row_x, cursor_row_y);
 
     // Buttons
+    const int button_x = start_x + 75;
+    const int button_y = 8;
+
     std::string bookmark_action = (current_bookmark_parent != NULL) ? 
         "<z> \x82Overwrite" :
         "<z> Bookmark";
+    if (current_bookmark_parent == NULL && M_AreBookmarksFull()) {
+        bookmark_action = std::string("\x85").append("Bookmarks full.");
+    }
     std::string delete_action = (current_bookmark_parent == NULL) ? "" : "  <y> Delete";
 
     std::string bookmark_buttons = M_GetText(va("%s%s", bookmark_action.c_str(), delete_action.c_str()));
