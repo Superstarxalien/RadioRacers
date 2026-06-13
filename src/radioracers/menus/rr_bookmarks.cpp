@@ -1224,11 +1224,14 @@ void RRM_DrawCharacterBookmarks(void) {
     // Draw the page numbers
     const INT16 page_button_x = start_x;
     const INT16 page_button_y = row_y + 141;
+    const size_t max_pages = M_GetMaxPagesForBookmarkMenu();
+    const std::string l_button = (max_pages > 1) ? "<l_animated>" : "<l>";
     K_DrawGameControl(
         page_button_x - 3, 
         page_button_y, 
         0, 
-        va("<l> Page %d of %d", 
+        va("%s Page %d of %d", 
+            l_button.c_str(),
             bookmarkmenu.current_page + 1, M_GetMaxPagesForBookmarkMenu()), 
         0, 
         TINY_FONT, 
