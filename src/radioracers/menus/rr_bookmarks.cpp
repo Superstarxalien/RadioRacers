@@ -111,7 +111,6 @@ static void Command_SaveCharacterBookmark(void)
     characterbookmarkparent_t new_bookmark = M_BuildBookmarkForPlayer(p);
 
     char_bookmarks.emplace_back(new_bookmark);
-    CONS_Printf("Bookmarked %d %s\n", new_bookmark.follower_name, new_bookmark.followercolor_name);
 }
 
 void RR_InitBookmarkCommands(void) {
@@ -382,8 +381,7 @@ static void M_HandleBookmarkSave(void)
         bookmarkmenu.current_page = global_idx / (ROWS * COLUMNS);
         bookmark_idx = global_idx % (ROWS * COLUMNS);
     } else {
-        const bool overwritten = M_HandleBookmarkOverwrite();
-        if (overwritten) {
+        if (M_HandleBookmarkOverwrite()) {
             RR_VerifyBookmarks();
             bookmarkmenu.stage = BMENU_STAGE_OVERWRITTEN;
         }

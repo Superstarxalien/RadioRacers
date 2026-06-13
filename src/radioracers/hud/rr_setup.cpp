@@ -1174,9 +1174,6 @@ void RR_LoadBookmarks(void) {
         std::string follower_name = split_token(line, index);
         std::string follower_colour = split_token(line, index);
 
-        // std::transform(char_colour.begin(), char_colour.end(), char_colour.begin(), ::toupper);
-        // std::transform(follower_colour.begin(), follower_colour.end(), follower_colour.begin(), ::toupper);
-
         CONS_Printf("Adding %s %s %s %s\n", char_name.c_str(), char_colour.c_str(), follower_name.c_str(), follower_colour.c_str());
         bool skincolor_valid = false, followercolor_valid = false;
 
@@ -1312,6 +1309,6 @@ void RR_Init(void) {
     // Any bookmarks?
     CONS_Printf("RADIO: Loading bookmarks.\n");
     RR_LoadBookmarks();
-    CONS_Printf("Added %d bookmarks\n", char_bookmarks.size());
+    CONS_Printf("RADIO: Added %d bookmarks.\n", char_bookmarks.size());
 
 }
