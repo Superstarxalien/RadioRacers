@@ -1080,10 +1080,11 @@ static void M_DrawCharacterCard(INT16 x, INT16 y, player_t *p) {
         V_DrawCenteredString(x+39, y+40, V_GREENMAP, "Saved!");
 }
 
-static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index)
+static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index, bool highlighted)
 {
     characterbookmarkparent_t* bookmark_parent = FetchBookmarkParent(index);
     const bool bookmark_valid = (bookmark_parent != NULL && bookmark_parent->valid);
+    const INT32 flags = (highlighted) ? 0 : V_40TRANS;
 
     // First, draw the little zit to show if the bookmark is valid or not
     patch_t* valid_bulb = static_cast<patch_t*>(W_CachePatchName("K_BLNA", PU_CACHE));
@@ -1103,7 +1104,7 @@ static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index)
     } else {
         bulbcolormap = IsBookmarkIncomplete(bookmark_parent) ? M_GetWarningColormap() : NULL;
     }
-    V_DrawMappedPatch(x, y+1, 0, valid_bulb, bulbcolormap);
+    V_DrawMappedPatch(x, y+1, flags, valid_bulb, bulbcolormap);
 
     // Then, draw the character icon (if present)
     characterbookmark_t *bookmark = &bookmark_parent->bookmark;
@@ -1123,7 +1124,7 @@ static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index)
         skinicon = faceprefix[bookmark->skin][FACE_RANK];
     }
 
-    V_DrawMappedPatch(x, y, 0, skinicon, charcolormap);
+    V_DrawMappedPatch(x, y, flags, skinicon, charcolormap);
 
     // Then, draw the follower icon (if present)
     x+= (16) + 1;
@@ -1137,7 +1138,7 @@ static void M_DrawSingleBookmark(INT16 x, INT16 y, INT16 index)
             followerskinicon = static_cast<patch_t*>(
                 W_CachePatchName(followers[bookmark->follower].icon, PU_CACHE));
         }
-        V_DrawMappedPatch(x, y, 0, followerskinicon, followercolormap);
+        V_DrawMappedPatch(x, y, flags, followerskinicon, followercolormap);
     }
 }
 
@@ -1160,17 +1161,12 @@ static void M_DrawBookmarkCursor(INT16 x, INT16 y)
 {
     // Urghhhh
     if (found_radioracers) {
-        UINT8* colormap = R_GetTranslationColormap(
-            TC_RAINBOW, 
-            SKINCOLOR_WHITE, 
-            GTC_CACHE
-        );
         V_DrawMappedPatch(
-            x - 4, 
-            y - 8, 
+            x - 6, 
+            y - 10, 
             0, 
             static_cast<patch_t*>(W_CachePatchName("BOOKCURS", PU_CACHE)),
-            colormap
+            NULL
         );
     } else {
         V_DrawFill(x, y - 6, 20, 5, 50);
@@ -1202,6 +1198,12 @@ void RRM_DrawCharacterBookmarks(void) {
 
     // No fancy borders for YOU
     if (found_radioracers) {
+        V_DrawScaledPatch(
+            start_x, 
+            row_y - 4, 
+            V_TRANSLUCENT, 
+            static_cast<patch_t*>(W_CachePatchName("BOKGBACK", PU_CACHE))
+        );
         V_DrawScaledPatch(
             start_x - 2, 
             row_y - 4, 
@@ -1242,15 +1244,17 @@ void RRM_DrawCharacterBookmarks(void) {
     INT16 cursor_row_x = 0;
     INT16 cursor_row_y = 0;
 
+    bool highlighted = false;
     for (INT16 i = 0; i < ROWS; i++) {
         for (INT16 j = 0; j < COLUMNS; j++) {
+            highlighted = (i == current_row && j == current_column);
             if (bookmark_menu_index >= char_bookmarks.size()) {
                 M_DrawPlaceholderBookmark(row_x, row_y);
             } else {
-                M_DrawSingleBookmark(row_x, row_y, bookmark_menu_index);
+                M_DrawSingleBookmark(row_x, row_y, bookmark_menu_index, highlighted);
             }
 
-            if (i == current_row && j == current_column) {
+            if (highlighted) {
                 cursor_row_x = row_x;
                 cursor_row_y = row_y;
             }
