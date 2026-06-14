@@ -519,25 +519,25 @@ boolean RRM_BookmarkHandler(INT32 choice) {
 
         M_SetMenuDelay(pid);
 	}
-    else if (M_MenuButtonPressed(pid, MBT_L))
+    else if (M_MenuButtonPressed(pid, MBT_R))
     {
         M_NextPage();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
         changed_direction = true;
     }
-    else if (M_MenuExtraPressed(pid))
+    else if (M_MenuButtonPressed(pid, MBT_Y))
     {
         M_HandleBookmarkSave();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
     }
-    else if (M_MenuButtonPressed(pid, MBT_Y)) {
+    else if (M_MenuExtraPressed(pid)) {
         M_HandleBookmarkDelete();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
     }
-    else if (M_MenuButtonPressed(pid, MBT_R)) {
+    else if (M_MenuButtonPressed(pid, MBT_L)) {
         bookmarkmenu.show_info ^= true;
         M_SetMenuDelay(pid);
     } else if (M_MenuConfirmPressed(pid)) {
@@ -1270,13 +1270,13 @@ void RRM_DrawCharacterBookmarks(void) {
     const INT16 page_button_x = start_x;
     const INT16 page_button_y = row_y + 141;
     const size_t max_pages = M_GetMaxPagesForBookmarkMenu();
-    const std::string l_button = (max_pages > 1) ? "<l_animated>" : "<l>";
+    const std::string r_button = (max_pages > 1) ? "<r_animated>" : "<r>";
     K_DrawGameControl(
         page_button_x - 3, 
         page_button_y, 
         0, 
         va("%s Page %d of %d", 
-            l_button.c_str(),
+            r_button.c_str(),
             bookmarkmenu.current_page + 1, M_GetMaxPagesForBookmarkMenu()), 
         0, 
         TINY_FONT, 
@@ -1329,12 +1329,12 @@ void RRM_DrawCharacterBookmarks(void) {
     const int button_y = 8;
 
     std::string bookmark_action = (current_bookmark_parent != NULL) ? 
-        "<c> \x82Overwrite" :
-        "<c> Bookmark";
+        "<y> \x82Overwrite" :
+        "<y> Bookmark";
     if (current_bookmark_parent == NULL && M_AreBookmarksFull()) {
         bookmark_action = std::string("\x85").append("Bookmarks full.");
     }
-    std::string delete_action = (current_bookmark_parent == NULL) ? "" : "  <y> Delete";
+    std::string delete_action = (current_bookmark_parent == NULL) ? "" : "  <c> Delete";
 
     std::string bookmark_buttons = M_GetText(va("%s%s", bookmark_action.c_str(), delete_action.c_str()));
     
@@ -1352,7 +1352,7 @@ void RRM_DrawCharacterBookmarks(void) {
         start_x + 150, 
         button_y,
         0, 
-        "<r_animated> Info", 
+        "<l_animated> Info", 
         2, 
         TINY_FONT, 
         0
