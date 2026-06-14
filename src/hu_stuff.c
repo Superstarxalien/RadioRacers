@@ -1199,6 +1199,17 @@ boolean HU_Responder(event_t *ev)
 	{
 		INT32 c = (INT32)ev->data1;
 
+		if (c == KEY_ESCAPE
+			/*|| ((c == gamecontrol[0][gc_talkkey][0] || c == gamecontrol[0][gc_talkkey][1]
+			|| c == gamecontrol[0][gc_teamkey][0] || c == gamecontrol[0][gc_teamkey][1])
+			&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
+		{
+			I_SetTextInputMode(false);
+			chat_on = false;
+			c_input = 0; // reset input cursor
+			I_UpdateMouseGrab();
+		}
+
 		if (!chat_on_first_event)
 		{
 			// since the text event is sent immediately after the keydown event,
@@ -1272,16 +1283,6 @@ boolean HU_Responder(event_t *ev)
 			chat_on = false;
 			c_input = 0; // reset input cursor
 			chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
-			I_UpdateMouseGrab();
-		}
-		else if (c == KEY_ESCAPE
-			/*|| ((c == gamecontrol[0][gc_talkkey][0] || c == gamecontrol[0][gc_talkkey][1]
-			|| c == gamecontrol[0][gc_teamkey][0] || c == gamecontrol[0][gc_teamkey][1])
-			&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
-		{
-			I_SetTextInputMode(false);
-			chat_on = false;
-			c_input = 0; // reset input cursor
 			I_UpdateMouseGrab();
 		}
 		else if ((c == KEY_UPARROW || c == KEY_MOUSEWHEELUP) && chat_scroll > 0 && !OLDCHAT) // CHAT SCROLLING YAYS!
