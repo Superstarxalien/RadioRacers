@@ -1863,6 +1863,7 @@ FUNCNORETURN void ATTRNORETURN I_Quit(void)
 	// RADIO
 	RR_SaveEmoteUsage();
 	RR_SaveFavouriteEmotes();
+	RR_SaveBookmarks();
 
 	// Make sure you lose points for ALT-F4
 	if (Playing())

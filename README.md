@@ -50,6 +50,15 @@ For details on customization, such as adding your own emotes and usability tips,
 In the Server Browser, you can "peek" into a server to view key details, such as the current level and connected players.
 </details>
 
+<details>
+<summary>Bookmarks</summary>
+
+<img src="./radio/readme/bookmarks.gif" width="500">
+
+<sup>Madonna and Don-Chan from [BluPak](https://mb.srb2.org/addons/blupak.7854/) by [FabulousNinji](https://bsky.app/profile/fabulousninji.bsky.social).</sup></br>
+Bookmark your favourite character and follower combinations for quick access.
+</details>
+
 ...and [more](https://github.com/blondedradio/RadioRacers/pulls?q=is%3Apr+label%3Aenhancement).
 
 ## Getting Started
