@@ -526,13 +526,13 @@ boolean RRM_BookmarkHandler(INT32 choice) {
         changed_bookmark = true;
         changed_direction = true;
     }
-    else if (M_MenuExtraPressed(pid))
+    else if (M_MenuButtonPressed(pid, MBT_Y))
     {
         M_HandleBookmarkSave();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
     }
-    else if (M_MenuButtonPressed(pid, MBT_Y)) {
+    else if (M_MenuExtraPressed(pid)) {
         M_HandleBookmarkDelete();
         M_SetMenuDelay(pid);
         changed_bookmark = true;
@@ -1329,12 +1329,12 @@ void RRM_DrawCharacterBookmarks(void) {
     const int button_y = 8;
 
     std::string bookmark_action = (current_bookmark_parent != NULL) ? 
-        "<c> \x82Overwrite" :
-        "<c> Bookmark";
+        "<y> \x82Overwrite" :
+        "<y> Bookmark";
     if (current_bookmark_parent == NULL && M_AreBookmarksFull()) {
         bookmark_action = std::string("\x85").append("Bookmarks full.");
     }
-    std::string delete_action = (current_bookmark_parent == NULL) ? "" : "  <y> Delete";
+    std::string delete_action = (current_bookmark_parent == NULL) ? "" : "  <c> Delete";
 
     std::string bookmark_buttons = M_GetText(va("%s%s", bookmark_action.c_str(), delete_action.c_str()));
     
