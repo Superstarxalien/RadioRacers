@@ -1330,16 +1330,6 @@ static boolean RR_HU_Responder(event_t *ev)
 			CV_AddValue(&cv_chat_emotes_sort, 1);
 			return true;
 		}
-	} else if (c == KEY_ESCAPE
-		/*|| ((c == gamecontrol[0][gc_talkkey][0] || c == gamecontrol[0][gc_talkkey][1]
-		|| c == gamecontrol[0][gc_teamkey][0] || c == gamecontrol[0][gc_teamkey][1])
-		&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
-	{
-		I_SetTextInputMode(false);
-		RR_ResetAllEmoteChatInfo();
-		chat_on = false;
-		c_input = 0; // reset input cursor
-		I_UpdateMouseGrab();
 	}
 	else if ((c == KEY_UPARROW || c == KEY_MOUSEWHEELUP) && !OLDCHAT) // CHAT SCROLLING YAYS!
 	{
@@ -1550,6 +1540,7 @@ boolean HU_Responder(event_t *ev)
 			&& c >= NUMKEYS)*/) // If it's not a keyboard key, then the chat button is used as a toggle.
 		{
 			I_SetTextInputMode(false);
+			if (cv_chat_emotes.value) RR_ResetAllEmoteChatInfo();
 			chat_on = false;
 			c_input = 0; // reset input cursor
 			I_UpdateMouseGrab();
