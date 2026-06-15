@@ -1285,7 +1285,7 @@ void P_DoPlayerExit(player_t *player, pflags_t flags)
 		player->mfdfinish = player->markedfordeath;
 
 		// RADIO: add the player to the finish ticker queue
-		if (!modeattacking)
+		if (!(modeattacking||dedicated))
 			RR_addPlayerToFinshTicker(player);
 	}
 
