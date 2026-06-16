@@ -1545,6 +1545,17 @@ boolean HU_Responder(event_t *ev)
 			c_input = 0; // reset input cursor
 			I_UpdateMouseGrab();
 		}
+		else if (c == KEY_ENTER)
+		{
+			if (!CHAT_MUTE)
+				HU_sendChatMessage();
+
+			I_SetTextInputMode(false);
+			chat_on = false;
+			c_input = 0; // reset input cursor
+			chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
+			I_UpdateMouseGrab();
+		}
 
 		if (!chat_on_first_event)
 		{
@@ -1613,17 +1624,6 @@ boolean HU_Responder(event_t *ev)
 			memcpy(&w_chat[c_input], paste, pastelen); // copy all of that.
 			c_input += pastelen;
 			return true;
-		}
-		else if (c == KEY_ENTER)
-		{
-			if (!CHAT_MUTE)
-				HU_sendChatMessage();
-
-			I_SetTextInputMode(false);
-			chat_on = false;
-			c_input = 0; // reset input cursor
-			chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
-			I_UpdateMouseGrab();
 		}
 		else if ((c == KEY_UPARROW || c == KEY_MOUSEWHEELUP) && chat_scroll > 0 && !OLDCHAT) // CHAT SCROLLING YAYS!
 		{
