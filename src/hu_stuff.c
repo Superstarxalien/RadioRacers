@@ -1627,11 +1627,23 @@ static void HU_DrawChat(void)
 	}
 	else
 	{
+		char w_chat_indicator[HU_MAXMSGLEN + 1];
+		size_t chatlen = strlen(w_chat);
+		
+		if (!!chatlen)
+		{
+			memcpy(w_chat_indicator, w_chat, chatlen);
+			memmove(&w_chat_indicator[c_input + 1], &w_chat_indicator[c_input], chatlen - c_input + 1);
+		}
+
+		w_chat_indicator[c_input] = '|';
+		w_chat_indicator[chatlen+1] = '\0';
+
 		msg = CHAT_WordWrap(
 			boxw-4,
 			scale,
 			V_SNAPTOBOTTOM|V_SNAPTOLEFT,
-			va("%c%s %c%s%c%c", cflag, talk, tflag, w_chat, '\x80', '_')
+			va("%c%s %c%s", cflag, talk, tflag, w_chat_indicator)
 		);
 
 		for (; msg[i]; i++) // iterate through msg
@@ -1640,12 +1652,6 @@ static void HU_DrawChat(void)
 				continue;
 
 			typelines++;
-		}
-
-		// This is removed after the fact to not have the newline handling flicker.
-		if (i != 0 && hu_tick >= 4)
-		{
-			msg[i-1] = '\0';
 		}
 	}
 
