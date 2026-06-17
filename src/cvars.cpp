@@ -1738,6 +1738,10 @@ consvar_t cv_voice_allowservervoice = NetVar("voice_allowservervoice", "Off")
 
 	consvar_t cv_glbatching = OpenGL("gr_batching", "On").on_off().dont_save();
 
+	// Dithered Lighting
+	extern "C" void CV_gllightdither_OnChange(void);
+	consvar_t cv_gllightdither = OpenGL("gr_lightdithering", "Off").on_off().onchange(CV_gllightdither_OnChange);
+
 #ifdef ALAM_LIGHTING
 		consvar_t cv_glcoronas = OpenGL("gr_coronas", "On").on_off();
 		consvar_t cv_glcoronasize = OpenGL("gr_coronasize", "1").floating_point();
