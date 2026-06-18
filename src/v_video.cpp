@@ -2505,9 +2505,6 @@ static UINT8 V_GetGenericButtonCodeWidth(UINT8 c, boolean largebutton)
 	return x;
 }
 
-fixed_t hu_indicatorx = 0;
-fixed_t hu_indicatory = 0;
-
 void V_DrawStringScaled(
 		fixed_t    x,
 		fixed_t    y,
