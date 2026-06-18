@@ -1631,6 +1631,9 @@ static void HU_DrawChat(void)
 		char w_chat_indicator[HU_MAXMSGLEN + 1];
 		size_t chatlen = strlen(w_chat);
 		
+		// specifically for the chat typing indicator we're making a copy of the chat text
+		// then we insert a | character right where text writing is located
+		// obviously don't do anything if there's no chat text
 		if (!!chatlen)
 		{
 			memcpy(w_chat_indicator, w_chat, chatlen);
