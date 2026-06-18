@@ -99,10 +99,12 @@ boolean chat_on_first_event; // blocker for first chat input event
 boolean g_voicepushtotalk_on; // holding PTT?
 /** RADIO: Expose w_chat, c_input */
 char w_chat[HU_MAXMSGLEN + 1];
+char w_chat_indicator[HU_MAXMSGLEN + 1];
 size_t c_input = 0; // let's try to make the chat input less shitty.
 static boolean headsupactive = false;
 boolean hu_showscores; // draw rankings
 char hu_tick;
+size_t hu_indicatorc = 0;
 
 //-------------------------------------------
 //              misc vars
@@ -1807,7 +1809,7 @@ static void HU_drawMiniChat(void)
 				scale, FRACUNIT, FRACUNIT,
 				V_SNAPTOBOTTOM|V_SNAPTOLEFT|transflag,
 				NULL,
-				HU_FONT,
+				HU_FONT, false,
 				msg
 			);
 	
@@ -1935,7 +1937,7 @@ static void HU_drawChatLog(INT32 offset)
 					scale, FRACUNIT, FRACUNIT,
 					V_SNAPTOBOTTOM|V_SNAPTOLEFT,
 					NULL,
-					HU_FONT,
+					HU_FONT, false,
 					msg+startj
 				);
 			}
@@ -2025,6 +2027,20 @@ static void HU_DrawChat(void)
 	}
 	else
 	{
+		size_t chatlen = strlen(w_chat);
+			
+		// specifically for the chat typing indicator we're making a copy of the chat text
+		// then we insert a | character right where text writing is located
+		// obviously don't do anything if there's no chat text
+		if (!!chatlen)
+		{
+			memcpy(w_chat_indicator, w_chat, chatlen);
+			memmove(&w_chat_indicator[c_input + 1], &w_chat_indicator[c_input], chatlen - c_input + 1);
+		}
+
+		w_chat_indicator[c_input] = '|';
+		w_chat_indicator[chatlen+1] = '\0';
+
 		RR_UpdateEmoteChatInputLog();
 		if (cv_chat_emotes.value && cv_chat_emotes_preview.value) {
 			chat_input_parameters_t parameters = {
@@ -2043,7 +2059,7 @@ static void HU_DrawChat(void)
 				boxw-4,
 				scale,
 				V_SNAPTOBOTTOM|V_SNAPTOLEFT,
-				va("%c%s %c%s%c%c", cflag, talk, tflag, w_chat, '\x80', '_')
+				va("%c%s %c%s", cflag, talk, tflag, w_chat_indicator)
 			);
 	
 			for (; msg[i]; i++) // iterate through msg
@@ -2053,12 +2069,6 @@ static void HU_DrawChat(void)
 	
 				typelines++;
 			}
-	
-			// This is removed after the fact to not have the newline handling flicker.
-			if (i != 0 && hu_tick >= 4)
-			{
-				msg[i-1] = '\0';
-			}
 		}
 	}
 
@@ -2067,13 +2077,16 @@ static void HU_DrawChat(void)
 	
 		V_DrawFillConsoleMap(chatx, y-1, boxw, (typelines*charheight), 159 | V_SNAPTOBOTTOM | V_SNAPTOLEFT);
 	
+		// get the exact location of the typing indicator
+		hu_indicatorc = c_input + strlen(va("%c%s %c", cflag, talk, tflag));
+
 		V_DrawStringScaled(
 			(chatx + 2) << FRACBITS,
 			y << FRACBITS,
 			scale, FRACUNIT, FRACUNIT,
 			V_SNAPTOBOTTOM|V_SNAPTOLEFT,
 			NULL,
-			HU_FONT,
+			HU_FONT, true,
 			msg ? msg : talk
 		);
 	

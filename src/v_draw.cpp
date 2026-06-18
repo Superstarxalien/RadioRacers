@@ -386,7 +386,7 @@ void Chain::string(const char* str, INT32 flags, Font font) const
 		break;
 	}
 
-	V_DrawStringScaled(x, y, FloatToFixed(scale_), FRACUNIT, FRACUNIT, flags, colormap_, font_to_fontno(font), str);
+	V_DrawStringScaled(x, y, FloatToFixed(scale_), FRACUNIT, FRACUNIT, flags, colormap_, font_to_fontno(font), false, str);
 }
 
 namespace

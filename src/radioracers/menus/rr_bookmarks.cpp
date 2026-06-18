@@ -957,7 +957,7 @@ static void M_DrawPreviewWarningsAndErrors(INT16 y, characterbookmarkparent_t* c
             FRACUNIT, 
             flags, 
             NULL,
-            TINY_FONT, 
+            TINY_FONT, false,
             message
         );
     };

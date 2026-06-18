@@ -327,7 +327,7 @@ void RR_DoChatStuff(chat_box_parameters_t parameters) {
                     FRACUNIT,
                     V_SNAPTOBOTTOM | V_SNAPTOLEFT,
                     NULL,
-                    HU_FONT,
+                    HU_FONT, false,
                     "END"
                 );
             }
@@ -466,7 +466,7 @@ void RR_drawRidersFinishTicker(void)
             FRACUNIT,
             flags,
             NULL,
-            TINY_FONT,
+            TINY_FONT, false,
             player.position.c_str()
         );
     }

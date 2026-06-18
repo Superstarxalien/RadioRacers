@@ -2147,7 +2147,7 @@ static void K_drawKartItem(void)
 						((fx+2)<<FRACBITS),
 						((fy+31)<<FRACBITS),
 						baseHudScale, baseHudScale, baseHudScale,
-						itemAmountFlags|fflags, NULL, HU_FONT, va("x%d", fakeitemamount)
+						itemAmountFlags|fflags, NULL, HU_FONT, false, va("x%d", fakeitemamount)
 					);
 				else
 					// V_DrawString(fx+24, fy+31, V_HUDTRANS|V_SLIDEIN|fflags, va("x%d", fakeitemamount));
@@ -2155,7 +2155,7 @@ static void K_drawKartItem(void)
 						((fx+24)<<FRACBITS),
 						((fy+31)<<FRACBITS),
 						baseHudScale, baseHudScale, baseHudScale,
-						itemAmountFlags|fflags, NULL, HU_FONT, va("x%d", fakeitemamount)
+						itemAmountFlags|fflags, NULL, HU_FONT, false, va("x%d", fakeitemamount)
 					);
 			}
 			else
@@ -2174,7 +2174,7 @@ static void K_drawKartItem(void)
 					((fx + (int)(38 * baseHudScaleFloat))<<FRACBITS),
 					((fy + (int)(36 * baseHudScaleFloat))<<FRACBITS),
 					baseHudScale, baseHudScale, baseHudScale,
-					itemAmountFlags|fflags, NULL, TIMER_FONT, va("x%d", fakeitemamount)
+					itemAmountFlags|fflags, NULL, TIMER_FONT, false, va("x%d", fakeitemamount)
 				);
 			}
 		}
@@ -2431,7 +2431,7 @@ static void K_drawBackupItem(void)
 			V_DrawStringScaled(
 				(fx+tx)<<FRACBITS, (fy+ty)<<FRACBITS,
 				baseHudScaleFixed, baseHudScaleFixed, baseHudScaleFixed,
-				backupitemflags, NULL, TINY_FONT, va("x%d", stplyr->backupitemamount)
+				backupitemflags, NULL, TINY_FONT, false, va("x%d", stplyr->backupitemamount)
 			);
 		} else {
 			V_DrawString(fx+tx, fy+ty, backupitemflags, va("x%d", stplyr->backupitemamount));
@@ -3346,7 +3346,7 @@ void PositionFacesInfo::draw_1p()
 					FRACUNIT,
 					flags,
 					colormap,
-					PINGF_FONT,
+					PINGF_FONT, false,
 					va("%d", players[rankplayer[i]].roundscore)
 			);
 		}
@@ -8036,7 +8036,7 @@ static void K_drawKartStartCountdown(void)
 			V_DrawStringScaled(
 				(centi_x) << FRACBITS,
 				(centi_y) << FRACBITS,
-				FloatToFixed(1.2f), FRACUNIT, FRACUNIT, V_HUDTRANS, NULL, HU_FONT,
+				FloatToFixed(1.2f), FRACUNIT, FRACUNIT, V_HUDTRANS, NULL, HU_FONT, false,
 				va(".%d", centiseconds)
 			);
 
@@ -8495,7 +8495,7 @@ void K_drawKartFreePlay(void)
 		FRACUNIT,
 		V_SNAPTOBOTTOM|h_snap|V_SPLITSCREEN|V_HUDTRANS,
 		NULL,
-		KART_FONT,
+		KART_FONT, false,
 		"FREE PLAY"
 	);
 }

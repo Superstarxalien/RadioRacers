@@ -930,7 +930,7 @@ static void F_DrawCreditsScroll(void)
 					V_DrawStringScaled(
 						((BASEVIDWIDTH * FRACUNIT) - str_width) / 2, y,
 						FRACUNIT, FRACUNIT, FRACUNIT,
-						0, nullptr, LSLOW_FONT,
+						0, nullptr, LSLOW_FONT, false,
 						new_str.c_str()
 					);
 				}
@@ -954,7 +954,7 @@ static void F_DrawCreditsScroll(void)
 						V_DrawStringScaled(
 							((BASEVIDWIDTH * FRACUNIT) - str_width) / 2, y,
 							FRACUNIT, FRACUNIT, FRACUNIT,
-							V_YELLOWMAP, nullptr, MENU_FONT,
+							V_YELLOWMAP, nullptr, MENU_FONT, false,
 							new_str.c_str()
 						);
 					}
@@ -963,7 +963,7 @@ static void F_DrawCreditsScroll(void)
 						V_DrawStringScaled(
 							32 * FRACUNIT, y,
 							FRACUNIT, FRACUNIT, FRACUNIT,
-							0, nullptr, MENU_FONT,
+							0, nullptr, MENU_FONT, false,
 							new_str.c_str()
 						);
 					}
@@ -989,7 +989,7 @@ static void F_DrawCreditsScroll(void)
 		V_DrawStringScaled(
 			((BASEVIDWIDTH * FRACUNIT) - label_width) / 2, 15 * FRACUNIT,
 			FRACUNIT, FRACUNIT, FRACUNIT,
-			0, nullptr, LSHI_FONT,
+			0, nullptr, LSHI_FONT, false,
 			slide->label.c_str()
 		);
 	}
@@ -1010,7 +1010,7 @@ static void F_DrawCreditsSlide(void)
 	V_DrawStringScaled(
 		((BASEVIDWIDTH * FRACUNIT) - label_width) / 2, label_space / 2,
 		FRACUNIT, FRACUNIT, FRACUNIT,
-		0, nullptr, LSHI_FONT,
+		0, nullptr, LSHI_FONT, false,
 		slide->label.c_str()
 	);
 
@@ -1062,7 +1062,7 @@ static void F_DrawCreditsSlide(void)
 		V_DrawStringScaled(
 			x + ease, y,
 			FRACUNIT, FRACUNIT, FRACUNIT,
-			0, nullptr, LSLOW_FONT,
+			0, nullptr, LSLOW_FONT, false,
 			str.c_str()
 		);
 
@@ -1093,7 +1093,7 @@ static void F_DrawCreditsTitleDrop(void)
 	V_DrawStringScaled(
 		((BASEVIDWIDTH * FRACUNIT) - label_width) / 2, 120 * FRACUNIT,
 		FRACUNIT, FRACUNIT, FRACUNIT,
-		0, nullptr, LSHI_FONT,
+		0, nullptr, LSHI_FONT, false,
 		slide->label.c_str()
 	);
 }
@@ -1124,7 +1124,7 @@ static void F_DrawCreditsTyler52(void)
 	V_DrawStringScaled(
 		((BASEVIDWIDTH * FRACUNIT) - memory_width) / 2, 60 * FRACUNIT,
 		FRACUNIT, FRACUNIT, FRACUNIT,
-		0, nullptr, LSLOW_FONT,
+		0, nullptr, LSLOW_FONT, false,
 		memory_str.c_str()
 	);
 
@@ -1137,7 +1137,7 @@ static void F_DrawCreditsTyler52(void)
 	V_DrawStringScaled(
 		((BASEVIDWIDTH * FRACUNIT) - tyler_width) / 2, 110 * FRACUNIT,
 		FRACUNIT, FRACUNIT, FRACUNIT,
-		0, nullptr, LSHI_FONT,
+		0, nullptr, LSHI_FONT, false,
 		tyler_str.c_str()
 	);
 }
@@ -1154,7 +1154,7 @@ static void F_DrawCreditsKartKrew(void)
 	V_DrawStringScaled(
 		((BASEVIDWIDTH * FRACUNIT) - label_width) / 2, 40 * FRACUNIT,
 		FRACUNIT, FRACUNIT, FRACUNIT,
-		0, nullptr, LSLOW_FONT,
+		0, nullptr, LSLOW_FONT, false,
 		slide->label.c_str()
 	);
 

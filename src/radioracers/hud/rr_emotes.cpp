@@ -105,6 +105,8 @@ static parse_message_results_t ParseMessageForEmotes(const char* message, int of
     parse_message_results_t result;
     result.contains_text = true;
 
+    UINT32 emojisbeforeindicator = 0;
+
     /**
      * Match any word between two colons (e.g. :joy:)
      * 
@@ -125,6 +127,9 @@ static parse_message_results_t ParseMessageForEmotes(const char* message, int of
      *  so, message_std.find will return std::string::npos.
      *  the loop will iterate as long as it doesn't hit std::string::npos.
      */
+    // get the exact location of the typing indicator
+    hu_indicatorc = c_input + (strlen(message) - strlen(w_chat_indicator));
+
     for (
             size_t start = message_std.find(":"); 
             start != std::string::npos; 
@@ -144,6 +149,12 @@ static parse_message_results_t ParseMessageForEmotes(const char* message, int of
              * Found an emote. Now replace it with a placeholder character 
              * ('\x01' + the hypothetical width of the emote)
              */
+
+            if (hu_indicatorc > end)
+            {
+                hu_indicatorc -= (emote_name.length() + 1);
+                emojisbeforeindicator++;
+            }
 
             emote_t* temp_emote = EMOTES[emote_name];
             if (temp_emote->atlas_id == -1) {
@@ -192,6 +203,12 @@ static parse_message_results_t ParseMessageForEmotes(const char* message, int of
         //     blank_spaces -= 1.f;
         // }
         
+        if (emojisbeforeindicator != 0)
+        {
+            hu_indicatorc += std::string(static_cast<size_t>(blank_spaces), ' ').length();
+            emojisbeforeindicator--;
+        }
+
         message_std.replace(start, 1, "\x01" + std::string(static_cast<size_t>(blank_spaces), ' '));
         idx++;
     }
@@ -549,7 +566,7 @@ INT32 RR_Parse_ChatLog(chat_log_parameters_t parameters)
 				scale, FRACUNIT, FRACUNIT,
 				flags,
 				NULL,
-				HU_FONT,
+				HU_FONT, false,
 				msg+startj,
 				static_cast<int>(i),
                 results.lines_with_emotes,
@@ -795,7 +812,7 @@ void RR_Draw_ChatMiniLog(chat_mini_log_parameters_t parameters) {
 			scale, FRACUNIT, FRACUNIT,
 			V_SNAPTOBOTTOM|V_SNAPTOLEFT|transflag,
 			NULL,
-			HU_FONT,
+			HU_FONT, false,
 			msg,
 			i,
             results.lines_with_emotes,
@@ -816,7 +833,7 @@ void RR_Draw_ChatMiniLog(chat_mini_log_parameters_t parameters) {
 INT16 RR_DrawChatInput(chat_input_parameters_t p, INT32 *chaty) {
     const fixed_t scale = (vid.width < 640) ? FRACUNIT : FRACUNIT/2;
 
-    const char* fmt_msg = va("%c%s %c%s%c%c", '\x80', p.talk, '\x80', w_chat, '\x80', '_');
+    const char* fmt_msg = va("%c%s %c%s", '\x80', p.talk, '\x80', w_chat_indicator);
     word_wrap_results_t r = RR_Chat_Input_WordWrap(
         p.boxw-4, 
         scale, 
@@ -844,12 +861,6 @@ INT16 RR_DrawChatInput(chat_input_parameters_t p, INT32 *chaty) {
         &had_at_least_one_emote
     );
 
-    // This is removed after the fact to not have the newline handling flicker.
-    if (i != 0 && hu_tick >= 4)
-    {
-        msg[i-1] = '\0';
-    }
-
     y -= typelines * p.charheight;
     *chaty = (y + (emote_lines*p.charheight));
 
@@ -866,13 +877,14 @@ INT16 RR_DrawChatInput(chat_input_parameters_t p, INT32 *chaty) {
     V_DrawFillConsoleMap(p.chatx, y-1, p.boxw, chatinput_h, 159 | p.flags);
 	
     int y_padding = (r.contains_text) ? EMOTE_PADDING_CONST_TEXT : EMOTE_PADDING_CONST;
+    
     V_RR_DrawStringScaled(
         (p.chatx + 2) << FRACBITS,
         ((y) + ((had_at_least_one_emote || line_has_emote) ? (y_padding) : 0)) << FRACBITS,
         scale, FRACUNIT, FRACUNIT,
         p.flags,
         NULL,
-        HU_FONT,
+        HU_FONT, true,
         msg ? msg : p.talk,
         0,
         r.lines_with_emotes,
@@ -1101,7 +1113,7 @@ static void draw_favourite(INT16 x, INT16 y) {
         FRACUNIT,
         V_BLUEMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
         NULL,
-        TINY_FONT,
+        TINY_FONT, false,
         "*"
     );
 }
@@ -1294,7 +1306,7 @@ void RR_DrawChatEmotePreview(
             FRACUNIT,
             V_YELLOWMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
             NULL,
-            TINY_FONT,
+            TINY_FONT, false,
             "* No emotes found."
         );
     } else {
@@ -1338,7 +1350,7 @@ void RR_DrawChatEmotePreview(
                     FRACUNIT,
                     V_GREENMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
                     NULL,
-                    TINY_FONT,
+                    TINY_FONT, false,
                     "*"
                 );
 
@@ -1350,7 +1362,7 @@ void RR_DrawChatEmotePreview(
                     FRACUNIT,
                     V_GREENMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
                     NULL,
-                    TINY_FONT,
+                    TINY_FONT, false,
                     preview_emote->name
                 );
             }
@@ -1697,7 +1709,7 @@ void RR_DrawChatEmoteMenu(
         FRACUNIT,
         V_SNAPTOBOTTOM | V_SNAPTOLEFT,
         NULL,
-        TINY_FONT,
+        TINY_FONT, false,
         va("Ctrl+=: \x82%s", cv_chat_emotes_sort.string)
     );
 
@@ -1716,7 +1728,7 @@ void RR_DrawChatEmoteMenu(
         FRACUNIT,
         V_YELLOWMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
         NULL,
-        TINY_FONT,
+        TINY_FONT, false,
         emote_menu_query.c_str()
     );
 
@@ -1758,7 +1770,7 @@ void RR_DrawChatEmoteMenu(
             FRACUNIT,
             V_YELLOWMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
             NULL,
-            TINY_FONT,
+            TINY_FONT, false,
             nothing
         );   
 
@@ -1793,7 +1805,7 @@ void RR_DrawChatEmoteMenu(
         FRACUNIT,
         V_SNAPTOBOTTOM | V_SNAPTOLEFT,
         NULL,
-        TINY_FONT,
+        TINY_FONT, false,
         va("Page %d of %d", emote_menu_page, max_page)
     );
 
@@ -1831,7 +1843,7 @@ void RR_DrawChatEmoteMenu(
                     FRACUNIT,
                     V_YELLOWMAP | V_SNAPTOBOTTOM | V_SNAPTOLEFT,
                     NULL,
-                    TINY_FONT,
+                    TINY_FONT, false,
                     m_emote->name
                 );
 

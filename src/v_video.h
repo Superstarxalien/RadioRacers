@@ -253,7 +253,7 @@ void V_DrawPromptBack(INT32 boxheight, INT32 color);
 
 /* Convenience macros for leagacy string function macros. */
 #define V__DrawOneScaleString( x,y,scale,option,cm,font,string ) \
-	V_DrawStringScaled(x,y,scale,FRACUNIT,FRACUNIT,option,cm,font,string)
+	V_DrawStringScaled(x,y,scale,FRACUNIT,FRACUNIT,option,cm,font,false,string)
 #define V__DrawDupxString( x,y,scale,option,cm,font,string )\
 	V__DrawOneScaleString ((x)<<FRACBITS,(y)<<FRACBITS,scale,option,cm,font,string)
 
@@ -291,6 +291,7 @@ void V_DrawStringScaled(
 		INT32       flags,
 		const UINT8 *colormap,
 		int         font,
+		boolean     typing,
 		const char *text);
 
 fixed_t V_StringScaledWidth(

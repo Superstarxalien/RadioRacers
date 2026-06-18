@@ -64,6 +64,7 @@ void V_RR_DrawStringScaled(
     INT32       flags,
     const UINT8 *colormap,
     int         font,
+    boolean     typing,
     const char *text,
     int chat_log_index,
     std::vector<int> lines_with_emotes,

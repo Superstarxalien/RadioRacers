@@ -680,6 +680,7 @@ void V_RR_DrawStringScaled(
 	INT32 flags,
 	const UINT8* colormap,
 	int fontno,
+	boolean typing,
 	const char* s,
     int chat_log_index,
 	std::vector<int> lines_with_emotes,
@@ -984,7 +985,14 @@ void V_RR_DrawStringScaled(
 					fixed_t patchxofs = SHORT(font->font[c]->leftoffset) * dupx * scale;
 					cw = SHORT(font->font[c]->width) * dupx;
 					cxoff = (*fontspec.dim_fn)(scale, fontspec.chw, hchw, dupx, &cw);
-					V_DrawFixedPatch(cx + cxoff + patchxofs, cy + cyoff, scale, flags, font->font[c], colormap);
+
+					// HORRIBLE HACK FOR THE CHAT TYPING INDICATOR
+					// check if function has the very specific "typing" param for chat
+					// check if the text character being drawn is the same location in the array as the typing indicator
+					if (!(typing && hu_indicatorc == dancecounter && hu_tick >= 4))
+					{
+						V_DrawFixedPatch(cx + cxoff + patchxofs, cy + cyoff, scale, flags, font->font[c], colormap);
+					}
 					cx += cw;
 				}
 				else

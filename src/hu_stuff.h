@@ -125,6 +125,7 @@ void HU_AddChatText(const char *text, boolean playsound);
 extern char chat_mini[8][255]; 
 extern tic_t chat_timers[8];
 extern char w_chat[HU_MAXMSGLEN + 1];
+extern char w_chat_indicator[HU_MAXMSGLEN + 1];
 extern size_t c_input;
 extern char hu_tick;
 
@@ -146,6 +147,10 @@ extern patch_t *frameslash;
 
 // set true whenever the tab rankings are being shown for any reason
 extern boolean hu_showscores;
+
+// used for chat typing indicator (required on v_video.cpp)
+extern char hu_tick;
+extern size_t hu_indicatorc;
 
 // init heads up data at game startup.
 void HU_Init(void);

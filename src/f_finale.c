@@ -1509,7 +1509,7 @@ void F_GameEvaluationDrawer(void)
 			FRACUNIT,
 			0,
 			NULL,
-			KART_FONT,
+			KART_FONT, false,
 			rankharder
 		);
 	}

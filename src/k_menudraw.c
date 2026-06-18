@@ -2141,7 +2141,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 						FRACUNIT,
 						notSelectable,
 						i == p->profilen ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-						FILE_FONT,
+						FILE_FONT, false,
 						txt
 					);
 				}
@@ -2444,7 +2444,7 @@ static void M_DrawCharSelectCursor(UINT8 num)
 			FRACUNIT,
 			V_20TRANS|V_YELLOWMAP,
 			NULL,
-			TINY_FONT,
+			TINY_FONT, false,
 			va("(%s, %s)", grid_speed, grid_weight)
 		);
 
@@ -2457,7 +2457,7 @@ static void M_DrawCharSelectCursor(UINT8 num)
 			FRACUNIT,
 			V_20TRANS|V_YELLOWMAP,
 			NULL,
-			TINY_FONT,
+			TINY_FONT, false,
 			va("Class %c", current_class)
 		);
 	}
@@ -2865,7 +2865,7 @@ void M_DrawCharacterSelect(void)
 					FRACUNIT,
 					0,
 					NULL,
-					font,
+					font, false,
 					name
 				);
 				
@@ -2889,7 +2889,7 @@ void M_DrawCharacterSelect(void)
 						(l == setup_listselect && font == TINY_FONT && !setup_scrollbar) ? V_SKYMAP : 0,
 						// if the entry is selected then apply skincolor_sapphire (unless you're in scrollbar mode)
 						(l == setup_listselect && font != TINY_FONT && !setup_scrollbar) ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-						font,
+						font, false,
 						name
 					);
 				}
@@ -2907,7 +2907,7 @@ void M_DrawCharacterSelect(void)
 							(l == setup_listselect && font == TINY_FONT) ? skincolors[sp->color].chatcolor : 0,
 							// apply selected player color
 							font != TINY_FONT ? R_GetTranslationColormap(TC_RAINBOW, sp->color, GTC_CACHE) : NULL,
-							font,
+							font, false,
 							name
 						);
 					}
@@ -2937,7 +2937,7 @@ void M_DrawCharacterSelect(void)
 				FRACUNIT,
 				0,
 				NULL,
-				TINY_FONT,
+				TINY_FONT, false,
 				stat
 			);
 
@@ -4927,7 +4927,7 @@ static inline void drawAsterisk(INT32 x, INT32 y, INT32 transflag) {
 		FRACUNIT,
 		transflag | V_GRAYMAP,
 		NULL,
-		HU_FONT,
+		HU_FONT, false,
 		"*"
 	);
 }
@@ -5061,7 +5061,7 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 		(powertype_p_x - powertype_str_w - 1)<<FRACBITS, 
 		(powertype_y + 1)<<FRACBITS, 
 		FloatToFixed(powertype_sc),
-		FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, powertypestr
+		FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, false, powertypestr
 	);
 
 	// Map Titty
@@ -5083,13 +5083,13 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 		}
 		V_DrawStringScaled(
 			peekx<<FRACBITS, maptitle_y<<FRACBITS, FloatToFixed(0.6f),
-			FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, maptitlebuffer
+			FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, false, maptitlebuffer
 		);
 		Z_Free(actualmaptitle);
 	} else {
 		V_DrawStringScaled(
 			peekx<<FRACBITS, maptitle_y<<FRACBITS, FloatToFixed(0.6f),
-			FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, "???"
+			FRACUNIT, FRACUNIT, baseflags, NULL, TINY_FONT, false, "???"
 		);
 	}
 
@@ -5187,7 +5187,7 @@ static void drawServerPeek(INT32 basex, INT32 basey, INT32 transflag) {
 
 				V_DrawStringScaled(
 					(plrinfo_x + 5)<<FRACBITS, plrinfo_y<<FRACBITS, playernamesc,
-					FRACUNIT, FRACUNIT, baseflags|spectating, NULL, TINY_FONT, name
+					FRACUNIT, FRACUNIT, baseflags|spectating, NULL, TINY_FONT, false, name
 				);
 
 				plrinfo_y += 10;
@@ -5381,7 +5381,7 @@ void M_DrawMPServerBrowser(void)
 				FRACUNIT,
 				dedicatedflag,
 				NULL,
-				HU_FONT,
+				HU_FONT, false,
 				dedicatedstr
 			);
 
@@ -5410,7 +5410,7 @@ void M_DrawMPServerBrowser(void)
 					FRACUNIT,
 					httpsourceflag,
 					NULL,
-					HU_FONT,
+					HU_FONT, false,
 					httpbadge
 				);
 
@@ -5437,7 +5437,7 @@ void M_DrawMPServerBrowser(void)
 						FRACUNIT,
 						addonsizeflag,
 						NULL,
-						HU_FONT,
+						HU_FONT, false,
 						serverextrainfo[serverlist[i].node].downloadsize
 					);
 				}
@@ -5636,7 +5636,7 @@ void M_DrawOptionsMovingButton(void)
 		FRACUNIT,
 		0,
 		c,
-		GM_FONT,
+		GM_FONT, false,
 		s
 	);
 }
@@ -5704,7 +5704,7 @@ void M_DrawOptions(void)
 				FRACUNIT,
 				tflag,
 				isRadio ? text_colormap : (i == itemOn ? c : NULL),
-				GM_FONT,
+				GM_FONT, false,
 				s
 			);
 		}
@@ -6132,7 +6132,7 @@ void M_DrawEditProfile(void)
 			FRACUNIT,
 			tflag,
 			colormap,
-			KART_FONT,
+			KART_FONT, false,
 			currentMenu->menuitems[i].text
 		);
 
@@ -6251,7 +6251,7 @@ static void M_DrawBindMediumString(INT32 y, INT32 flags, const char *string)
 		FRACUNIT,
 		flags,
 		NULL,
-		MED_FONT,
+		MED_FONT, false,
 		string
 	);
 }
@@ -6300,7 +6300,7 @@ void M_DrawProfileControls(void)
 			FRACUNIT,
 			highlightflags,
 			NULL,
-			MED_FONT,
+			MED_FONT, false,
 			msg
 		);
 		return;	// Don't draw the rest if we're trying the controller.
@@ -6744,7 +6744,7 @@ static void DrawMappedString(INT32 x, INT32 y, INT32 option, int font, const cha
 		FRACUNIT,
 		option,
 		colormap,
-		font,
+		font, false,
 		text
 	);
 }
@@ -7105,7 +7105,7 @@ void M_DrawPause(void)
 				FRACUNIT,
 				V_AQUAMAP,
 				NULL,
-				MED_FONT,
+				MED_FONT, false,
 				name
 			);
 
