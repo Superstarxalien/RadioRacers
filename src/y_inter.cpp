@@ -1934,7 +1934,7 @@ static void Y_DrawMapTitleString(fixed_t x, const char *name)
 		FRACUNIT,
 		V_SUBTRACT | V_60TRANS,
 		NULL,
-		LSHI_FONT,
+		LSHI_FONT, false,
 		name
 	);
 }

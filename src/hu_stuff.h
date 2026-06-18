@@ -141,6 +141,10 @@ extern patch_t *frameslash;
 // set true whenever the tab rankings are being shown for any reason
 extern boolean hu_showscores;
 
+// used for chat typing indicator (required on v_video.cpp)
+extern char hu_tick;
+extern size_t hu_indicatorc;
+
 // init heads up data at game startup.
 void HU_Init(void);
 

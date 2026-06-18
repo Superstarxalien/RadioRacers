@@ -2505,6 +2505,9 @@ static UINT8 V_GetGenericButtonCodeWidth(UINT8 c, boolean largebutton)
 	return x;
 }
 
+fixed_t hu_indicatorx = 0;
+fixed_t hu_indicatory = 0;
+
 void V_DrawStringScaled(
 		fixed_t    x,
 		fixed_t    y,
@@ -2514,6 +2517,7 @@ void V_DrawStringScaled(
 		INT32      flags,
 		const UINT8 *colormap,
 		int        fontno,
+		boolean    typing,
 		const char *s)
 {
 	INT32     hchw;/* half-width for centering */
@@ -2974,8 +2978,14 @@ void V_DrawStringScaled(
 
 						if (boxed != 1)
 						{
-							V_DrawFixedPatch(cx + cxoff + patchxofs, cy + cyoff + (boxed == 3 ? 2*FRACUNIT : 0), scale,
-								boxed ? boxedflags : flags, font->font[c], boxed ? 0 : colormap);
+							// HORRIBLE HACK FOR THE CHAT TYPING INDICATOR
+							// check if function has the very specific "typing" param for chat
+							// check if the text character being drawn is the same location in the array as the typing indicator
+							if (!(typing && hu_indicatorc == dancecounter && hu_tick >= 4))
+							{
+								V_DrawFixedPatch(cx + cxoff + patchxofs, cy + cyoff + (boxed == 3 ? 2*FRACUNIT : 0), scale,
+									boxed ? boxedflags : flags, font->font[c], boxed ? 0 : colormap);
+							}
 						}
 
 						cx += cw;

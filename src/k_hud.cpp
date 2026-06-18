@@ -2976,7 +2976,7 @@ void PositionFacesInfo::draw_1p()
 					FRACUNIT,
 					flags,
 					colormap,
-					PINGF_FONT,
+					PINGF_FONT, false,
 					va("%d", players[rankplayer[i]].roundscore)
 			);
 		}
@@ -7298,7 +7298,7 @@ void K_drawKartFreePlay(void)
 		FRACUNIT,
 		V_SNAPTOBOTTOM|h_snap|V_SPLITSCREEN,
 		NULL,
-		KART_FONT,
+		KART_FONT, false,
 		"FREE PLAY"
 	);
 }

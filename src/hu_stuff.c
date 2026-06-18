@@ -92,7 +92,8 @@ static char w_chat[HU_MAXMSGLEN + 1];
 static size_t c_input = 0; // let's try to make the chat input less shitty.
 static boolean headsupactive = false;
 boolean hu_showscores; // draw rankings
-static char hu_tick;
+char hu_tick;
+size_t hu_indicatorc = 0;
 
 //-------------------------------------------
 //              misc vars
@@ -1427,7 +1428,7 @@ static void HU_drawMiniChat(void)
 			scale, FRACUNIT, FRACUNIT,
 			V_SNAPTOBOTTOM|V_SNAPTOLEFT|transflag,
 			NULL,
-			HU_FONT,
+			HU_FONT, false,
 			msg
 		);
 
@@ -1537,7 +1538,7 @@ static void HU_drawChatLog(INT32 offset)
 				scale, FRACUNIT, FRACUNIT,
 				V_SNAPTOBOTTOM|V_SNAPTOLEFT,
 				NULL,
-				HU_FONT,
+				HU_FONT, false,
 				msg+startj
 			);
 		}
@@ -1659,13 +1660,16 @@ static void HU_DrawChat(void)
 
 	V_DrawFillConsoleMap(chatx, y-1, boxw, (typelines*charheight), 159 | V_SNAPTOBOTTOM | V_SNAPTOLEFT);
 
+	// get the exact location of the typing indicator
+	hu_indicatorc = c_input + strlen(va("%c%s %c", cflag, talk, tflag));
+
 	V_DrawStringScaled(
 		(chatx + 2) << FRACBITS,
 		y << FRACBITS,
 		scale, FRACUNIT, FRACUNIT,
 		V_SNAPTOBOTTOM|V_SNAPTOLEFT,
 		NULL,
-		HU_FONT,
+		HU_FONT, true,
 		msg ? msg : talk
 	);
 

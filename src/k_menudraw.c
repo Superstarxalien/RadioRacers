@@ -2084,7 +2084,7 @@ static void M_DrawCharSelectPreview(UINT8 num)
 						FRACUNIT,
 						notSelectable,
 						i == p->profilen ? R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_SAPPHIRE, GTC_CACHE) : NULL,
-						FILE_FONT,
+						FILE_FONT, false,
 						txt
 					);
 				}
@@ -4771,7 +4771,7 @@ void M_DrawOptionsMovingButton(void)
 		FRACUNIT,
 		0,
 		c,
-		GM_FONT,
+		GM_FONT, false,
 		s
 	);
 }
@@ -4822,7 +4822,7 @@ void M_DrawOptions(void)
 				FRACUNIT,
 				tflag,
 				(i == itemOn ? c : NULL),
-				GM_FONT,
+				GM_FONT, false,
 				s
 			);
 		}
@@ -5250,7 +5250,7 @@ void M_DrawEditProfile(void)
 			FRACUNIT,
 			tflag,
 			colormap,
-			KART_FONT,
+			KART_FONT, false,
 			currentMenu->menuitems[i].text
 		);
 
@@ -5369,7 +5369,7 @@ static void M_DrawBindMediumString(INT32 y, INT32 flags, const char *string)
 		FRACUNIT,
 		flags,
 		NULL,
-		MED_FONT,
+		MED_FONT, false,
 		string
 	);
 }
@@ -5418,7 +5418,7 @@ void M_DrawProfileControls(void)
 			FRACUNIT,
 			highlightflags,
 			NULL,
-			MED_FONT,
+			MED_FONT, false,
 			msg
 		);
 		return;	// Don't draw the rest if we're trying the controller.
@@ -5862,7 +5862,7 @@ static void DrawMappedString(INT32 x, INT32 y, INT32 option, int font, const cha
 		FRACUNIT,
 		option,
 		colormap,
-		font,
+		font, false,
 		text
 	);
 }
@@ -6223,7 +6223,7 @@ void M_DrawPause(void)
 				FRACUNIT,
 				V_AQUAMAP,
 				NULL,
-				MED_FONT,
+				MED_FONT, false,
 				name
 			);
 

@@ -1323,7 +1323,7 @@ static void ST_overlayDrawer(void)
 					}
 
 					V_DrawStringScaled(x*FRACUNIT - textwidth/2, (y+10)*FRACUNIT,
-						FRACUNIT, FRACUNIT, FRACUNIT, flags, NULL, font, text);
+						FRACUNIT, FRACUNIT, FRACUNIT, flags, NULL, font, false, text);
 				}
 				else
 				{
@@ -1480,7 +1480,7 @@ void ST_DrawServerSplash(boolean timelimited)
 		FRACUNIT, FRACUNIT, FRACUNIT,
 		(V_SNAPTORIGHT|V_SNAPTOTOP) | opacityFlag,
 		NULL,
-		MED_FONT,
+		MED_FONT, false,
 		connectedservername
 	);
 
