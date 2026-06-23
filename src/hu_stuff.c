@@ -1220,6 +1220,12 @@ boolean HU_Responder(event_t *ev)
 			chat_scrollmedown = true; // you hit enter, so you might wanna autoscroll to see what you just sent. :)
 			I_UpdateMouseGrab();
 		}
+		else if ((c == KEY_UPARROW || c == KEY_MOUSEWHEELUP) && chat_scroll > 0 && !OLDCHAT) // CHAT SCROLLING YAYS!
+		{
+			chat_scroll--;
+			justscrolledup = true;
+			chat_scrolltime = 4;
+		}
 
 		if (!chat_on_first_event)
 		{
@@ -1284,12 +1290,6 @@ boolean HU_Responder(event_t *ev)
 			memcpy(&w_chat[c_input], paste, pastelen); // copy all of that.
 			c_input += pastelen;
 			return true;
-		}
-		else if ((c == KEY_UPARROW || c == KEY_MOUSEWHEELUP) && chat_scroll > 0 && !OLDCHAT) // CHAT SCROLLING YAYS!
-		{
-			chat_scroll--;
-			justscrolledup = true;
-			chat_scrolltime = 4;
 		}
 		else if ((c == KEY_DOWNARROW || c == KEY_MOUSEWHEELDOWN) && chat_scroll < chat_maxscroll && chat_maxscroll > 0 && !OLDCHAT)
 		{
