@@ -2687,14 +2687,14 @@ void I_RegisterSysCommands(void) {}
 void I_SetTextInputMode(boolean active)
 {
 	if (active)
-		SDL_StartTextInput();
+		SDL_StartTextInput(window);
 	else
-		SDL_StopTextInput();
+		SDL_StopTextInput(window);
 }
 
 boolean I_GetTextInputMode(void)
 {
-	return SDL_IsTextInputActive();
+	return SDL_TextInputActive(window);
 }
 
 #endif // HAVE_SDL

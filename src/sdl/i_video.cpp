@@ -82,7 +82,7 @@
 #endif
 
 // maximum number of windowed modes (see windowedModes[][])
-#define MAXWINMODES (20)
+#define MAXWINMODES (19)
 
 using namespace srb2;
 
@@ -136,7 +136,6 @@ static uint32_t g_rhi_generation = 0;
 // windowed video modes from which to choose from.
 static INT32 windowedModes[MAXWINMODES][2] =
 {
-	{2560,1440}, // 1.66
 	{1920,1200}, // 1.60,6.00
 	{1920,1080}, // 1.66
 	{1680,1050}, // 1.60,5.25
@@ -549,6 +548,19 @@ static void Impl_HandleKeyboardEvent(SDL_KeyboardEvent evt, Uint32 type)
 	event.data1 = Impl_SDL_Scancode_To_Keycode(evt.scancode);
 	event.data2 = evt.repeat;
 	if (event.data1) D_PostEvent(&event);
+}
+
+static void Impl_HandleTextEvent(SDL_TextInputEvent evt)
+{
+	event_t event;
+	event.type = ev_text;
+	if (evt.text[1] != '\0')
+	{
+		// limit ourselves to ASCII for now, we can add UTF-8 support later
+		return;
+	}
+	event.data1 = evt.text[0];
+	D_PostEvent(&event);
 }
 
 static void Impl_HandleMouseMotionEvent(SDL_MouseMotionEvent evt)
@@ -980,6 +992,9 @@ void I_GetEvent(void)
 			case SDL_EVENT_KEY_UP:
 			case SDL_EVENT_KEY_DOWN:
 				Impl_HandleKeyboardEvent(evt.key, evt.type);
+				break;
+			case SDL_EVENT_TEXT_INPUT:
+				Impl_HandleTextEvent(evt.text);
 				break;
 			case SDL_EVENT_MOUSE_MOTION:
 				//if (!mouseMotionOnce)
