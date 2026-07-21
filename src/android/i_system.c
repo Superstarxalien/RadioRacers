@@ -34,7 +34,7 @@ static INT64 start_time; // as microseconds since the epoch
 
 // I should probably return how much memory is remaining
 // for this process, considering Android's process memory limit.
-UINT64 I_GetFreeMem(UINT64 *total)
+UINT32 I_GetFreeMem(UINT32 *total)
 {
   // what the heck?  sysinfo() is partially missing in bionic?
   /* struct sysinfo si; */
@@ -44,8 +44,8 @@ UINT64 I_GetFreeMem(UINT64 *total)
   /* return si.freeram; */
   char buf[1024];
   char *memTag;
-  UINT64 freeKBytes;
-  UINT64 totalKBytes;
+  UINT32 freeKBytes;
+  UINT32 totalKBytes;
   INT32 n;
   INT32 meminfo_fd = -1;
 
@@ -56,7 +56,7 @@ UINT64 I_GetFreeMem(UINT64 *total)
   if (n < 0)
     {
       // Error
-      *total = 0;
+      *total = 0L;
       return 0;
     }
 
@@ -64,7 +64,7 @@ UINT64 I_GetFreeMem(UINT64 *total)
   if (NULL == (memTag = strstr(buf, MEMTOTAL)))
     {
       // Error
-      *total = 0;
+      *total = 0L;
       return 0;
     }
 
@@ -74,7 +74,7 @@ UINT64 I_GetFreeMem(UINT64 *total)
   if (NULL == (memTag = strstr(buf, MEMFREE)))
     {
       // Error
-      *total = 0;
+      *total = 0L;
       return 0;
     }
 

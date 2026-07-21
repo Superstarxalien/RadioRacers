@@ -8595,7 +8595,7 @@ static void K_DrawWaypointDebugger(void)
 	label.font(Draw::Font::kThin);
 	label.flags(V_AQUAMAP);
 	Draw line = Draw(8, 110).font(Draw::Font::kMenu);
-	auto put = [&]<typename... Args>(const char* label_str, fmt::format_string<Args...> fmt, Args&&... args)
+	auto put = [&](const char* label_str, auto&&... args)
 	{
 		constexpr int kTabWidth = 48;
 		label.string(label_str);
@@ -8603,7 +8603,7 @@ static void K_DrawWaypointDebugger(void)
 		x -= x % kTabWidth;
 		line.size(x + 4, 2).y(7).fill(31);
 		line.text(label);
-		line.x(x).text(fmt, std::forward<Args>(args)...);
+		line.x(x).text(args...);
 		line = line.y(kH);
 	};
 
@@ -9256,12 +9256,10 @@ void K_drawKartHUD(void)
 					row.x(-35).font(Draw::Font::kPing).text(va("%d", pos));
 
 				Draw::TextElement text = Draw::TextElement(
-					"{} {:02}'{:02}\"{:02} {}",
-					ahead >= 0 ? "-" : "+",
+					std::string(ahead >= 0 ? "-" : "+") + " " + "{:02}'{:02}\"{:02} " + arrow,
 					G_TicsToMinutes(split, true),
 					G_TicsToSeconds(split),
-					G_TicsToCentiseconds(split),
-					arrow
+					G_TicsToCentiseconds(split)
 				);
 
 				// vibes offset TWO

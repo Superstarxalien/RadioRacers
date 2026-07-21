@@ -16,7 +16,6 @@
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -365,23 +364,6 @@ extern template class Vector<int16_t>;
 extern template class Vector<int32_t>;
 extern template class Vector<int64_t>;
 extern template class Vector<String>;
-
-template <typename T>
-inline bool operator==(const Vector<T>& lhs, const Vector<T>& rhs)
-{
-	if (lhs.size() != rhs.size())
-	{
-		return false;
-	}
-	for (size_t i = 0; i < lhs.size(); i++)
-	{
-		if (!(lhs[i] == rhs[i]))
-		{
-			return false;
-		}
-	}
-	return true;
-}
 
 } // namespace srb2
 

@@ -86,21 +86,11 @@ void K_DrawInputDisplay(float x, float y, INT32 flags, char mode, UINT8 pid, boo
 	const ticcmd_t& cmd = players[displayplayers[pid]].cmd;
 	const boolean analog = (mode == '4' || mode == '5') ? players[displayplayers[pid]].analoginput : false;
 	srb2::String prefix = srb2::format("PR{}", mode);
-	auto gfx = [&]<typename... Args>(fmt::format_string<Args...> format, Args&&... args) -> srb2::String
-	{
-		return prefix + srb2::format(format, std::forward<Args>(args)...);
-	};
-	auto but = [&](char key, INT32 gc, UINT32 bt) -> srb2::String
+	auto gfx = [&](auto format, auto&&... args) { return prefix + srb2::format(format, args...); };
+	auto but = [&](char key, INT32 gc, UINT32 bt)
 	{
 		bool press = local ? G_PlayerInputAnalog(pid, gc, guessinput) : ((cmd.buttons & bt) == bt);
-		if (press)
-		{
-			return gfx("BT{}B", key);
-		}
-		else
-		{
-			return gfx("BT{}", key);
-		}
+		return gfx(press ? "BT{}B" : "BT{}", key);
 	};
 
 	Draw box = Draw(x, y).flags(flags);

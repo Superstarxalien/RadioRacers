@@ -76,6 +76,7 @@ public:
 		{
 			return self_ == r.self_ && bucket_ == r.bucket_ && cur_ == r.cur_;
 		}
+		bool operator!=(const Iter& r) const noexcept { return !(*this == r); }
 
 		Iter& operator++()
 		{
@@ -136,6 +137,7 @@ public:
 		const Entry& operator*() const noexcept { return iter_.cur_->entry; }
 		const Entry* operator->() const noexcept { return &iter_.cur_->entry; }
 		bool operator==(const ConstIter& r) const noexcept { return iter_ == r.iter_; }
+		bool operator!=(const ConstIter& r) const noexcept { return !(*this == r); }
 		ConstIter& operator++() noexcept
 		{
 			++iter_;
@@ -679,28 +681,6 @@ public:
 		return 0;
 	}
 };
-
-template <typename K, typename V>
-inline bool operator==(const HashMap<K, V>& lhs, const HashMap<K, V>& rhs)
-{
-	if (lhs.size() != rhs.size())
-	{
-		return false;
-	}
-	for (auto itr = lhs.begin(); itr != lhs.end(); ++itr)
-	{
-		auto rhs_itr = rhs.find(itr->first);
-		if (rhs_itr == rhs.end())
-		{
-			return false;
-		}
-		if (!(itr->second == rhs_itr->second))
-		{
-			return false;
-		}
-	}
-	return true;
-}
 
 } // namespace srb2
 

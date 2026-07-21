@@ -33,6 +33,8 @@ struct Gl2FramebufferKey
 	{
 		return color == rhs.color && depth_stencil == rhs.depth_stencil;
 	}
+
+	bool operator!=(const Gl2FramebufferKey& rhs) const noexcept { return !(*this == rhs); }
 };
 
 } // namespace srb2::rhi
