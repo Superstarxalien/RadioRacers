@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      VCPKG_TARGET_TRIPLET: x86-64-mingw-static
-      CC: x86-64-w64-mingw64-gcc
-      CXX: x86-64-w64-mingw64-g++
-      LD: x86-64-w64-mingw64-ld
+      VCPKG_TARGET_TRIPLET: x64-mingw-static
+      CC: x86_64-w64-mingw32-gcc
+      CXX: x86_64-w64-mingw32-g++
+      LD: x86_64-w64-mingw32-ld
 
     steps:
       - name: Checkout
