@@ -26,7 +26,7 @@ jobs:
       - name: apt_toolchain
         run: |
           echo -e "\e[0Ksection_start:`date +%s`:apt_toolchain[collapsed=true]\r\e[0KInstalling toolchain packages"
-          sudo apt-get install g++-mingw-w64-x86_64-win64
+          sudo apt-get install g++-mingw-w64-x86_64
           echo -e "\e[0Ksection_end:`date +%s`:apt_toolchain\r\e[0K"
 
       - name: apt_development
