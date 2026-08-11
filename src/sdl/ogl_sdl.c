@@ -18,13 +18,7 @@
 #ifdef HAVE_SDL
 #define _MATH_DEFINES_DEFINED
 
-/*
- * TODO ISO C forbids converting object pointers to function pointers and vice versa.
- * The existing legacy GL code still uses void pointers though, so to clear the warning we need
- * to tell SDL3 to declare SDL_FunctionPointer as void*.
-*/
-#define SDL_FUNCTION_POINTER_IS_VOID_POINTER
-#include <SDL3/SDL.h>
+#include "SDL.h"
 
 #include "sdlmain.h"
 
@@ -82,7 +76,7 @@ void *GetGLFunc(const char *proc)
 		else
 			return NULL;
 	}
-	return (void*)SDL_GL_GetProcAddress(proc);
+	return SDL_GL_GetProcAddress(proc);
 }
 
 boolean LoadGL(void)
@@ -100,7 +94,7 @@ boolean LoadGL(void)
 	if (M_CheckParm("-OGLlib") && M_IsNextParm())
 		OGLLibname = M_GetNextParm();
 
-	if (!SDL_GL_LoadLibrary(OGLLibname))
+	if (SDL_GL_LoadLibrary(OGLLibname) != 0)
 	{
 		CONS_Alert(CONS_ERROR, "Could not load OpenGL Library: %s\n"
 					"Falling back to Software mode.\n", SDL_GetError());

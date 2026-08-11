@@ -33,6 +33,7 @@ struct TwodeePipelineKey
 	bool lines;
 
 	bool operator==(const TwodeePipelineKey& r) const noexcept { return !(blend != r.blend || lines != r.lines); }
+	bool operator!=(const TwodeePipelineKey& r) const noexcept { return !(*this == r); }
 };
 
 } // namespace srb2::hwr2
@@ -56,6 +57,7 @@ struct MergedTwodeeCommandFlatTexture
 	lumpnum_t lump;
 
 	bool operator==(const MergedTwodeeCommandFlatTexture& rhs) const noexcept { return lump == rhs.lump; }
+	bool operator!=(const MergedTwodeeCommandFlatTexture& rhs) const noexcept { return !(*this == rhs); }
 };
 
 struct MergedTwodeeCommand

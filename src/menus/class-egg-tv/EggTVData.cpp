@@ -56,8 +56,7 @@ namespace
 template <class... Args>
 void print_error(fmt::format_string<Args...> format, Args&&... args)
 {
-	srb2::String formatted = srb2::format(format, std::forward<Args>(args)...);
-	CONS_Alert(CONS_ERROR, "Egg TV: %s\n", formatted.c_str());
+	CONS_Alert(CONS_ERROR, "Egg TV: %s\n", fmt::format(format, args...).c_str());
 }
 
 template <class To, class From>

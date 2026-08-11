@@ -16,7 +16,7 @@
     "libyuv",
     "opus",
     {
-      "name": "sdl3",
+      "name": "sdl2",
       "features": ["vulkan"]
     },
     "zlib"
